@@ -13,8 +13,7 @@ function DiagramImport({ onImport, onCancel }) {
   const [useAI, setUseAI] = useState(false);
   
   // Demo API key (obfuscated, but not truly secure - extractable from network)
-  // TODO: Replace with your actual OpenAI API key encoded in base64
-  const DEMO_API_KEY = 'REPLACE_WITH_YOUR_KEY'; // atob('base64_encoded_key_here');
+  const DEMO_API_KEY = atob('c2stcHJvai1MRnJsRmhkQ01NQkY5TkJSekhFY1Mtc1FPY21SRHlQTlljdXByM1QyMjFkTk1xb1Q0cVc3eFcxTlFfbXBOTWZsX0tuV0pXNGwwMFQzQmxia0ZKeE1uSFZNSWhvbGZoa3JCdlp6c05sdS13V25CeEZGODJENEpMTFkyYlhHQmNhTmpqVU9QT01IOWlwS21lTy1SQXFZSE5PdDktVUE=');
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
