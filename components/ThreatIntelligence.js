@@ -10,13 +10,19 @@ function ThreatIntelligence({ project }) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedSeverity, setSelectedSeverity] = React.useState('all');
 
-  // Fetch CVEs based on project components
+  // Fetch CVEs based on project threats
   const fetchThreatIntel = async () => {
+    if (!project.threats || project.threats.length === 0) {
+      alert('No threats found in this project. Please generate threats first.');
+      return;
+    }
+
     setLoading(true);
-    setProgress('Analyzing project components...');
+    setProgress('Analyzing project threats...');
+    
     try {
-      const keywords = extractKeywords(project);
-      setProgress(`Found ${keywords.length} keywords. Fetching CVEs...`);
+      const keywords = extractKeywordsFromThreats(project);
+      setProgress(`Found ${keywords.length} threat categories. Fetching relevant CVEs...`);
       const cves = await fetchCVEsFromNVD(keywords);
       setCveData(cves);
       setProgress('');
@@ -27,45 +33,53 @@ function ThreatIntelligence({ project }) {
     setLoading(false);
   };
 
-  // Extract keywords from project components
-  const extractKeywords = (project) => {
+  // Extract keywords from project threats (STRIDE categories + components)
+  const extractKeywordsFromThreats = (project) => {
     const keywords = new Set();
-    project.components.forEach(comp => {
-      const type = comp.type.toLowerCase();
-      const name = comp.name.toLowerCase();
+    
+    // Analyze threats
+    project.threats.forEach(threat => {
+      const desc = threat.description.toLowerCase();
+      const title = threat.title.toLowerCase();
+      const component = threat.component?.toLowerCase() || '';
       
-      // Infrastructure
-      if (type.includes('api') || name.includes('api')) keywords.add('api gateway');
-      if (type.includes('load balancer')) keywords.add('load balancer');
-      if (type.includes('firewall')) keywords.add('firewall');
-      if (type.includes('waf')) keywords.add('web application firewall');
+      // STRIDE-based keywords
+      if (threat.stride?.includes('S') || title.includes('spoof') || desc.includes('authentication')) {
+        keywords.add('authentication bypass');
+      }
+      if (threat.stride?.includes('T') || title.includes('tamper') || desc.includes('integrity')) {
+        keywords.add('data tampering');
+      }
+      if (threat.stride?.includes('R') || title.includes('repudiation')) {
+        keywords.add('audit logging');
+      }
+      if (threat.stride?.includes('I') || title.includes('information') || desc.includes('disclosure')) {
+        keywords.add('information disclosure');
+      }
+      if (threat.stride?.includes('D') || title.includes('denial') || desc.includes('availability')) {
+        keywords.add('denial of service');
+      }
+      if (threat.stride?.includes('E') || title.includes('elevation') || desc.includes('privilege')) {
+        keywords.add('privilege escalation');
+      }
       
-      // Compute
-      if (type.includes('web') || name.includes('web')) keywords.add('web application');
-      if (type.includes('container') || type.includes('docker')) keywords.add('docker');
-      if (type.includes('kubernetes') || type.includes('k8s')) keywords.add('kubernetes');
-      if (type.includes('lambda') || type.includes('serverless')) keywords.add('serverless');
-      
-      // Data
-      if (type.includes('database') || type.includes('sql') || type.includes('mysql') || type.includes('postgres')) keywords.add('database');
-      if (type.includes('nosql') || type.includes('mongodb')) keywords.add('nosql');
-      if (type.includes('redis') || type.includes('cache')) keywords.add('redis');
-      if (type.includes('s3') || type.includes('storage')) keywords.add('cloud storage');
-      
-      // AI/ML
-      if (type.includes('llm') || type.includes('gpt') || name.includes('llm')) keywords.add('large language model');
-      if (type.includes('ai') || type.includes('ml')) keywords.add('machine learning');
-      
-      // Security
-      if (type.includes('auth') || type.includes('oauth')) keywords.add('authentication');
-      if (type.includes('identity')) keywords.add('identity management');
+      // Component-specific keywords
+      if (component.includes('api') || desc.includes('api')) keywords.add('api security');
+      if (component.includes('database') || desc.includes('sql')) keywords.add('sql injection');
+      if (component.includes('web') || desc.includes('xss')) keywords.add('cross site scripting');
+      if (component.includes('auth') || desc.includes('oauth')) keywords.add('oauth');
+      if (component.includes('container') || desc.includes('docker')) keywords.add('container escape');
+      if (component.includes('kubernetes')) keywords.add('kubernetes');
+      if (component.includes('llm') || desc.includes('prompt')) keywords.add('prompt injection');
+      if (desc.includes('csrf')) keywords.add('csrf');
+      if (desc.includes('injection')) keywords.add('code injection');
+      if (desc.includes('deserialization')) keywords.add('deserialization');
     });
     
-    // Add general keywords if specific ones not found
+    // If no specific keywords found, use general ones
     if (keywords.size === 0) {
-      keywords.add('web application');
-      keywords.add('api');
-      keywords.add('cloud');
+      keywords.add('web application security');
+      keywords.add('api security');
     }
     
     return Array.from(keywords);
@@ -76,13 +90,15 @@ function ThreatIntelligence({ project }) {
     const results = [];
     const seenCVEs = new Set();
     
-    // Fetch up to 5 keywords with 20 results each
-    for (let i = 0; i < Math.min(keywords.length, 5); i++) {
-      const keyword = keywords[i];
-      setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${Math.min(keywords.length, 5)})...`);
+    // Limit to top 3 most relevant keywords
+    const topKeywords = keywords.slice(0, 3);
+    
+    for (let i = 0; i < topKeywords.length; i++) {
+      const keyword = topKeywords[i];
+      setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${topKeywords.length})...`);
       
       try {
-        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=50`;
+        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=30`;
         
         const response = await fetch(url);
         
@@ -104,26 +120,27 @@ function ThreatIntelligence({ project }) {
             const metrics = cve.metrics?.cvssMetricV31?.[0] || cve.metrics?.cvssMetricV2?.[0];
             const publishedDate = new Date(cve.published);
             
-            // Only include CVEs from last 3 years
-            const threeYearsAgo = new Date();
-            threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+            // Only include CVEs from last 5 years
+            const fiveYearsAgo = new Date();
+            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
             
-            if (publishedDate < threeYearsAgo) return;
+            if (publishedDate < fiveYearsAgo) return;
             
             results.push({
               id: cve.id,
               description: cve.descriptions?.[0]?.value || 'No description',
-              severity: metrics?.cvssData?.baseSeverity || 'UNKNOWN',
-              score: metrics?.cvssData?.baseScore || 0,
+              severity: metrics?.cvssData?.baseSeverity || 'MEDIUM',
+              score: metrics?.cvssData?.baseScore || 5.0,
               published: cve.published,
               publishedDate: publishedDate,
-              keyword: keyword
+              keyword: keyword,
+              matchedThreat: keyword
             });
           });
         }
         
         // Add delay to avoid rate limiting
-        if (i < Math.min(keywords.length, 5) - 1) {
+        if (i < topKeywords.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 6000));
         }
         
@@ -132,10 +149,10 @@ function ThreatIntelligence({ project }) {
       }
     }
     
-    // Sort by date (newest first), then by score
+    // Sort by severity score (highest first), then by date
     return results.sort((a, b) => {
-      const dateDiff = b.publishedDate - a.publishedDate;
-      return dateDiff !== 0 ? dateDiff : b.score - a.score;
+      const scoreDiff = b.score - a.score;
+      return scoreDiff !== 0 ? scoreDiff : b.publishedDate - a.publishedDate;
     });
   };
 
@@ -172,7 +189,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-info-circle"></i> Showing CVEs from the last 3 years relevant to your architecture
+        <i className="fas fa-info-circle"></i> Fetches CVEs matching your project's identified threats (STRIDE categories)
       </p>
 
       {cveData.length > 0 && (
@@ -201,7 +218,10 @@ function ThreatIntelligence({ project }) {
       {cveData.length === 0 && !loading && (
         <div className="empty-state">
           <i className="fas fa-shield-virus" style={{ fontSize: '3rem', color: 'var(--text-muted)', marginBottom: '1rem' }}></i>
-          <p>Click "Fetch Latest CVEs" to get real-time vulnerability data from NVD</p>
+          <p>Click "Fetch Latest CVEs" to get vulnerabilities matching your project threats</p>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+            Make sure you've generated threats first (Architecture → Generate Threats)
+          </p>
         </div>
       )}
 
@@ -226,7 +246,7 @@ function ThreatIntelligence({ project }) {
                   </a>
                 </h3>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  <i className="fas fa-tag"></i> {cve.keyword}
+                  <i className="fas fa-bullseye"></i> Matches: {cve.matchedThreat}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
