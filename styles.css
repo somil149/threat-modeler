@@ -411,6 +411,7 @@ body {
    ======================================== */
 
 @media (max-width: 768px) {
+  /* Mobile Layout */
   .sidebar {
     position: fixed;
     left: 0;
@@ -418,18 +419,165 @@ body {
     bottom: 0;
     z-index: 100;
     transform: translateX(-100%);
+    width: 280px;
   }
   
   .sidebar.open {
     transform: translateX(0);
+    box-shadow: var(--shadow-lg);
   }
   
+  /* Mobile overlay when sidebar is open */
+  .sidebar.open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 280px;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+  }
+  
+  /* Grids to single column */
   .grid-2, .grid-3, .grid-4 {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Content padding */
+  .content-area {
+    padding: 1rem;
+    width: 100%;
+  }
+  
+  /* Mobile header */
+  .header {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+  
+  /* Mobile buttons */
+  .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .btn-sm {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  /* Mobile cards */
+  .card {
+    padding: 1rem;
+  }
+  
+  /* Mobile modals */
+  .modal {
+    width: 95%;
+    max-width: 95%;
+    margin: 1rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  /* Mobile forms */
+  .input, .select, .textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  /* Mobile tables */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Hide text on small buttons */
+  .btn i + span {
+    display: none;
+  }
+  
+  /* Mobile navigation */
+  .nav-item {
+    padding: 0.75rem;
+  }
+  
+  /* Mobile canvas */
+  canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+  
+  /* Mobile flex */
+  .flex {
+    flex-wrap: wrap;
+  }
+  
+  /* Mobile typography */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.125rem; }
+  
+  /* Touch targets */
+  button, a, .nav-item {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
+  
+  .grid-3, .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
   }
   
   .content-area {
-    padding: 1rem;
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile landscape */
+@media (max-width: 768px) and (orientation: landscape) {
+  .modal {
+    max-height: 85vh;
+  }
+  
+  .sidebar {
+    width: 260px;
+  }
+}
+
+/* Small mobile */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+  }
+  
+  .modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+    margin: 0;
+    border-radius: 0;
+  }
+  
+  .card {
+    padding: 0.75rem;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .flex.gap-2 {
+    gap: 0.5rem;
   }
 }
 
@@ -448,3 +596,122 @@ body {
 .justify-between { justify-content: space-between; }
 .gap-1 { gap: 0.5rem; }
 .gap-2 { gap: 1rem; }
+
+
+
+/* ========================================
+   Mobile Touch Optimizations
+   ======================================== */
+
+/* Smooth scrolling on mobile */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Remove tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Better touch targets */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Prevent text selection on buttons */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Mobile-friendly scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Mobile safe areas (notch support) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+  
+  .header {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile menu toggle button */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 101;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Mobile-friendly canvas */
+@media (max-width: 768px) {
+  #architecture-canvas {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+}
+
+/* Responsive images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Mobile-friendly tables */
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    min-width: 600px;
+  }
+}
