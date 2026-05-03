@@ -176,19 +176,16 @@ function AttackPaths({ project }) {
                         {(() => {
                           console.log('DEBUG - Attack Path #' + (index + 1), {
                             pathComponents: chain.path,
-                            allThreats: project.threats?.map(t => ({
-                              id: t.id,
-                              component: t.component,
-                              componentName: t.componentName,
-                              title: t.title
-                            }))
+                            threatCount: project.threats?.length || 0
                           });
 
-                          // Match threats by component name OR component ID
+                          // Match threats by looking up component names from IDs
                           const pathThreats = project.threats?.filter(t => {
-                            const componentName = t.componentName || t.component;
-                            const componentId = t.component;
-                            const matches = chain.path.includes(componentName) || chain.path.includes(componentId);
+                            // Find the component for this threat
+                            const component = project.components?.find(c => c.id === t.component);
+                            const componentName = component?.name || t.componentName || t.component;
+                            
+                            const matches = chain.path.includes(componentName);
                             
                             if (matches) {
                               console.log('MATCHED threat:', t.title, 'for component:', componentName);
@@ -208,11 +205,15 @@ function AttackPaths({ project }) {
                             const priority = threat.likelihood * threat.impact >= 15 ? 'critical' :
                                            threat.likelihood * threat.impact >= 9 ? 'high' : 'medium';
                             
+                            // Look up component name from ID
+                            const component = project.components?.find(c => c.id === threat.component);
+                            const componentName = component?.name || threat.componentName || threat.component;
+                            
                             const mitigation = {
                               threat: threat.title,
                               mitigation: threat.mitigation,
                               detection: threat.detection,
-                              component: threat.componentName || threat.component,
+                              component: componentName,
                               priority: priority
                             };
 
