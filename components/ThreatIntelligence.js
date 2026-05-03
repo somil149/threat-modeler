@@ -9,6 +9,11 @@ function ThreatIntelligence({ project }) {
   const [progress, setProgress] = React.useState('');
   const [searchTerm, setSearchTerm] = React.useState('');
 
+  // Clear cache when project changes
+  React.useEffect(() => {
+    setCveData([]);
+  }, [project.id]);
+
   // Fetch CVEs based on project threats
   const fetchThreatIntel = async () => {
     if (!project.threats || project.threats.length === 0) {
@@ -17,17 +22,30 @@ function ThreatIntelligence({ project }) {
     }
 
     setLoading(true);
+    setCveData([]); // Clear previous results
     setProgress('Analyzing project threats...');
     
     try {
       const keywords = extractKeywordsFromThreats(project);
-      setProgress(`Found ${keywords.length} threat categories. Fetching relevant CVEs...`);
+      
+      if (keywords.length === 0) {
+        setProgress('No relevant keywords found in threats');
+        setLoading(false);
+        return;
+      }
+      
+      setProgress(`Found ${keywords.length} threat categories: ${keywords.map(k => k.keyword).join(', ')}`);
       const cves = await fetchCVEsFromNVD(keywords);
+      
+      if (cves.length === 0) {
+        setProgress('No CRITICAL/HIGH CVEs found for these threats');
+      }
+      
       setCveData(cves);
       setProgress('');
     } catch (error) {
       console.error('Failed to fetch threat intelligence:', error);
-      setProgress('Error fetching CVEs');
+      setProgress('Error fetching CVEs: ' + error.message);
     }
     setLoading(false);
   };
@@ -111,8 +129,11 @@ function ThreatIntelligence({ project }) {
       .sort((a, b) => b[1] - a[1])
       .map(([keyword, score]) => ({ keyword, score }));
     
+    console.log('Extracted keywords from threats:', sortedKeywords);
+    
     // If no specific keywords found, use general high-risk ones
     if (sortedKeywords.length === 0) {
+      console.log('No keywords found, using defaults');
       return [
         { keyword: 'remote code execution', score: 10 },
         { keyword: 'sql injection', score: 9 },
@@ -143,6 +164,8 @@ function ThreatIntelligence({ project }) {
         }
         
         const data = await response.json();
+        
+        console.log(`NVD API returned ${data.vulnerabilities?.length || 0} CVEs for "${keyword}"`);
         
         if (data.vulnerabilities) {
           data.vulnerabilities.forEach(vuln => {
@@ -196,8 +219,14 @@ function ThreatIntelligence({ project }) {
       }
     }
     
+    console.log(`Total CVEs found: ${results.length} (after filtering for CRITICAL/HIGH from last 5 years)`);
+    
     // Sort by relevance score (highest first)
-    return results.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 30); // Top 30 most relevant
+    const sorted = results.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 30); // Top 30 most relevant
+    
+    console.log(`Returning top ${sorted.length} most relevant CVEs`);
+    
+    return sorted;
   };
 
   // Filter CVEs
