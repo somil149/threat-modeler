@@ -1,4 +1,60 @@
 {
+  "categories": [
+    {
+      "id": "web-applications",
+      "name": "Web Applications",
+      "icon": "🌐",
+      "description": "Modern and legacy web application architectures"
+    },
+    {
+      "id": "mobile-applications",
+      "name": "Mobile Applications",
+      "icon": "📱",
+      "description": "Native and cross-platform mobile app architectures"
+    },
+    {
+      "id": "api-microservices",
+      "name": "API & Microservices",
+      "icon": "🔌",
+      "description": "API gateways and microservices architectures"
+    },
+    {
+      "id": "cloud-native",
+      "name": "Cloud Native",
+      "icon": "☁️",
+      "description": "Cloud-native and serverless architectures"
+    },
+    {
+      "id": "ai-ml-data",
+      "name": "AI/ML & Data",
+      "icon": "🤖",
+      "description": "AI, machine learning, and data pipeline architectures"
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise",
+      "icon": "🏢",
+      "description": "Enterprise and legacy system architectures"
+    },
+    {
+      "id": "financial",
+      "name": "Financial Services",
+      "icon": "💰",
+      "description": "Banking, payment, and financial system architectures"
+    },
+    {
+      "id": "iot-realtime",
+      "name": "IoT & Real-Time",
+      "icon": "📡",
+      "description": "IoT devices and real-time data processing"
+    },
+    {
+      "id": "security-identity",
+      "name": "Security & Identity",
+      "icon": "🔒",
+      "description": "Security, authentication, and identity management"
+    }
+  ],
   "templates": [
     {
       "id": "custom",
@@ -183,6 +239,258 @@
         { "from": "gateway", "to": "app2", "label": "Proxy", "protocol": "HTTPS" },
         { "from": "app1", "to": "data", "label": "Query", "protocol": "SQL" },
         { "from": "app2", "to": "data", "label": "Query", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "spa-app",
+      "name": "Single Page Application (SPA)",
+      "category": "web-applications",
+      "description": "Modern SPA with CDN and API backend",
+      "tags": ["spa", "react", "api", "cdn"],
+      "complexity": "medium",
+      "icon": "⚡",
+      "components": [
+        { "id": "browser", "name": "Browser", "type": "Browser", "trustBoundary": "external", "x": 100, "y": 250 },
+        { "id": "cdn", "name": "CDN", "type": "CDN", "trustBoundary": "dmz", "x": 250, "y": 250 },
+        { "id": "api", "name": "API Gateway", "type": "API Gateway", "trustBoundary": "dmz", "x": 400, "y": 250 },
+        { "id": "backend", "name": "Backend Service", "type": "Microservice", "trustBoundary": "internal", "x": 550, "y": 250 },
+        { "id": "db", "name": "Database", "type": "SQL Database", "trustBoundary": "internal", "x": 700, "y": 250 }
+      ],
+      "flows": [
+        { "from": "browser", "to": "cdn", "label": "Static Assets", "protocol": "HTTPS" },
+        { "from": "browser", "to": "api", "label": "REST API", "protocol": "HTTPS" },
+        { "from": "api", "to": "backend", "label": "Process Request", "protocol": "HTTP" },
+        { "from": "backend", "to": "db", "label": "Query Data", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "serverless-arch",
+      "name": "Serverless Architecture",
+      "category": "cloud-native",
+      "description": "AWS serverless with Lambda, API Gateway, and DynamoDB",
+      "tags": ["serverless", "lambda", "aws", "dynamodb"],
+      "complexity": "medium",
+      "icon": "⚡",
+      "components": [
+        { "id": "user", "name": "User", "type": "User", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "apigw", "name": "API Gateway", "type": "API Gateway", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "lambda1", "name": "Auth Lambda", "type": "Lambda Function", "trustBoundary": "internal", "x": 400, "y": 200 },
+        { "id": "lambda2", "name": "Business Lambda", "type": "Lambda Function", "trustBoundary": "internal", "x": 400, "y": 300 },
+        { "id": "lambda3", "name": "Data Lambda", "type": "Lambda Function", "trustBoundary": "internal", "x": 400, "y": 400 },
+        { "id": "dynamodb", "name": "DynamoDB", "type": "NoSQL Database", "trustBoundary": "internal", "x": 600, "y": 300 },
+        { "id": "s3", "name": "S3 Bucket", "type": "S3 Bucket", "trustBoundary": "internal", "x": 600, "y": 400 }
+      ],
+      "flows": [
+        { "from": "user", "to": "apigw", "label": "HTTPS Request", "protocol": "HTTPS" },
+        { "from": "apigw", "to": "lambda1", "label": "Invoke", "protocol": "AWS" },
+        { "from": "apigw", "to": "lambda2", "label": "Invoke", "protocol": "AWS" },
+        { "from": "lambda2", "to": "lambda3", "label": "Async Invoke", "protocol": "AWS" },
+        { "from": "lambda2", "to": "dynamodb", "label": "Query", "protocol": "AWS SDK" },
+        { "from": "lambda3", "to": "s3", "label": "Store", "protocol": "AWS SDK" }
+      ]
+    },
+    {
+      "id": "payment-gateway",
+      "name": "Payment Gateway",
+      "category": "financial",
+      "description": "Secure payment processing system",
+      "tags": ["payment", "pci-dss", "financial", "security"],
+      "complexity": "high",
+      "icon": "💳",
+      "components": [
+        { "id": "merchant", "name": "Merchant App", "type": "Web Server", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "gateway", "name": "Payment Gateway", "type": "API Gateway", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "fraud", "name": "Fraud Detection", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 200 },
+        { "id": "processor", "name": "Payment Processor", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 300 },
+        { "id": "vault", "name": "Token Vault", "type": "Secrets Manager", "trustBoundary": "internal", "x": 400, "y": 400 },
+        { "id": "bank", "name": "Bank API", "type": "Third-Party API", "trustBoundary": "external", "x": 600, "y": 300 },
+        { "id": "db", "name": "Transaction DB", "type": "SQL Database", "trustBoundary": "internal", "x": 600, "y": 400 }
+      ],
+      "flows": [
+        { "from": "merchant", "to": "gateway", "label": "Payment Request", "protocol": "HTTPS" },
+        { "from": "gateway", "to": "fraud", "label": "Risk Check", "protocol": "HTTP" },
+        { "from": "gateway", "to": "processor", "label": "Process Payment", "protocol": "HTTP" },
+        { "from": "processor", "to": "vault", "label": "Tokenize Card", "protocol": "HTTP" },
+        { "from": "processor", "to": "bank", "label": "Authorize", "protocol": "HTTPS" },
+        { "from": "processor", "to": "db", "label": "Log Transaction", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "iot-platform",
+      "name": "IoT Device Management",
+      "category": "iot-realtime",
+      "description": "IoT device management and monitoring platform",
+      "tags": ["iot", "mqtt", "devices", "monitoring"],
+      "complexity": "high",
+      "icon": "📡",
+      "components": [
+        { "id": "devices", "name": "IoT Devices", "type": "User", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "gateway", "name": "IoT Gateway", "type": "API Gateway", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "mqtt", "name": "MQTT Broker", "type": "Message Queue", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "registry", "name": "Device Registry", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 350 },
+        { "id": "processor", "name": "Data Processor", "type": "Microservice", "trustBoundary": "internal", "x": 550, "y": 250 },
+        { "id": "tsdb", "name": "Time-Series DB", "type": "NoSQL Database", "trustBoundary": "internal", "x": 700, "y": 250 },
+        { "id": "dashboard", "name": "Dashboard", "type": "Web Server", "trustBoundary": "dmz", "x": 700, "y": 350 }
+      ],
+      "flows": [
+        { "from": "devices", "to": "gateway", "label": "Telemetry", "protocol": "MQTT" },
+        { "from": "gateway", "to": "mqtt", "label": "Publish", "protocol": "MQTT" },
+        { "from": "gateway", "to": "registry", "label": "Register", "protocol": "HTTP" },
+        { "from": "mqtt", "to": "processor", "label": "Subscribe", "protocol": "MQTT" },
+        { "from": "processor", "to": "tsdb", "label": "Store Metrics", "protocol": "HTTP" },
+        { "from": "dashboard", "to": "tsdb", "label": "Query", "protocol": "HTTP" }
+      ]
+    },
+    {
+      "id": "sso-system",
+      "name": "Single Sign-On (SSO)",
+      "category": "security-identity",
+      "description": "Enterprise SSO with SAML/OIDC",
+      "tags": ["sso", "saml", "oidc", "authentication"],
+      "complexity": "high",
+      "icon": "🔐",
+      "components": [
+        { "id": "user", "name": "User", "type": "User", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "sp", "name": "Service Provider", "type": "Web Server", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "idp", "name": "Identity Provider", "type": "Identity Provider", "trustBoundary": "internal", "x": 400, "y": 300 },
+        { "id": "mfa", "name": "MFA Service", "type": "MFA", "trustBoundary": "internal", "x": 550, "y": 250 },
+        { "id": "userstore", "name": "User Directory", "type": "SQL Database", "trustBoundary": "internal", "x": 550, "y": 350 },
+        { "id": "audit", "name": "Audit Log", "type": "Logging Service", "trustBoundary": "internal", "x": 700, "y": 300 }
+      ],
+      "flows": [
+        { "from": "user", "to": "sp", "label": "Access Request", "protocol": "HTTPS" },
+        { "from": "sp", "to": "idp", "label": "SAML Request", "protocol": "HTTPS" },
+        { "from": "idp", "to": "mfa", "label": "2FA Challenge", "protocol": "HTTP" },
+        { "from": "idp", "to": "userstore", "label": "Verify User", "protocol": "LDAP" },
+        { "from": "idp", "to": "audit", "label": "Log Event", "protocol": "HTTP" },
+        { "from": "idp", "to": "sp", "label": "SAML Response", "protocol": "HTTPS" }
+      ]
+    },
+    {
+      "id": "ecommerce-platform",
+      "name": "E-commerce Platform",
+      "category": "web-applications",
+      "description": "Full-featured e-commerce system",
+      "tags": ["ecommerce", "shopping", "payment", "inventory"],
+      "complexity": "high",
+      "icon": "🛒",
+      "components": [
+        { "id": "user", "name": "Customer", "type": "User", "trustBoundary": "external", "x": 100, "y": 350 },
+        { "id": "web", "name": "Web Frontend", "type": "Web Server", "trustBoundary": "dmz", "x": 250, "y": 350 },
+        { "id": "product", "name": "Product Service", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "cart", "name": "Cart Service", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 350 },
+        { "id": "order", "name": "Order Service", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 450 },
+        { "id": "payment", "name": "Payment Gateway", "type": "Third-Party API", "trustBoundary": "external", "x": 600, "y": 350 },
+        { "id": "inventory", "name": "Inventory DB", "type": "SQL Database", "trustBoundary": "internal", "x": 600, "y": 250 },
+        { "id": "orderdb", "name": "Order DB", "type": "SQL Database", "trustBoundary": "internal", "x": 600, "y": 450 }
+      ],
+      "flows": [
+        { "from": "user", "to": "web", "label": "Browse", "protocol": "HTTPS" },
+        { "from": "web", "to": "product", "label": "Get Products", "protocol": "HTTP" },
+        { "from": "web", "to": "cart", "label": "Add to Cart", "protocol": "HTTP" },
+        { "from": "web", "to": "order", "label": "Checkout", "protocol": "HTTP" },
+        { "from": "product", "to": "inventory", "label": "Query", "protocol": "SQL" },
+        { "from": "order", "to": "payment", "label": "Process Payment", "protocol": "HTTPS" },
+        { "from": "order", "to": "orderdb", "label": "Save Order", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "ml-training",
+      "name": "ML Training Pipeline",
+      "category": "ai-ml-data",
+      "description": "Machine learning model training and deployment",
+      "tags": ["ml", "training", "mlops", "pipeline"],
+      "complexity": "high",
+      "icon": "🧠",
+      "components": [
+        { "id": "datasource", "name": "Data Source", "type": "SQL Database", "trustBoundary": "internal", "x": 100, "y": 300 },
+        { "id": "feature", "name": "Feature Store", "type": "NoSQL Database", "trustBoundary": "internal", "x": 250, "y": 300 },
+        { "id": "training", "name": "Training Service", "type": "Microservice", "trustBoundary": "internal", "x": 400, "y": 300 },
+        { "id": "registry", "name": "Model Registry", "type": "S3 Bucket", "trustBoundary": "internal", "x": 550, "y": 250 },
+        { "id": "serving", "name": "Model Serving", "type": "Model Serving", "trustBoundary": "dmz", "x": 550, "y": 350 },
+        { "id": "monitoring", "name": "ML Monitoring", "type": "Metrics Service", "trustBoundary": "internal", "x": 700, "y": 300 }
+      ],
+      "flows": [
+        { "from": "datasource", "to": "feature", "label": "Extract Features", "protocol": "SQL" },
+        { "from": "feature", "to": "training", "label": "Load Features", "protocol": "HTTP" },
+        { "from": "training", "to": "registry", "label": "Save Model", "protocol": "S3" },
+        { "from": "registry", "to": "serving", "label": "Deploy Model", "protocol": "HTTP" },
+        { "from": "serving", "to": "monitoring", "label": "Metrics", "protocol": "HTTP" }
+      ]
+    },
+    {
+      "id": "graphql-api",
+      "name": "GraphQL API",
+      "category": "api-microservices",
+      "description": "GraphQL API with multiple data sources",
+      "tags": ["graphql", "api", "federation", "gateway"],
+      "complexity": "medium",
+      "icon": "🔷",
+      "components": [
+        { "id": "client", "name": "Client App", "type": "Browser", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "graphql", "name": "GraphQL Server", "type": "API Gateway", "trustBoundary": "dmz", "x": 300, "y": 300 },
+        { "id": "resolver1", "name": "User Resolver", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 200 },
+        { "id": "resolver2", "name": "Product Resolver", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 300 },
+        { "id": "resolver3", "name": "Order Resolver", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 400 },
+        { "id": "cache", "name": "Redis Cache", "type": "Cache", "trustBoundary": "internal", "x": 700, "y": 250 },
+        { "id": "db", "name": "Database", "type": "SQL Database", "trustBoundary": "internal", "x": 700, "y": 350 }
+      ],
+      "flows": [
+        { "from": "client", "to": "graphql", "label": "GraphQL Query", "protocol": "HTTPS" },
+        { "from": "graphql", "to": "resolver1", "label": "Resolve", "protocol": "HTTP" },
+        { "from": "graphql", "to": "resolver2", "label": "Resolve", "protocol": "HTTP" },
+        { "from": "graphql", "to": "resolver3", "label": "Resolve", "protocol": "HTTP" },
+        { "from": "resolver1", "to": "cache", "label": "Cache Check", "protocol": "Redis" },
+        { "from": "resolver2", "to": "db", "label": "Query", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "event-driven",
+      "name": "Event-Driven Architecture",
+      "category": "api-microservices",
+      "description": "Event-driven microservices with message broker",
+      "tags": ["events", "kafka", "messaging", "async"],
+      "complexity": "high",
+      "icon": "📨",
+      "components": [
+        { "id": "producer", "name": "Event Producer", "type": "Microservice", "trustBoundary": "internal", "x": 100, "y": 300 },
+        { "id": "broker", "name": "Message Broker", "type": "Message Queue", "trustBoundary": "internal", "x": 300, "y": 300 },
+        { "id": "consumer1", "name": "Consumer A", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 200 },
+        { "id": "consumer2", "name": "Consumer B", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 300 },
+        { "id": "consumer3", "name": "Consumer C", "type": "Microservice", "trustBoundary": "internal", "x": 500, "y": 400 },
+        { "id": "eventstore", "name": "Event Store", "type": "NoSQL Database", "trustBoundary": "internal", "x": 700, "y": 300 }
+      ],
+      "flows": [
+        { "from": "producer", "to": "broker", "label": "Publish Event", "protocol": "Kafka" },
+        { "from": "broker", "to": "consumer1", "label": "Subscribe", "protocol": "Kafka" },
+        { "from": "broker", "to": "consumer2", "label": "Subscribe", "protocol": "Kafka" },
+        { "from": "broker", "to": "consumer3", "label": "Subscribe", "protocol": "Kafka" },
+        { "from": "consumer1", "to": "eventstore", "label": "Store Event", "protocol": "HTTP" },
+        { "from": "consumer2", "to": "eventstore", "label": "Store Event", "protocol": "HTTP" }
+      ]
+    },
+    {
+      "id": "data-lake",
+      "name": "Data Lake Architecture",
+      "category": "ai-ml-data",
+      "description": "Modern data lake with processing layers",
+      "tags": ["data-lake", "etl", "analytics", "big-data"],
+      "complexity": "high",
+      "icon": "🏞️",
+      "components": [
+        { "id": "sources", "name": "Data Sources", "type": "SQL Database", "trustBoundary": "internal", "x": 100, "y": 300 },
+        { "id": "ingestion", "name": "Ingestion Service", "type": "Microservice", "trustBoundary": "internal", "x": 250, "y": 300 },
+        { "id": "raw", "name": "Raw Storage", "type": "S3 Bucket", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "processing", "name": "Data Processing", "type": "Microservice", "trustBoundary": "internal", "x": 550, "y": 300 },
+        { "id": "curated", "name": "Curated Storage", "type": "S3 Bucket", "trustBoundary": "internal", "x": 700, "y": 250 },
+        { "id": "analytics", "name": "Analytics Engine", "type": "Microservice", "trustBoundary": "internal", "x": 700, "y": 350 }
+      ],
+      "flows": [
+        { "from": "sources", "to": "ingestion", "label": "Extract", "protocol": "SQL" },
+        { "from": "ingestion", "to": "raw", "label": "Store Raw", "protocol": "S3" },
+        { "from": "raw", "to": "processing", "label": "Process", "protocol": "S3" },
+        { "from": "processing", "to": "curated", "label": "Store Curated", "protocol": "S3" },
+        { "from": "curated", "to": "analytics", "label": "Analyze", "protocol": "S3" }
       ]
     }
   ]
