@@ -205,6 +205,16 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile Menu Toggle */}
+      <button 
+        className="mobile-menu-toggle" 
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle menu"
+      >
+        <i className={`fas ${sidebarOpen ? 'fa-times' : 'fa-bars'}`}></i>
+      </button>
+
+
       {/* Login Modal */}
       {showLogin && (
         <div className="modal-overlay">
