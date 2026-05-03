@@ -174,12 +174,30 @@ function AttackPaths({ project }) {
 
                         {/* Get unique mitigations from threats in this path */}
                         {(() => {
+                          console.log('DEBUG - Attack Path #' + (index + 1), {
+                            pathComponents: chain.path,
+                            allThreats: project.threats?.map(t => ({
+                              id: t.id,
+                              component: t.component,
+                              componentName: t.componentName,
+                              title: t.title
+                            }))
+                          });
+
                           // Match threats by component name OR component ID
                           const pathThreats = project.threats?.filter(t => {
                             const componentName = t.componentName || t.component;
                             const componentId = t.component;
-                            return chain.path.includes(componentName) || chain.path.includes(componentId);
+                            const matches = chain.path.includes(componentName) || chain.path.includes(componentId);
+                            
+                            if (matches) {
+                              console.log('MATCHED threat:', t.title, 'for component:', componentName);
+                            }
+                            
+                            return matches;
                           }) || [];
+
+                          console.log('Filtered pathThreats:', pathThreats.length);
 
                           // Group mitigations by priority
                           const criticalMitigations = [];
