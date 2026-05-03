@@ -59,68 +59,73 @@ function ThreatIntelligence({ project }) {
       const desc = threat.description.toLowerCase();
       const title = threat.title.toLowerCase();
       const component = threat.component?.toLowerCase() || '';
-      const riskScore = (threat.likelihood || 3) * (threat.impact || 3); // Higher risk = more relevant
+      const riskScore = (threat.likelihood || 3) * (threat.impact || 3);
       
-      // STRIDE-based keywords with risk weighting
-      if (threat.stride?.includes('S') || title.includes('spoof') || desc.includes('authentication')) {
-        keywordMap['authentication bypass'] = (keywordMap['authentication bypass'] || 0) + riskScore;
-        if (desc.includes('oauth') || component.includes('oauth')) {
-          keywordMap['oauth vulnerability'] = (keywordMap['oauth vulnerability'] || 0) + riskScore;
-        }
+      // Specific vulnerability keywords (avoid generic terms)
+      if (desc.includes('sql') || desc.includes('injection') && desc.includes('database')) {
+        keywordMap['sql injection'] = (keywordMap['sql injection'] || 0) + riskScore;
       }
-      if (threat.stride?.includes('T') || title.includes('tamper') || desc.includes('integrity')) {
-        if (desc.includes('sql') || component.includes('database')) {
-          keywordMap['sql injection'] = (keywordMap['sql injection'] || 0) + riskScore;
-        }
-        if (desc.includes('code') || desc.includes('script')) {
-          keywordMap['code injection'] = (keywordMap['code injection'] || 0) + riskScore;
-        }
-      }
-      if (threat.stride?.includes('I') || title.includes('information') || desc.includes('disclosure')) {
-        keywordMap['information disclosure'] = (keywordMap['information disclosure'] || 0) + riskScore;
-        if (desc.includes('path traversal') || desc.includes('directory')) {
-          keywordMap['path traversal'] = (keywordMap['path traversal'] || 0) + riskScore;
-        }
-      }
-      if (threat.stride?.includes('D') || title.includes('denial') || desc.includes('availability')) {
-        keywordMap['denial of service'] = (keywordMap['denial of service'] || 0) + riskScore;
-      }
-      if (threat.stride?.includes('E') || title.includes('elevation') || desc.includes('privilege')) {
-        keywordMap['privilege escalation'] = (keywordMap['privilege escalation'] || 0) + riskScore;
-      }
-      
-      // Specific vulnerability types
-      if (desc.includes('xss') || desc.includes('cross-site scripting')) {
+      if (desc.includes('xss') || desc.includes('cross-site scripting') || desc.includes('script injection')) {
         keywordMap['cross site scripting'] = (keywordMap['cross site scripting'] || 0) + riskScore;
       }
-      if (desc.includes('csrf') || desc.includes('cross-site request')) {
+      if (desc.includes('csrf') || desc.includes('cross-site request forgery')) {
         keywordMap['csrf'] = (keywordMap['csrf'] || 0) + riskScore;
       }
-      if (desc.includes('deserialization')) {
-        keywordMap['deserialization'] = (keywordMap['deserialization'] || 0) + riskScore;
+      if (desc.includes('authentication') && (desc.includes('bypass') || desc.includes('broken'))) {
+        keywordMap['authentication bypass'] = (keywordMap['authentication bypass'] || 0) + riskScore;
       }
-      if (desc.includes('xxe') || desc.includes('xml external')) {
+      if (desc.includes('oauth') || desc.includes('token')) {
+        keywordMap['oauth vulnerability'] = (keywordMap['oauth vulnerability'] || 0) + riskScore;
+      }
+      if (desc.includes('session') && (desc.includes('hijack') || desc.includes('fixation'))) {
+        keywordMap['session hijacking'] = (keywordMap['session hijacking'] || 0) + riskScore;
+      }
+      if (desc.includes('deserialization') || desc.includes('pickle') || desc.includes('yaml')) {
+        keywordMap['insecure deserialization'] = (keywordMap['insecure deserialization'] || 0) + riskScore;
+      }
+      if (desc.includes('xxe') || desc.includes('xml external entity')) {
         keywordMap['xxe'] = (keywordMap['xxe'] || 0) + riskScore;
       }
-      if (desc.includes('ssrf') || desc.includes('server-side request')) {
+      if (desc.includes('ssrf') || desc.includes('server-side request forgery')) {
         keywordMap['ssrf'] = (keywordMap['ssrf'] || 0) + riskScore;
       }
-      if (desc.includes('rce') || desc.includes('remote code execution')) {
+      if (desc.includes('rce') || desc.includes('remote code execution') || desc.includes('command injection')) {
         keywordMap['remote code execution'] = (keywordMap['remote code execution'] || 0) + riskScore;
+      }
+      if (desc.includes('path traversal') || desc.includes('directory traversal') || desc.includes('../')) {
+        keywordMap['path traversal'] = (keywordMap['path traversal'] || 0) + riskScore;
+      }
+      if (desc.includes('file upload') || desc.includes('unrestricted upload')) {
+        keywordMap['unrestricted file upload'] = (keywordMap['unrestricted file upload'] || 0) + riskScore;
+      }
+      if (desc.includes('privilege') && desc.includes('escalation')) {
+        keywordMap['privilege escalation'] = (keywordMap['privilege escalation'] || 0) + riskScore;
+      }
+      if (desc.includes('api') && (desc.includes('broken') || desc.includes('insecure'))) {
+        keywordMap['broken api'] = (keywordMap['broken api'] || 0) + riskScore;
+      }
+      if (desc.includes('jwt') || desc.includes('json web token')) {
+        keywordMap['jwt vulnerability'] = (keywordMap['jwt vulnerability'] || 0) + riskScore;
+      }
+      if (desc.includes('ldap') && desc.includes('injection')) {
+        keywordMap['ldap injection'] = (keywordMap['ldap injection'] || 0) + riskScore;
+      }
+      if (desc.includes('nosql') && desc.includes('injection')) {
+        keywordMap['nosql injection'] = (keywordMap['nosql injection'] || 0) + riskScore;
       }
       
       // Component-specific
-      if (component.includes('api') || desc.includes('api')) {
-        keywordMap['api security'] = (keywordMap['api security'] || 0) + riskScore;
-      }
-      if (component.includes('container') || desc.includes('docker')) {
+      if (component.includes('container') || component.includes('docker')) {
         keywordMap['container escape'] = (keywordMap['container escape'] || 0) + riskScore;
       }
-      if (component.includes('kubernetes')) {
-        keywordMap['kubernetes'] = (keywordMap['kubernetes'] || 0) + riskScore;
+      if (component.includes('kubernetes') || component.includes('k8s')) {
+        keywordMap['kubernetes privilege escalation'] = (keywordMap['kubernetes privilege escalation'] || 0) + riskScore;
       }
-      if (component.includes('llm') || desc.includes('prompt')) {
+      if (component.includes('llm') || desc.includes('prompt injection')) {
         keywordMap['prompt injection'] = (keywordMap['prompt injection'] || 0) + riskScore;
+      }
+      if (component.includes('redis') || component.includes('memcached')) {
+        keywordMap['cache poisoning'] = (keywordMap['cache poisoning'] || 0) + riskScore;
       }
     });
     
@@ -131,14 +136,24 @@ function ThreatIntelligence({ project }) {
     
     console.log('Extracted keywords from threats:', sortedKeywords);
     
-    // If no specific keywords found, use general high-risk ones
+    // If no specific keywords found, analyze components
     if (sortedKeywords.length === 0) {
-      console.log('No keywords found, using defaults');
-      return [
-        { keyword: 'remote code execution', score: 10 },
-        { keyword: 'sql injection', score: 9 },
-        { keyword: 'authentication bypass', score: 8 }
-      ];
+      console.log('No specific vulnerability keywords found, analyzing components...');
+      
+      const hasWeb = project.components.some(c => c.type.toLowerCase().includes('web'));
+      const hasAPI = project.components.some(c => c.type.toLowerCase().includes('api'));
+      const hasDB = project.components.some(c => c.type.toLowerCase().includes('database'));
+      
+      if (hasWeb) sortedKeywords.push({ keyword: 'cross site scripting', score: 8 });
+      if (hasAPI) sortedKeywords.push({ keyword: 'broken api', score: 8 });
+      if (hasDB) sortedKeywords.push({ keyword: 'sql injection', score: 9 });
+      
+      if (sortedKeywords.length === 0) {
+        return [
+          { keyword: 'remote code execution', score: 10 },
+          { keyword: 'authentication bypass', score: 9 }
+        ];
+      }
     }
     
     return sortedKeywords.slice(0, 5); // Top 5 most relevant
