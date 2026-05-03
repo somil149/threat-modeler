@@ -11,15 +11,29 @@ const Storage = {
     THEME: 'threatmodeler_theme'
   },
 
-  // Get all projects
+  // Get current user ID for data isolation
+  getCurrentUserId() {
+    const user = GitHubAuth?.getUser();
+    return user ? user.id : 'anonymous';
+  },
+
+  // Get user-specific storage key
+  getUserKey(baseKey) {
+    const userId = this.getCurrentUserId();
+    return `${baseKey}_user_${userId}`;
+  },
+
+  // Get all projects for current user
   getProjects() {
-    const data = localStorage.getItem(this.KEYS.PROJECTS);
+    const key = this.getUserKey(this.KEYS.PROJECTS);
+    const data = localStorage.getItem(key);
     return data ? JSON.parse(data) : [];
   },
 
-  // Save all projects
+  // Save all projects for current user
   saveProjects(projects) {
-    localStorage.setItem(this.KEYS.PROJECTS, JSON.stringify(projects));
+    const key = this.getUserKey(this.KEYS.PROJECTS);
+    localStorage.setItem(key, JSON.stringify(projects));
   },
 
   // Get project by ID
@@ -62,9 +76,9 @@ const Storage = {
     return null;
   },
 
-  // Version History
+  // Version History (user-specific)
   saveVersion(projectId, snapshot) {
-    const key = `${this.KEYS.PROJECTS}_versions_${projectId}`;
+    const key = this.getUserKey(`${this.KEYS.PROJECTS}_versions_${projectId}`);
     const versions = JSON.parse(localStorage.getItem(key) || '[]');
     versions.push({
       timestamp: new Date().toISOString(),
@@ -76,7 +90,7 @@ const Storage = {
   },
 
   getVersions(projectId) {
-    const key = `${this.KEYS.PROJECTS}_versions_${projectId}`;
+    const key = this.getUserKey(`${this.KEYS.PROJECTS}_versions_${projectId}`);
     return JSON.parse(localStorage.getItem(key) || '[]');
   },
 
@@ -96,14 +110,16 @@ const Storage = {
     this.saveProjects(filtered);
   },
 
-  // Current project
+  // Current project (user-specific)
   getCurrentProject() {
-    const id = localStorage.getItem(this.KEYS.CURRENT_PROJECT);
+    const key = this.getUserKey(this.KEYS.CURRENT_PROJECT);
+    const id = localStorage.getItem(key);
     return id ? this.getProject(id) : null;
   },
 
   setCurrentProject(id) {
-    localStorage.setItem(this.KEYS.CURRENT_PROJECT, id);
+    const key = this.getUserKey(this.KEYS.CURRENT_PROJECT);
+    localStorage.setItem(key, id);
   },
 
   // User profile
@@ -148,7 +164,7 @@ const Storage = {
     }
   },
 
-  // Template Builder
+  // Template Builder (user-specific)
   saveAsTemplate(project) {
     const templates = this.getCustomTemplates();
     const template = {
@@ -160,17 +176,20 @@ const Storage = {
       createdAt: new Date().toISOString()
     };
     templates.push(template);
-    localStorage.setItem('threatmodeler_custom_templates', JSON.stringify(templates));
+    const key = this.getUserKey('threatmodeler_custom_templates');
+    localStorage.setItem(key, JSON.stringify(templates));
     return template;
   },
 
   getCustomTemplates() {
-    return JSON.parse(localStorage.getItem('threatmodeler_custom_templates') || '[]');
+    const key = this.getUserKey('threatmodeler_custom_templates');
+    return JSON.parse(localStorage.getItem(key) || '[]');
   },
 
   deleteTemplate(id) {
     const templates = this.getCustomTemplates();
     const filtered = templates.filter(t => t.id !== id);
-    localStorage.setItem('threatmodeler_custom_templates', JSON.stringify(filtered));
+    const key = this.getUserKey('threatmodeler_custom_templates');
+    localStorage.setItem(key, JSON.stringify(filtered));
   }
 };
