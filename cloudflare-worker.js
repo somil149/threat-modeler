@@ -28,8 +28,8 @@ export default {
       
       console.log('Calling Gemini API...');
       
-      // Call Gemini API - use v1beta with correct format
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+      // Call Gemini API with correct model name (gemini-2.5-flash)
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
