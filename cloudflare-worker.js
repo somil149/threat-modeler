@@ -1,5 +1,6 @@
-// Cloudflare Worker - Hugging Face Proxy for ThreatModeler
+// Cloudflare Worker - Gemini API Proxy for ThreatModeler
 // Deploy this at: https://workers.cloudflare.com/
+// Updated: 2026-05-03 13:45
 
 export default {
   async fetch(request, env) {
