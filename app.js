@@ -112,7 +112,8 @@ function App() {
   };
 
   const renderView = () => {
-    if (!currentProject && currentView !== 'dashboard') {
+    // Allow dashboard and diagramimport without a project
+    if (!currentProject && currentView !== 'dashboard' && currentView !== 'diagramimport') {
       return <Dashboard 
         onProjectSelect={handleProjectSelect} 
         onImportDiagram={() => setCurrentView('diagramimport')}
