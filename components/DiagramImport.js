@@ -182,36 +182,6 @@ function DiagramImport({ onImport, onCancel }) {
     }
   };
 
-  const handleUseDemoKey = async () => {
-    if (!checkRateLimit()) {
-      alert('Demo limit reached (5 uses per day). Please use your own OpenAI API key for unlimited access.');
-      return;
-    }
-    
-    setShowApiKeyDialog(false);
-    setIsProcessing(true);
-
-    try {
-      // Re-fetch the file from uploadedImage URL
-      const response = await fetch(uploadedImage);
-      const blob = await response.blob();
-      const file = new File([blob], 'diagram.png', { type: blob.type });
-      
-      const components = await extractComponentsWithAI(file, DEMO_API_KEY);
-      incrementUsage();
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } catch (error) {
-      console.error('AI detection failed:', error);
-      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
-      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const extractComponentsWithAI = async (file) => {
     // Convert image to base64
     const base64 = await new Promise((resolve) => {
