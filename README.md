@@ -1,8 +1,31 @@
 # ThreatModeler 🛡️
 
-Modern, production-ready threat modeling web application that runs entirely on GitHub Pages. Built for security architects, developers, and security teams.
+**Modern, production-ready threat modeling platform with PWA support**
 
-**Live Demo:** https://somil149.github.io/threat-modeler/
+Built for security architects, developers, and security teams. Runs entirely client-side with offline capabilities.
+
+**🚀 Live Demo:** https://somil149.github.io/threat-modeler/  
+**📦 Current Version:** v2.0.0  
+**⭐ Latest:** PWA-enabled with offline support
+
+---
+
+## ✨ What's New in v2.0.0
+
+### **🎉 Major Features**
+- ✅ **PWA Support** - Install as desktop/mobile app
+- ✅ **Offline Mode** - Works without internet connection
+- ✅ **60+ Industry Threats** - OWASP Top 10, Cloud, API, Container security
+- ✅ **Enhanced Search** - Search threats by keyword with severity filters
+- ✅ **Collaboration** - Export/Import projects, shareable read-only links
+- ✅ **Keyboard Shortcuts** - Ctrl+S to save, Ctrl+/ for help
+- ✅ **10 Sample Diagrams** - Modern architectures ready to import
+
+### **📚 New Threat Libraries**
+- **OWASP Top 10 2021** - 30+ web application threats
+- **Cloud Security** - AWS, Azure, GCP, Kubernetes threats
+- **API Security** - OWASP API Top 10
+- **Container Security** - Docker, K8s vulnerabilities
 
 ---
 
@@ -83,7 +106,8 @@ Modern, production-ready threat modeling web application that runs entirely on G
 - **Authentication:** Firebase Auth
 - **Export:** jsPDF
 - **APIs:** NVD CVE Database
-- **Storage:** localStorage, IndexedDB
+- **Storage:** localStorage (with IndexedDB ready)
+- **PWA:** Service Worker, Web App Manifest
 - **Hosting:** GitHub Pages (static)
 
 ---
@@ -93,33 +117,55 @@ Modern, production-ready threat modeling web application that runs entirely on G
 ### **1. Access the App**
 Visit: https://somil149.github.io/threat-modeler/
 
-### **2. Login**
+### **2. Install as App (Optional)**
+**Desktop:** Click install icon (⊕) in address bar  
+**Mobile:** Menu → "Add to Home Screen"
+
+### **3. Login**
 - Click "Continue with Google" (or other provider)
 - Authenticate with your account
 
-### **3. Create Your First Threat Model**
+### **4. Create Your First Threat Model**
+
+**Option A: Import Sample Diagram**
+1. Click "Import Diagram"
+2. Choose from 10 modern architectures
+3. AI detects components automatically
+4. Review and generate threats
+
+**Option B: Build from Scratch**
 1. Click "New Project"
 2. Choose a template or "Custom Architecture"
-3. Add components from the library
+3. Add components from 60+ library
 4. Connect components with data flows
 5. Click "Generate Threats"
 6. Review and mitigate threats
 
-### **4. Explore Advanced Features**
+### **5. Explore Advanced Features**
+- **Search Threats:** Filter by keyword or severity
 - **Threat Intel:** Get real-time CVE data
 - **AI Suggestions:** Get security recommendations
 - **3D View:** Visualize in 3D
 - **Compliance:** Map to frameworks
-- **Export:** Download reports
+- **Export:** Download reports (PDF/JSON/CSV)
+- **Share:** Generate read-only link
+- **Keyboard Shortcuts:** Press Ctrl+/ for help
 
 ---
 
-## 📖 Documentation
+## 🎯 Sample Architectures
 
-- **[Testing Guide](docs/TESTING.md)** - Comprehensive test plan
-- **[OAuth Setup](docs/OAUTH_SETUP.md)** - Firebase Auth configuration
-- **[Deployment](docs/DEPLOYMENT.md)** - GitHub Pages deployment
-- **[Project Spec](docs/PROJECT_SPEC.md)** - Full specification
+**10 ready-to-use diagrams in `assets/sample-diagrams/`:**
+1. E-commerce Microservices
+2. AWS Serverless Architecture
+3. Kubernetes Platform
+4. IoT Platform
+5. Banking System
+6. AI/ML Platform
+7. Healthcare System (HIPAA)
+8. Social Media Platform
+9. Video Streaming Platform
+10. Blockchain DeFi Platform
 
 ---
 
@@ -153,15 +199,20 @@ Click the **?** icon in the top right to start!
 
 ## 🌟 Key Highlights
 
-- **60+ Components** across 7 categories
-- **15+ Major Features** across 3 phases
-- **Real-time CVE Data** from NVD
-- **AI-Powered Analysis** for security gaps
-- **3D Visualization** with Three.js
-- **Multi-Provider Auth** (Google, GitHub, Microsoft, Twitter)
-- **Compliance Ready** (NIST, ISO 27001, PCI-DSS)
-- **Fully Offline** (except Threat Intel)
-- **Zero Backend** - Pure static hosting
+- **🎨 20 Architecture Templates** - Pre-built threat models
+- **🧩 60+ Components** across 7 categories
+- **🔍 100+ Threat Patterns** - STRIDE framework
+- **📚 60+ Industry Threats** - OWASP, Cloud, API, Container
+- **🔐 Real-time CVE Data** from NVD
+- **🤖 AI-Powered Analysis** for security gaps
+- **🎮 3D Visualization** with Three.js
+- **🔑 Multi-Provider Auth** (Google, GitHub, Microsoft, Twitter)
+- **✅ Compliance Ready** (NIST, ISO 27001, PCI-DSS, GDPR, OWASP)
+- **📱 PWA Support** - Install as app, works offline
+- **🔗 Collaboration** - Export/Import/Share projects
+- **⌨️ Keyboard Shortcuts** - Power user features
+- **🚀 Zero Backend** - Pure static hosting
+- **📊 10 Sample Diagrams** - Modern architectures
 
 ---
 
@@ -224,19 +275,43 @@ MIT License - See LICENSE file for details
 ## 🎯 Roadmap
 
 ### **Completed ✅**
-- Phase 1: Quick Wins
-- Phase 2: Core Features
-- Phase 3: Advanced Features
-- Firebase Authentication
-- User Data Isolation
+- **v1.0.0** - Phase 1-3: Core Features
+- **v1.1.0** - Phase 4A: Collaboration (Export/Import/Share)
+- **v1.2.0** - Phase 4B: Enhanced Threat Library (60+ threats)
+- **v1.3.0** - Phase 4C: Keyboard Shortcuts & UX
+- **v1.6.0** - Phase 6A: Testing Infrastructure
+- **v1.7.0** - Phase 6B: Performance Optimization
+- **v2.0.0** - Phase 7: PWA & Offline Support
 
 ### **Future Enhancements 🚀**
 - Real-time collaboration
 - Team workspaces
-- Advanced AI with LLM integration
+- CISA KEV integration
+- MITRE ATT&CK mapping
+- AI-powered threat prioritization
 - Custom compliance frameworks
-- API for integrations
-- Mobile app
+- Mobile app (native)
+
+---
+
+## 📚 Documentation
+
+- **[Release Summary](RELEASE_SUMMARY.md)** - Complete v2.0.0 release notes
+- **[Improvement Plan](IMPROVEMENT_PLAN.md)** - Phased development plan
+- **[Testing Guide](docs/TESTING.md)** - Comprehensive test plan
+- **[Performance Guide](docs/PERFORMANCE.md)** - Optimization strategies
+- **[OAuth Setup](docs/OAUTH_SETUP.md)** - Firebase Auth configuration
+- **[Deployment](docs/DEPLOYMENT.md)** - GitHub Pages deployment
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+- **Ctrl+/** - Show shortcuts help
+- **Ctrl+S** - Save project
+- **Ctrl+E** - Export project
+- **Ctrl+F** - Search threats
+- **Escape** - Close modals
 
 ---
 
