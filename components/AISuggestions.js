@@ -20,50 +20,197 @@ function AISuggestions({ project, onApplySuggestion }) {
       const threats = project.threats || [];
       const flows = project.flows || [];
       
-      // Missing security components
-      const hasFirewall = components.some(c => c.type.toLowerCase().includes('firewall'));
-      const hasWAF = components.some(c => c.type.toLowerCase().includes('waf'));
-      const hasAuth = components.some(c => c.type.toLowerCase().includes('auth'));
-      const hasLogging = components.some(c => c.type.toLowerCase().includes('log'));
-      const hasAPI = components.some(c => c.type.toLowerCase().includes('api'));
-      const hasDatabase = components.some(c => c.type.toLowerCase().includes('database'));
+      console.log('Analyzing project:', { 
+        componentCount: components.length, 
+        threatCount: threats.length, 
+        flowCount: flows.length,
+        componentTypes: components.map(c => c.type)
+      });
       
-      if (hasAPI && !hasWAF) {
+      // Missing security components (flexible matching)
+      const hasFirewall = components.some(c => 
+        c.type?.toLowerCase().includes('firewall') || 
+        c.name?.toLowerCase().includes('firewall')
+      );
+      const hasWAF = components.some(c => 
+        c.type?.toLowerCase().includes('waf') || 
+        c.name?.toLowerCase().includes('waf')
+      );
+      const hasAuth = components.some(c => 
+        c.type?.toLowerCase().includes('auth') || 
+        c.type?.toLowerCase().includes('identity') ||
+        c.name?.toLowerCase().includes('auth') ||
+        c.name?.toLowerCase().includes('idp')
+      );
+      const hasLogging = components.some(c => 
+        c.type?.toLowerCase().includes('log') || 
+        c.type?.toLowerCase().includes('monitoring') ||
+        c.name?.toLowerCase().includes('log')
+      );
+      const hasAPI = components.some(c => 
+        c.type?.toLowerCase().includes('api') || 
+        c.type?.toLowerCase().includes('gateway') ||
+        c.name?.toLowerCase().includes('api')
+      );
+      const hasDatabase = components.some(c => 
+        c.type?.toLowerCase().includes('database') || 
+        c.type?.toLowerCase().includes('db') ||
+        c.type?.toLowerCase().includes('sql') ||
+        c.type?.toLowerCase().includes('nosql') ||
+        c.type?.toLowerCase().includes('dynamodb') ||
+        c.name?.toLowerCase().includes('database')
+      );
+      const hasExternal = components.some(c =>
+        c.type?.toLowerCase().includes('user') ||
+        c.type?.toLowerCase().includes('external') ||
+        c.type?.toLowerCase().includes('browser') ||
+        c.trustBoundary === 'external'
+      );
+      const hasEncryption = components.some(c =>
+        c.type?.toLowerCase().includes('vault') ||
+        c.type?.toLowerCase().includes('secrets') ||
+        c.type?.toLowerCase().includes('hsm')
+      );
+      const hasCache = components.some(c =>
+        c.type?.toLowerCase().includes('cache') ||
+        c.type?.toLowerCase().includes('redis')
+      );
+      
+      // Template-specific suggestions
+      const templateId = project.template;
+      
+      // Payment/Financial systems
+      if (templateId?.includes('payment') || templateId?.includes('financial') || templateId?.includes('ecommerce')) {
+        if (!hasEncryption) {
+          newSuggestions.push({
+            id: 'add_vault',
+            category: 'architecture',
+            priority: 'critical',
+            title: 'Add Secrets/Token Vault',
+            description: 'Financial systems require secure storage for sensitive data like payment tokens and credentials.',
+            impact: 'PCI-DSS compliance and secure credential management',
+            action: 'Add Component'
+          });
+        }
+        
+        newSuggestions.push({
+          id: 'pci_compliance',
+          category: 'compliance',
+          priority: 'critical',
+          title: 'Ensure PCI-DSS Compliance',
+          description: 'Payment systems must comply with PCI-DSS requirements. Review all 12 requirements.',
+          impact: 'Legal compliance and customer trust',
+          action: 'Review'
+        });
+      }
+      
+      // IoT systems
+      if (templateId?.includes('iot') || components.some(c => c.name?.toLowerCase().includes('device'))) {
+        newSuggestions.push({
+          id: 'device_auth',
+          category: 'architecture',
+          priority: 'high',
+          title: 'Implement Device Authentication',
+          description: 'IoT devices should use certificate-based authentication or device tokens.',
+          impact: 'Prevents unauthorized device access',
+          action: 'Review'
+        });
+        
+        if (!hasEncryption) {
+          newSuggestions.push({
+            id: 'device_encryption',
+            category: 'dataflow',
+            priority: 'high',
+            title: 'Enable End-to-End Encryption',
+            description: 'IoT telemetry data should be encrypted in transit and at rest.',
+            impact: 'Protects sensitive device data',
+            action: 'Review'
+          });
+        }
+      }
+      
+      // AI/ML systems
+      if (templateId?.includes('llm') || templateId?.includes('rag') || templateId?.includes('agent') || templateId?.includes('ml')) {
+        newSuggestions.push({
+          id: 'prompt_injection',
+          category: 'threats',
+          priority: 'high',
+          title: 'Add Prompt Injection Protections',
+          description: 'LLM systems are vulnerable to prompt injection attacks. Implement input validation and output filtering.',
+          impact: 'Prevents malicious prompt manipulation',
+          action: 'Add Mitigation'
+        });
+        
+        newSuggestions.push({
+          id: 'data_privacy',
+          category: 'compliance',
+          priority: 'high',
+          title: 'Review Data Privacy for AI',
+          description: 'Ensure training data and user inputs comply with GDPR/privacy regulations.',
+          impact: 'Legal compliance and user privacy',
+          action: 'Review'
+        });
+      }
+      
+      // Serverless systems
+      if (templateId?.includes('serverless') || components.some(c => c.type?.toLowerCase().includes('lambda'))) {
+        newSuggestions.push({
+          id: 'lambda_timeout',
+          category: 'architecture',
+          priority: 'medium',
+          title: 'Configure Function Timeouts',
+          description: 'Set appropriate timeout values for Lambda functions to prevent resource exhaustion.',
+          impact: 'Prevents DoS and cost overruns',
+          action: 'Review'
+        });
+      }
+      
+      // General security components
+      if (hasAPI && !hasWAF && !hasFirewall) {
         newSuggestions.push({
           id: 'add_waf',
           category: 'architecture',
           priority: 'high',
           title: 'Add Web Application Firewall (WAF)',
-          description: 'Your API Gateway lacks WAF protection. Add a WAF to protect against OWASP Top 10 attacks.',
+          description: 'Your API lacks WAF protection. Add a WAF to protect against OWASP Top 10 attacks.',
           impact: 'Prevents SQL injection, XSS, and other common web attacks',
-          action: 'Add Component',
-          component: { type: 'WAF', name: 'Web Application Firewall' }
+          action: 'Add Component'
         });
       }
       
-      if (!hasAuth && (hasAPI || hasDatabase)) {
+      if (!hasAuth && (hasAPI || hasDatabase) && hasExternal) {
         newSuggestions.push({
           id: 'add_auth',
           category: 'architecture',
           priority: 'critical',
           title: 'Add Authentication Service',
-          description: 'No authentication component detected. Add an identity provider to secure access.',
-          impact: 'Prevents unauthorized access to APIs and data',
-          action: 'Add Component',
-          component: { type: 'Identity Provider', name: 'Auth Service' }
+          description: 'No authentication component detected. External users can access APIs/databases directly.',
+          impact: 'Prevents unauthorized access',
+          action: 'Add Component'
         });
       }
       
-      if (!hasLogging) {
+      if (!hasLogging && components.length > 3) {
         newSuggestions.push({
           id: 'add_logging',
           category: 'architecture',
           priority: 'medium',
           title: 'Add Centralized Logging',
-          description: 'No logging component found. Add centralized logging for security monitoring and incident response.',
+          description: 'No logging component found. Add centralized logging for security monitoring.',
           impact: 'Enables threat detection and forensic analysis',
-          action: 'Add Component',
-          component: { type: 'Logging Service', name: 'Centralized Logs' }
+          action: 'Add Component'
+        });
+      }
+      
+      if (hasDatabase && !hasCache && components.length > 5) {
+        newSuggestions.push({
+          id: 'add_cache',
+          category: 'architecture',
+          priority: 'low',
+          title: 'Consider Adding Cache Layer',
+          description: 'A cache layer can improve performance and reduce database load.',
+          impact: 'Better performance and scalability',
+          action: 'Consider'
         });
       }
       
