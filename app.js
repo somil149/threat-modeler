@@ -127,6 +127,8 @@ function App() {
         return <ArchitectureCanvas project={currentProject} onUpdate={handleProjectUpdate} />;
       case 'threats':
         return <ThreatList project={currentProject} onUpdate={handleProjectUpdate} />;
+      case 'intelligence':
+        return <ThreatIntelligence project={currentProject} />;
       case 'risk':
         return <RiskMatrix project={currentProject} />;
       case 'attackpaths':
@@ -259,6 +261,14 @@ function App() {
               >
                 <i className="fas fa-exclamation-triangle"></i>
                 <span>Threats</span>
+              </button>
+
+              <button
+                className={`nav-item ${currentView === 'intelligence' ? 'active' : ''}`}
+                onClick={() => setCurrentView('intelligence')}
+              >
+                <i className="fas fa-shield-virus"></i>
+                <span>Threat Intel</span>
               </button>
 
               <button
