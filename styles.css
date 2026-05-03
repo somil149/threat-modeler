@@ -413,17 +413,17 @@ body {
 @media (max-width: 768px) {
   /* Mobile Layout */
   .sidebar {
-    position: fixed;
+    position: fixed !important;
     left: 0;
     top: 0;
     bottom: 0;
     z-index: 100;
-    transform: translateX(-100%);
+    transform: translateX(-100%) !important;
     width: 280px;
   }
   
   .sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
     box-shadow: var(--shadow-lg);
   }
   

@@ -15,6 +15,17 @@ function App() {
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
 
+  // Debug: Log sidebar state changes
+  useEffect(() => {
+    console.log('Sidebar state changed:', sidebarOpen);
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+      console.log('Sidebar classes:', sidebar.className);
+      console.log('Sidebar computed transform:', window.getComputedStyle(sidebar).transform);
+    }
+  }, [sidebarOpen]);
+
+
   // Check authentication on mount
   useEffect(() => {
     // Wait for FirebaseAuth to initialize
@@ -208,7 +219,11 @@ function App() {
       {/* Mobile Menu Toggle */}
       <button 
         className="mobile-menu-toggle" 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
+        onClick={() => {
+          console.log('Mobile menu clicked, sidebarOpen:', sidebarOpen);
+          setSidebarOpen(!sidebarOpen);
+          console.log('After click, sidebarOpen will be:', !sidebarOpen);
+        }}
         aria-label="Toggle menu"
       >
         <i className={`fas ${sidebarOpen ? 'fa-times' : 'fa-bars'}`}></i>
