@@ -129,6 +129,8 @@ function App() {
         return <ThreatList project={currentProject} onUpdate={handleProjectUpdate} />;
       case 'intelligence':
         return <ThreatIntelligence project={currentProject} />;
+      case 'aisuggestions':
+        return <AISuggestions project={currentProject} onApplySuggestion={null} />;
       case 'risk':
         return <RiskMatrix project={currentProject} />;
       case 'attackpaths':
@@ -269,6 +271,14 @@ function App() {
               >
                 <i className="fas fa-shield-virus"></i>
                 <span>Threat Intel</span>
+              </button>
+
+              <button
+                className={`nav-item ${currentView === 'aisuggestions' ? 'active' : ''}`}
+                onClick={() => setCurrentView('aisuggestions')}
+              >
+                <i className="fas fa-magic"></i>
+                <span>AI Suggestions</span>
               </button>
 
               <button
