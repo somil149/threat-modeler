@@ -128,6 +128,8 @@ function App() {
       case 'diagramimport':
         return <DiagramImport 
           onImport={(data) => {
+            console.log('DiagramImport - onImport called with data:', data);
+            
             // Create new project from imported diagram
             const newProject = {
               id: Date.now().toString(),
@@ -141,7 +143,10 @@ function App() {
               updatedAt: new Date().toISOString(),
               isFinalized: false
             };
+            
+            console.log('Created new project:', newProject);
             Storage.saveProject(newProject);
+            console.log('Project saved, setting current project and view');
             setCurrentProject(newProject);
             setCurrentView('architecture');
           }}

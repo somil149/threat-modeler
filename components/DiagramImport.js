@@ -178,13 +178,20 @@ function DiagramImport({ onImport, onCancel }) {
   };
 
   const handleConfirmImport = () => {
+    console.log('handleConfirmImport called');
+    console.log('detectedComponents:', detectedComponents);
+    
     if (detectedComponents.components && detectedComponents.components.length > 0) {
+      console.log('Calling onImport with data');
       onImport({
         components: detectedComponents.components,
         flows: detectedComponents.flows || [],
         name: selectedSample.name,
         description: selectedSample.description
       });
+    } else {
+      console.error('No components detected!');
+      alert('No components detected. Please try another diagram.');
     }
   };
 
