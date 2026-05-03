@@ -105,7 +105,7 @@ function DiagramImport({ onImport, onCancel }) {
     setUploadedImage(imageUrl);
 
     // Check if user wants AI detection
-    const hasApiKey = localStorage.getItem('openai_api_key');
+    const hasApiKey = localStorage.getItem('openrouter_api_key');
     if (hasApiKey || useAI) {
       setIsProcessing(true);
       try {
