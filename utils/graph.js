@@ -81,22 +81,79 @@ const Graph = {
 
   // Generate attack chains based on threats
   generateAttackChains(components, flows, threats) {
+    if (!components || !flows || !threats || components.length === 0) {
+      console.log('Missing data for attack chain generation');
+      return [];
+    }
+
     const graph = this.buildGraph(components, flows);
     const chains = [];
 
-    // Find entry points (external components)
-    const entryPoints = components.filter(c => c.type === 'external' || c.type === 'user');
+    // Find entry points (external components) - flexible matching
+    const entryPoints = components.filter(c => {
+      const type = (c.type || '').toLowerCase();
+      const name = (c.name || '').toLowerCase();
+      const boundary = (c.trustBoundary || '').toLowerCase();
+      
+      return boundary === 'external' ||
+             type.includes('user') ||
+             type.includes('external') ||
+             type.includes('browser') ||
+             type.includes('mobile') ||
+             type.includes('client') ||
+             name.includes('user') ||
+             name.includes('client');
+    });
     
-    // Find high-value targets (databases, APIs)
-    const targets = components.filter(c => c.type === 'database' || c.type === 'api');
+    // Find high-value targets (databases, APIs, services) - flexible matching
+    const targets = components.filter(c => {
+      const type = (c.type || '').toLowerCase();
+      const name = (c.name || '').toLowerCase();
+      
+      return type.includes('database') ||
+             type.includes('db') ||
+             type.includes('sql') ||
+             type.includes('nosql') ||
+             type.includes('api') ||
+             type.includes('service') ||
+             type.includes('storage') ||
+             type.includes('vault') ||
+             type.includes('secrets') ||
+             name.includes('database') ||
+             name.includes('api') ||
+             name.includes('storage');
+    });
 
-    entryPoints.forEach(entry => {
-      targets.forEach(target => {
+    console.log('Attack chain analysis:', {
+      totalComponents: components.length,
+      entryPoints: entryPoints.length,
+      targets: targets.length,
+      threats: threats.length
+    });
+
+    // If no entry points or targets found, use all components
+    const effectiveEntryPoints = entryPoints.length > 0 ? entryPoints : components.slice(0, Math.min(3, components.length));
+    const effectiveTargets = targets.length > 0 ? targets : components.slice(-Math.min(3, components.length));
+
+    effectiveEntryPoints.forEach(entry => {
+      effectiveTargets.forEach(target => {
+        if (entry.id === target.id) return; // Skip same component
+        
         const paths = this.findAllPaths(graph, entry.id, target.id);
         
         paths.forEach(path => {
-          // Find threats along this path
-          const pathThreats = threats.filter(t => path.includes(t.component));
+          // Find threats along this path - match by component name or ID
+          const pathComponents = path.map(nodeId => 
+            components.find(c => c.id === nodeId)
+          ).filter(Boolean);
+          
+          const pathThreats = threats.filter(t => {
+            return pathComponents.some(c => 
+              t.component === c.name || 
+              t.component === c.id ||
+              (c.name && t.component && c.name.toLowerCase().includes(t.component.toLowerCase()))
+            );
+          });
           
           if (pathThreats.length > 0) {
             chains.push({
