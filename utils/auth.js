@@ -4,7 +4,7 @@
 
 const GitHubAuth = {
   // Replace with your GitHub OAuth App Client ID
-  CLIENT_ID: 'YOUR_GITHUB_CLIENT_ID', // TODO: Replace this after creating OAuth app
+  CLIENT_ID: 'Ov23li7T02IBwQ4gkS5Z', // TODO: Replace this after creating OAuth app
   
   REDIRECT_URI: window.location.origin + window.location.pathname,
   STORAGE_KEY: 'github_auth_token',
