@@ -299,7 +299,7 @@ function App() {
       )}
 
       {/* Sidebar */}
-      <div className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
+      <div className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
           <div className="logo">
             <i className="fas fa-shield-alt"></i>
