@@ -12,6 +12,30 @@ function App() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [versions, setVersions] = useState([]);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showLogin, setShowLogin] = useState(false);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Handle OAuth callback
+      const callbackUser = await GitHubAuth.handleCallback();
+      if (callbackUser) {
+        setUser(callbackUser);
+        return;
+      }
+
+      // Check existing auth
+      if (GitHubAuth.isAuthenticated()) {
+        const existingUser = GitHubAuth.getUser();
+        setUser(existingUser);
+      } else {
+        setShowLogin(true);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Apply theme
   useEffect(() => {
@@ -99,6 +123,36 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Login Modal */}
+      {showLogin && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: '400px' }}>
+            <div className="modal-header">
+              <h2>
+                <i className="fas fa-shield-alt" style={{ color: 'var(--accent)', marginRight: '0.5rem' }}></i>
+                Welcome to ThreatModeler
+              </h2>
+            </div>
+            <div className="modal-body" style={{ textAlign: 'center' }}>
+              <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+                Sign in with GitHub to save your threat models securely
+              </p>
+              <button
+                className="btn btn-primary"
+                onClick={() => GitHubAuth.login()}
+                style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+              >
+                <i className="fab fa-github" style={{ marginRight: '0.5rem' }}></i>
+                Sign in with GitHub
+              </button>
+              <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Your data is stored locally. GitHub login is used for identity only.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <div className={`sidebar ${sidebarOpen ? '' : 'closed'}`}>
         <div className="sidebar-header">
@@ -187,6 +241,24 @@ function App() {
           </div>
 
           <div className="topbar-right">
+            {user && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginRight: '1rem' }}>
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2px solid var(--accent)' }}
+                />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{user.name}</span>
+                  <button
+                    onClick={() => GitHubAuth.logout()}
+                    style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            )}
             {currentProject && (
               <>
                 <button className="btn-secondary btn-sm" onClick={handleShowVersions} title="Version History">
