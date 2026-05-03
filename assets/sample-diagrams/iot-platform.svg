@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">IoT Platform Architecture</text>
+  
+  <!-- IoT Devices -->
+  <rect x="50" y="100" width="100" height="60" fill="#00BCD4" stroke="#0097A7" stroke-width="2" rx="5"/>
+  <text x="100" y="135" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Smart Sensors</text>
+  
+  <rect x="50" y="180" width="100" height="60" fill="#00BCD4" stroke="#0097A7" stroke-width="2" rx="5"/>
+  <text x="100" y="215" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Cameras</text>
+  
+  <rect x="50" y="260" width="100" height="60" fill="#00BCD4" stroke="#0097A7" stroke-width="2" rx="5"/>
+  <text x="100" y="295" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Wearables</text>
+  
+  <rect x="50" y="340" width="100" height="60" fill="#00BCD4" stroke="#0097A7" stroke-width="2" rx="5"/>
+  <text x="100" y="375" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Industrial IoT</text>
+  
+  <!-- IoT Gateway -->
+  <rect x="220" y="200" width="130" height="80" fill="#FF9800" stroke="#F57C00" stroke-width="2" rx="5"/>
+  <text x="285" y="235" font-size="13" font-weight="bold" text-anchor="middle" fill="white">IoT Gateway</text>
+  <text x="285" y="255" font-size="10" text-anchor="middle" fill="white">(Edge Computing)</text>
+  
+  <!-- MQTT Broker -->
+  <rect x="420" y="120" width="130" height="70" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="485" y="150" font-size="12" font-weight="bold" text-anchor="middle" fill="white">MQTT Broker</text>
+  <text x="485" y="170" font-size="10" text-anchor="middle" fill="white">(Mosquitto)</text>
+  
+  <!-- Message Queue -->
+  <rect x="420" y="210" width="130" height="70" fill="#E91E63" stroke="#C2185B" stroke-width="2" rx="5"/>
+  <text x="485" y="240" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Kafka</text>
+  <text x="485" y="260" font-size="10" text-anchor="middle" fill="white">(Stream Processing)</text>
+  
+  <!-- Device Registry -->
+  <rect x="420" y="300" width="130" height="70" fill="#607D8B" stroke="#455A64" stroke-width="2" rx="5"/>
+  <text x="485" y="330" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Device Registry</text>
+  <text x="485" y="350" font-size="10" text-anchor="middle" fill="white">(Identity/Auth)</text>
+  
+  <!-- Processing Layer -->
+  <rect x="620" y="120" width="130" height="70" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="685" y="150" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Stream Processor</text>
+  <text x="685" y="170" font-size="10" text-anchor="middle" fill="white">(Apache Flink)</text>
+  
+  <rect x="620" y="210" width="130" height="70" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="685" y="240" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Analytics Engine</text>
+  <text x="685" y="260" font-size="10" text-anchor="middle" fill="white">(Spark)</text>
+  
+  <rect x="620" y="300" width="130" height="70" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="685" y="330" font-size="12" font-weight="bold" text-anchor="middle" fill="white">ML Pipeline</text>
+  <text x="685" y="350" font-size="10" text-anchor="middle" fill="white">(Anomaly Detection)</text>
+  
+  <!-- Storage Layer -->
+  <rect x="820" y="120" width="130" height="70" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="885" y="150" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Time Series DB</text>
+  <text x="885" y="170" font-size="10" text-anchor="middle" fill="white">(InfluxDB)</text>
+  
+  <rect x="820" y="210" width="130" height="70" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="885" y="240" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Document DB</text>
+  <text x="885" y="260" font-size="10" text-anchor="middle" fill="white">(MongoDB)</text>
+  
+  <rect x="820" y="300" width="130" height="70" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="885" y="330" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Data Lake</text>
+  <text x="885" y="350" font-size="10" text-anchor="middle" fill="white">(S3/HDFS)</text>
+  
+  <!-- Application Layer -->
+  <rect x="1020" y="150" width="130" height="70" fill="#FF5722" stroke="#E64A19" stroke-width="2" rx="5"/>
+  <text x="1085" y="180" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Dashboard API</text>
+  <text x="1085" y="200" font-size="10" text-anchor="middle" fill="white">(REST/GraphQL)</text>
+  
+  <rect x="1020" y="240" width="130" height="70" fill="#FF5722" stroke="#E64A19" stroke-width="2" rx="5"/>
+  <text x="1085" y="270" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Web Dashboard</text>
+  <text x="1085" y="290" font-size="10" text-anchor="middle" fill="white">(React/Vue)</text>
+  
+  <!-- Alert System -->
+  <rect x="620" y="450" width="130" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="685" y="475" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Alert System</text>
+  <text x="685" y="495" font-size="10" text-anchor="middle" fill="white">(Notifications)</text>
+  
+  <!-- Device Management -->
+  <rect x="820" y="450" width="130" height="60" fill="#795548" stroke="#5D4037" stroke-width="2" rx="5"/>
+  <text x="885" y="475" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Device Mgmt</text>
+  <text x="885" y="495" font-size="10" text-anchor="middle" fill="white">(OTA Updates)</text>
+  
+  <!-- Connections -->
+  <line x1="150" y1="130" x2="220" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="210" x2="220" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="290" x2="220" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="370" x2="220" y2="260" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="350" y1="240" x2="420" y2="155" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="350" y1="240" x2="420" y2="245" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="350" y1="240" x2="420" y2="335" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="550" y1="155" x2="620" y2="155" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="245" x2="620" y2="245" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="245" x2="620" y2="335" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="750" y1="155" x2="820" y2="155" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="245" x2="820" y2="245" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="335" x2="820" y2="335" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="950" y1="155" x2="1020" y2="185" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="950" y1="245" x2="1020" y2="275" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="685" y1="370" x2="685" y2="450" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="485" y1="370" x2="820" y2="480" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

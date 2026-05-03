@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Video Streaming Platform Architecture</text>
+  
+  <!-- Client Devices -->
+  <rect x="50" y="100" width="100" height="55" fill="#E50914" stroke="#B20710" stroke-width="2" rx="5"/>
+  <text x="100" y="132" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Smart TV</text>
+  
+  <rect x="50" y="170" width="100" height="55" fill="#E50914" stroke="#B20710" stroke-width="2" rx="5"/>
+  <text x="100" y="202" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Mobile App</text>
+  
+  <rect x="50" y="240" width="100" height="55" fill="#E50914" stroke="#B20710" stroke-width="2" rx="5"/>
+  <text x="100" y="272" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Web Browser</text>
+  
+  <rect x="50" y="310" width="100" height="55" fill="#E50914" stroke="#B20710" stroke-width="2" rx="5"/>
+  <text x="100" y="342" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Game Console</text>
+  
+  <!-- CDN -->
+  <rect x="210" y="180" width="130" height="70" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="275" y="210" font-size="12" font-weight="bold" text-anchor="middle" fill="white">CDN</text>
+  <text x="275" y="230" font-size="10" text-anchor="middle" fill="white">(CloudFront/Akamai)</text>
+  
+  <!-- API Gateway -->
+  <rect x="400" y="80" width="130" height="60" fill="#FF9800" stroke="#F57C00" stroke-width="2" rx="5"/>
+  <text x="465" y="115" font-size="12" font-weight="bold" text-anchor="middle" fill="white">API Gateway</text>
+  
+  <!-- Core Services -->
+  <rect x="400" y="160" width="130" height="55" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="465" y="192" font-size="11" font-weight="bold" text-anchor="middle" fill="white">User Service</text>
+  
+  <rect x="400" y="230" width="130" height="55" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="465" y="262" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Content Service</text>
+  
+  <rect x="400" y="300" width="130" height="55" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="465" y="332" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Playback Service</text>
+  
+  <rect x="400" y="370" width="130" height="55" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="465" y="402" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Search Service</text>
+  
+  <!-- Video Processing -->
+  <rect x="590" y="80" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="655" y="107" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Upload Service</text>
+  <text x="655" y="122" font-size="9" text-anchor="middle" fill="white">(Multipart)</text>
+  
+  <rect x="590" y="150" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="655" y="177" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Transcoding</text>
+  <text x="655" y="192" font-size="9" text-anchor="middle" fill="white">(FFmpeg/MediaConvert)</text>
+  
+  <rect x="590" y="220" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="655" y="247" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Thumbnail Gen</text>
+  <text x="655" y="262" font-size="9" text-anchor="middle" fill="white">(Image Processing)</text>
+  
+  <rect x="590" y="290" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="655" y="317" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Subtitle Service</text>
+  <text x="655" y="332" font-size="9" text-anchor="middle" fill="white">(Multi-language)</text>
+  
+  <rect x="590" y="360" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="655" y="387" font-size="11" font-weight="bold" text-anchor="middle" fill="white">DRM Service</text>
+  <text x="655" y="402" font-size="9" text-anchor="middle" fill="white">(Widevine/FairPlay)</text>
+  
+  <!-- Recommendation & Analytics -->
+  <rect x="590" y="430" width="130" height="55" fill="#FF5722" stroke="#E64A19" stroke-width="2" rx="5"/>
+  <text x="655" y="457" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Recommend Svc</text>
+  <text x="655" y="472" font-size="9" text-anchor="middle" fill="white">(ML-based)</text>
+  
+  <!-- Storage -->
+  <rect x="780" y="100" width="130" height="55" fill="#569A31" stroke="#3F7023" stroke-width="2" rx="5"/>
+  <text x="845" y="127" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Object Storage</text>
+  <text x="845" y="142" font-size="9" text-anchor="middle" fill="white">(S3 - Raw Videos)</text>
+  
+  <rect x="780" y="170" width="130" height="55" fill="#569A31" stroke="#3F7023" stroke-width="2" rx="5"/>
+  <text x="845" y="197" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Transcoded</text>
+  <text x="845" y="212" font-size="9" text-anchor="middle" fill="white">(Multi-bitrate HLS)</text>
+  
+  <rect x="780" y="240" width="130" height="55" fill="#569A31" stroke="#3F7023" stroke-width="2" rx="5"/>
+  <text x="845" y="267" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Thumbnails</text>
+  <text x="845" y="282" font-size="9" text-anchor="middle" fill="white">(CDN Origin)</text>
+  
+  <!-- Databases -->
+  <rect x="780" y="320" width="130" height="55" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="845" y="347" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Metadata DB</text>
+  <text x="845" y="362" font-size="9" text-anchor="middle" fill="white">(PostgreSQL)</text>
+  
+  <rect x="780" y="390" width="130" height="55" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="845" y="417" font-size="11" font-weight="bold" text-anchor="middle" fill="white">User DB</text>
+  <text x="845" y="432" font-size="9" text-anchor="middle" fill="white">(MySQL)</text>
+  
+  <rect x="780" y="460" width="130" height="55" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="845" y="487" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Analytics DB</text>
+  <text x="845" y="502" font-size="9" text-anchor="middle" fill="white">(ClickHouse)</text>
+  
+  <!-- Cache & Search -->
+  <rect x="970" y="150" width="130" height="55" fill="#E74C3C" stroke="#C0392B" stroke-width="2" rx="5"/>
+  <text x="1035" y="177" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Redis Cache</text>
+  <text x="1035" y="192" font-size="9" text-anchor="middle" fill="white">(Metadata/Session)</text>
+  
+  <rect x="970" y="220" width="130" height="55" fill="#FF5722" stroke="#E64A19" stroke-width="2" rx="5"/>
+  <text x="1035" y="247" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Elasticsearch</text>
+  <text x="1035" y="262" font-size="9" text-anchor="middle" fill="white">(Search Index)</text>
+  
+  <!-- Message Queue -->
+  <rect x="400" y="520" width="130" height="55" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="465" y="547" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Kafka</text>
+  <text x="465" y="562" font-size="9" text-anchor="middle" fill="white">(Event Stream)</text>
+  
+  <!-- Analytics -->
+  <rect x="590" y="520" width="130" height="55" fill="#FF9800" stroke="#F57C00" stroke-width="2" rx="5"/>
+  <text x="655" y="547" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Analytics Engine</text>
+  <text x="655" y="562" font-size="9" text-anchor="middle" fill="white">(Spark/Flink)</text>
+  
+  <!-- Live Streaming -->
+  <rect x="780" y="540" width="130" height="55" fill="#00BCD4" stroke="#0097A7" stroke-width="2" rx="5"/>
+  <text x="845" y="567" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Live Streaming</text>
+  <text x="845" y="582" font-size="9" text-anchor="middle" fill="white">(RTMP/WebRTC)</text>
+  
+  <!-- Connections -->
+  <line x1="150" y1="127" x2="210" y2="200" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="197" x2="210" y2="210" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="267" x2="210" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="150" y1="337" x2="210" y2="235" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="340" y1="215" x2="400" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="340" y1="215" x2="400" y2="187" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="340" y1="215" x2="400" y2="257" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="340" y1="215" x2="400" y2="327" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="340" y1="215" x2="400" y2="397" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="530" y1="257" x2="590" y2="107" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="257" x2="590" y2="177" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="257" x2="590" y2="247" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="327" x2="590" y2="317" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="327" x2="590" y2="387" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="397" x2="590" y2="457" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="720" y1="107" x2="780" y2="127" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="720" y1="177" x2="780" y2="197" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="720" y1="247" x2="780" y2="267" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="257" x2="780" y2="347" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="187" x2="780" y2="417" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="655" y1="485" x2="780" y2="487" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="530" y1="257" x2="970" y2="177" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="530" y1="397" x2="970" y2="247" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="465" y1="425" x2="465" y2="520" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="465" y1="520" x2="590" y2="547" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="465" y1="327" x2="780" y2="567" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

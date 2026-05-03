@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Serverless Event-Driven Architecture (AWS)</text>
+  
+  <!-- CloudFront -->
+  <rect x="50" y="100" width="140" height="70" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="120" y="140" font-size="13" font-weight="bold" text-anchor="middle" fill="white">CloudFront CDN</text>
+  
+  <!-- S3 Static Site -->
+  <rect x="250" y="100" width="130" height="70" fill="#569A31" stroke="#3F7023" stroke-width="2" rx="5"/>
+  <text x="315" y="130" font-size="13" font-weight="bold" text-anchor="middle" fill="white">S3 Bucket</text>
+  <text x="315" y="150" font-size="11" text-anchor="middle" fill="white">(Static Website)</text>
+  
+  <!-- API Gateway -->
+  <rect x="250" y="220" width="130" height="70" fill="#FF4F8B" stroke="#CC3F6F" stroke-width="2" rx="5"/>
+  <text x="315" y="250" font-size="13" font-weight="bold" text-anchor="middle" fill="white">API Gateway</text>
+  <text x="315" y="270" font-size="11" text-anchor="middle" fill="white">(REST/WebSocket)</text>
+  
+  <!-- Lambda Functions -->
+  <rect x="450" y="80" width="120" height="60" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="510" y="115" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Auth Lambda</text>
+  
+  <rect x="450" y="160" width="120" height="60" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="510" y="195" font-size="12" font-weight="bold" text-anchor="middle" fill="white">API Lambda</text>
+  
+  <rect x="450" y="240" width="120" height="60" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="510" y="275" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Process Lambda</text>
+  
+  <rect x="450" y="320" width="120" height="60" fill="#FF9900" stroke="#CC7A00" stroke-width="2" rx="5"/>
+  <text x="510" y="355" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Notify Lambda</text>
+  
+  <!-- Event Sources -->
+  <rect x="650" y="160" width="130" height="60" fill="#5294CF" stroke="#3F7AA3" stroke-width="2" rx="5"/>
+  <text x="715" y="185" font-size="12" font-weight="bold" text-anchor="middle" fill="white">EventBridge</text>
+  <text x="715" y="205" font-size="11" text-anchor="middle" fill="white">(Event Bus)</text>
+  
+  <rect x="650" y="240" width="130" height="60" fill="#C925D1" stroke="#A01DA8" stroke-width="2" rx="5"/>
+  <text x="715" y="265" font-size="12" font-weight="bold" text-anchor="middle" fill="white">SQS Queue</text>
+  <text x="715" y="285" font-size="11" text-anchor="middle" fill="white">(Message Queue)</text>
+  
+  <rect x="650" y="320" width="130" height="60" fill="#E7157B" stroke="#B91162" stroke-width="2" rx="5"/>
+  <text x="715" y="345" font-size="12" font-weight="bold" text-anchor="middle" fill="white">SNS Topic</text>
+  <text x="715" y="365" font-size="11" text-anchor="middle" fill="white">(Notifications)</text>
+  
+  <!-- DynamoDB -->
+  <rect x="850" y="80" width="120" height="60" fill="#4053D6" stroke="#3342AB" stroke-width="2" rx="5"/>
+  <text x="910" y="115" font-size="12" font-weight="bold" text-anchor="middle" fill="white">DynamoDB</text>
+  
+  <!-- S3 Data Lake -->
+  <rect x="850" y="160" width="120" height="60" fill="#569A31" stroke="#3F7023" stroke-width="2" rx="5"/>
+  <text x="910" y="185" font-size="12" font-weight="bold" text-anchor="middle" fill="white">S3 Data Lake</text>
+  <text x="910" y="205" font-size="11" text-anchor="middle" fill="white">(Storage)</text>
+  
+  <!-- Cognito -->
+  <rect x="850" y="240" width="120" height="60" fill="#DD344C" stroke="#B12A3D" stroke-width="2" rx="5"/>
+  <text x="910" y="265" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Cognito</text>
+  <text x="910" y="285" font-size="11" text-anchor="middle" fill="white">(User Pool)</text>
+  
+  <!-- CloudWatch -->
+  <rect x="1030" y="160" width="120" height="60" fill="#FF4F8B" stroke="#CC3F6F" stroke-width="2" rx="5"/>
+  <text x="1090" y="185" font-size="12" font-weight="bold" text-anchor="middle" fill="white">CloudWatch</text>
+  <text x="1090" y="205" font-size="11" text-anchor="middle" fill="white">(Logs/Metrics)</text>
+  
+  <!-- Connections -->
+  <line x1="190" y1="135" x2="250" y2="135" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="255" x2="450" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="255" x2="450" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="255" x2="450" y2="270" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="570" y1="190" x2="650" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="270" x2="650" y2="270" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="350" x2="650" y2="350" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="570" y1="110" x2="850" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="190" x2="850" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="110" x2="850" y2="270" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="510" y1="80" x2="1030" y2="190" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="510" y1="160" x2="1030" y2="190" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="510" y1="240" x2="1030" y2="190" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

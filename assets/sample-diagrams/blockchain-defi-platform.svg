@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Blockchain DApp Architecture (DeFi Platform)</text>
+  
+  <!-- Frontend -->
+  <rect x="50" y="120" width="120" height="60" fill="#627EEA" stroke="#4E63BA" stroke-width="2" rx="5"/>
+  <text x="110" y="145" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Web3 DApp</text>
+  <text x="110" y="165" font-size="10" text-anchor="middle" fill="white">(React + Web3.js)</text>
+  
+  <rect x="50" y="200" width="120" height="60" fill="#627EEA" stroke="#4E63BA" stroke-width="2" rx="5"/>
+  <text x="110" y="225" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Mobile Wallet</text>
+  <text x="110" y="245" font-size="10" text-anchor="middle" fill="white">(MetaMask/Trust)</text>
+  
+  <!-- Wallet Connection -->
+  <rect x="230" y="150" width="130" height="70" fill="#F0B90B" stroke="#C09409" stroke-width="2" rx="5"/>
+  <text x="295" y="180" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Wallet Connect</text>
+  <text x="295" y="200" font-size="10" text-anchor="middle" fill="white">(WalletConnect)</text>
+  
+  <!-- Backend Services -->
+  <rect x="420" y="80" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="105" font-size="11" font-weight="bold" text-anchor="middle" fill="white">API Gateway</text>
+  <text x="485" y="125" font-size="9" text-anchor="middle" fill="white">(GraphQL/REST)</text>
+  
+  <rect x="420" y="160" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="185" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Indexer Service</text>
+  <text x="485" y="205" font-size="9" text-anchor="middle" fill="white">(The Graph)</text>
+  
+  <rect x="420" y="240" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="265" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Price Oracle</text>
+  <text x="485" y="285" font-size="9" text-anchor="middle" fill="white">(Chainlink)</text>
+  
+  <rect x="420" y="320" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="345" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Analytics Svc</text>
+  <text x="485" y="365" font-size="9" text-anchor="middle" fill="white">(Dune/Nansen)</text>
+  
+  <!-- Blockchain Layer -->
+  <rect x="610" y="80" width="140" height="70" fill="#627EEA" stroke="#4E63BA" stroke-width="2" rx="5"/>
+  <text x="680" y="110" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Ethereum Node</text>
+  <text x="680" y="130" font-size="10" text-anchor="middle" fill="white">(Geth/Infura)</text>
+  
+  <rect x="610" y="170" width="140" height="70" fill="#8247E5" stroke="#6839B7" stroke-width="2" rx="5"/>
+  <text x="680" y="200" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Polygon Node</text>
+  <text x="680" y="220" font-size="10" text-anchor="middle" fill="white">(L2 Scaling)</text>
+  
+  <rect x="610" y="260" width="140" height="70" fill="#00D4AA" stroke="#00A888" stroke-width="2" rx="5"/>
+  <text x="680" y="290" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Arbitrum Node</text>
+  <text x="680" y="310" font-size="10" text-anchor="middle" fill="white">(L2 Rollup)</text>
+  
+  <!-- Smart Contracts -->
+  <rect x="810" y="80" width="130" height="55" fill="#FF6B35" stroke="#CC5529" stroke-width="2" rx="5"/>
+  <text x="875" y="107" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Token Contract</text>
+  <text x="875" y="122" font-size="9" text-anchor="middle" fill="white">(ERC-20)</text>
+  
+  <rect x="810" y="150" width="130" height="55" fill="#FF6B35" stroke="#CC5529" stroke-width="2" rx="5"/>
+  <text x="875" y="177" font-size="11" font-weight="bold" text-anchor="middle" fill="white">NFT Contract</text>
+  <text x="875" y="192" font-size="9" text-anchor="middle" fill="white">(ERC-721/1155)</text>
+  
+  <rect x="810" y="220" width="130" height="55" fill="#FF6B35" stroke="#CC5529" stroke-width="2" rx="5"/>
+  <text x="875" y="247" font-size="11" font-weight="bold" text-anchor="middle" fill="white">DEX Contract</text>
+  <text x="875" y="262" font-size="9" text-anchor="middle" fill="white">(Uniswap V3)</text>
+  
+  <rect x="810" y="290" width="130" height="55" fill="#FF6B35" stroke="#CC5529" stroke-width="2" rx="5"/>
+  <text x="875" y="317" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Staking Contract</text>
+  <text x="875" y="332" font-size="9" text-anchor="middle" fill="white">(Yield Farming)</text>
+  
+  <rect x="810" y="360" width="130" height="55" fill="#FF6B35" stroke="#CC5529" stroke-width="2" rx="5"/>
+  <text x="875" y="387" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Governance</text>
+  <text x="875" y="402" font-size="9" text-anchor="middle" fill="white">(DAO Voting)</text>
+  
+  <!-- IPFS Storage -->
+  <rect x="1000" y="120" width="130" height="60" fill="#65C2CB" stroke="#51989F" stroke-width="2" rx="5"/>
+  <text x="1065" y="145" font-size="11" font-weight="bold" text-anchor="middle" fill="white">IPFS Storage</text>
+  <text x="1065" y="165" font-size="9" text-anchor="middle" fill="white">(Metadata/Images)</text>
+  
+  <!-- Off-chain DB -->
+  <rect x="1000" y="200" width="130" height="60" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="1065" y="225" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Off-chain DB</text>
+  <text x="1065" y="245" font-size="9" text-anchor="middle" fill="white">(PostgreSQL)</text>
+  
+  <!-- Cache -->
+  <rect x="1000" y="280" width="130" height="60" fill="#E74C3C" stroke="#C0392B" stroke-width="2" rx="5"/>
+  <text x="1065" y="305" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Redis Cache</text>
+  <text x="1065" y="325" font-size="9" text-anchor="middle" fill="white">(Price/Data)</text>
+  
+  <!-- Security & Monitoring -->
+  <rect x="420" y="450" width="130" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="485" y="475" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Security Monitor</text>
+  <text x="485" y="495" font-size="9" text-anchor="middle" fill="white">(OpenZeppelin)</text>
+  
+  <rect x="610" y="450" width="140" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="680" y="475" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Audit Service</text>
+  <text x="680" y="495" font-size="9" text-anchor="middle" fill="white">(Certik/Trail of Bits)</text>
+  
+  <rect x="810" y="450" width="130" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="875" y="475" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Gas Optimizer</text>
+  <text x="875" y="495" font-size="9" text-anchor="middle" fill="white">(Flashbots)</text>
+  
+  <!-- External Services -->
+  <rect x="610" y="570" width="140" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="680" y="595" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Bridge Service</text>
+  <text x="680" y="615" font-size="9" text-anchor="middle" fill="white">(Cross-chain)</text>
+  
+  <rect x="810" y="570" width="130" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="875" y="595" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Fiat On-Ramp</text>
+  <text x="875" y="615" font-size="9" text-anchor="middle" fill="white">(Moonpay/Ramp)</text>
+  
+  <!-- Connections -->
+  <line x1="170" y1="150" x2="230" y2="175" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="170" y1="230" x2="230" y2="195" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="360" y1="185" x2="420" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="185" x2="420" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="185" x2="420" y2="270" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="185" x2="420" y2="350" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="550" y1="110" x2="610" y2="115" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="190" x2="610" y2="205" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="610" y2="295" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="750" y1="115" x2="810" y2="107" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="115" x2="810" y2="177" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="205" x2="810" y2="247" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="295" x2="810" y2="317" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="750" y1="295" x2="810" y2="387" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="940" y1="177" x2="1000" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="190" x2="1000" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="1000" y2="310" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="485" y1="380" x2="485" y2="450" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="680" y1="330" x2="680" y2="450" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="875" y1="415" x2="875" y2="450" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <line x1="680" y1="510" x2="680" y2="570" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="680" y1="510" x2="875" y2="570" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+</svg>

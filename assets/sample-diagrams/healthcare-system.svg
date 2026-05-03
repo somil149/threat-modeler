@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <text x="600" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Healthcare Management System (HIPAA Compliant)</text>
+  
+  <!-- User Interfaces -->
+  <rect x="50" y="100" width="110" height="60" fill="#2196F3" stroke="#1976D2" stroke-width="2" rx="5"/>
+  <text x="105" y="125" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Patient Portal</text>
+  <text x="105" y="145" font-size="9" text-anchor="middle" fill="white">(Web/Mobile)</text>
+  
+  <rect x="50" y="180" width="110" height="60" fill="#2196F3" stroke="#1976D2" stroke-width="2" rx="5"/>
+  <text x="105" y="205" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Doctor Portal</text>
+  <text x="105" y="225" font-size="9" text-anchor="middle" fill="white">(EMR System)</text>
+  
+  <rect x="50" y="260" width="110" height="60" fill="#2196F3" stroke="#1976D2" stroke-width="2" rx="5"/>
+  <text x="105" y="285" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Admin Portal</text>
+  <text x="105" y="305" font-size="9" text-anchor="middle" fill="white">(Management)</text>
+  
+  <!-- API Gateway with Auth -->
+  <rect x="220" y="160" width="140" height="80" fill="#FF9800" stroke="#F57C00" stroke-width="2" rx="5"/>
+  <text x="290" y="195" font-size="12" font-weight="bold" text-anchor="middle" fill="white">API Gateway</text>
+  <text x="290" y="215" font-size="10" text-anchor="middle" fill="white">(OAuth2/SAML)</text>
+  
+  <!-- Core Services -->
+  <rect x="420" y="80" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="105" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Patient Service</text>
+  <text x="485" y="125" font-size="9" text-anchor="middle" fill="white">(Demographics)</text>
+  
+  <rect x="420" y="160" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="185" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Appointment Svc</text>
+  <text x="485" y="205" font-size="9" text-anchor="middle" fill="white">(Scheduling)</text>
+  
+  <rect x="420" y="240" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="265" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Medical Records</text>
+  <text x="485" y="285" font-size="9" text-anchor="middle" fill="white">(EHR/EMR)</text>
+  
+  <rect x="420" y="320" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="345" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Prescription Svc</text>
+  <text x="485" y="365" font-size="9" text-anchor="middle" fill="white">(e-Prescribing)</text>
+  
+  <rect x="420" y="400" width="130" height="60" fill="#4CAF50" stroke="#388E3C" stroke-width="2" rx="5"/>
+  <text x="485" y="425" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Billing Service</text>
+  <text x="485" y="445" font-size="9" text-anchor="middle" fill="white">(Claims/Payment)</text>
+  
+  <!-- Supporting Services -->
+  <rect x="610" y="120" width="130" height="60" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="675" y="145" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Lab Integration</text>
+  <text x="675" y="165" font-size="9" text-anchor="middle" fill="white">(HL7/FHIR)</text>
+  
+  <rect x="610" y="200" width="130" height="60" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="675" y="225" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Imaging Service</text>
+  <text x="675" y="245" font-size="9" text-anchor="middle" fill="white">(DICOM/PACS)</text>
+  
+  <rect x="610" y="280" width="130" height="60" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="675" y="305" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Notification Svc</text>
+  <text x="675" y="325" font-size="9" text-anchor="middle" fill="white">(SMS/Email)</text>
+  
+  <rect x="610" y="360" width="130" height="60" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2" rx="5"/>
+  <text x="675" y="385" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Telemedicine</text>
+  <text x="675" y="405" font-size="9" text-anchor="middle" fill="white">(Video Consult)</text>
+  
+  <!-- Databases (Encrypted) -->
+  <rect x="800" y="120" width="130" height="60" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="865" y="145" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Patient DB</text>
+  <text x="865" y="165" font-size="9" text-anchor="middle" fill="white">(Encrypted)</text>
+  
+  <rect x="800" y="200" width="130" height="60" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="865" y="225" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Medical Records</text>
+  <text x="865" y="245" font-size="9" text-anchor="middle" fill="white">(Encrypted)</text>
+  
+  <rect x="800" y="280" width="130" height="60" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="865" y="305" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Billing DB</text>
+  <text x="865" y="325" font-size="9" text-anchor="middle" fill="white">(PCI Compliant)</text>
+  
+  <rect x="800" y="360" width="130" height="60" fill="#3F51B5" stroke="#303F9F" stroke-width="2" rx="5"/>
+  <text x="865" y="385" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Audit Logs</text>
+  <text x="865" y="405" font-size="9" text-anchor="middle" fill="white">(Immutable)</text>
+  
+  <!-- Security & Compliance -->
+  <rect x="990" y="140" width="140" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="1060" y="165" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Access Control</text>
+  <text x="1060" y="185" font-size="9" text-anchor="middle" fill="white">(RBAC/ABAC)</text>
+  
+  <rect x="990" y="220" width="140" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="1060" y="245" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Audit Service</text>
+  <text x="1060" y="265" font-size="9" text-anchor="middle" fill="white">(HIPAA Logs)</text>
+  
+  <rect x="990" y="300" width="140" height="60" fill="#F44336" stroke="#D32F2F" stroke-width="2" rx="5"/>
+  <text x="1060" y="325" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Encryption Svc</text>
+  <text x="1060" y="345" font-size="9" text-anchor="middle" fill="white">(AES-256/TLS)</text>
+  
+  <!-- External Integrations -->
+  <rect x="420" y="540" width="130" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="485" y="565" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Insurance API</text>
+  <text x="485" y="585" font-size="9" text-anchor="middle" fill="white">(Eligibility Check)</text>
+  
+  <rect x="610" y="540" width="130" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="675" y="565" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Pharmacy API</text>
+  <text x="675" y="585" font-size="9" text-anchor="middle" fill="white">(e-Prescribe)</text>
+  
+  <rect x="800" y="540" width="130" height="60" fill="#FFC107" stroke="#FFA000" stroke-width="2" rx="5"/>
+  <text x="865" y="565" font-size="11" font-weight="bold" text-anchor="middle" fill="white">Lab Systems</text>
+  <text x="865" y="585" font-size="9" text-anchor="middle" fill="white">(HL7 Interface)</text>
+  
+  <!-- Connections -->
+  <line x1="160" y1="130" x2="220" y2="180" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="160" y1="210" x2="220" y2="200" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="160" y1="290" x2="220" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="360" y1="200" x2="420" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="200" x2="420" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="200" x2="420" y2="270" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="200" x2="420" y2="350" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="360" y1="200" x2="420" y2="430" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="550" y1="270" x2="610" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="610" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="610" y2="310" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="610" y2="390" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="550" y1="110" x2="800" y2="150" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="800" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="430" x2="800" y2="310" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="550" y1="270" x2="800" y2="390" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="485" y1="460" x2="485" y2="540" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="485" y1="380" x2="675" y2="540" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="675" y1="180" x2="865" y2="540" stroke="#666" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <line x1="930" y1="150" x2="990" y2="170" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="930" y1="230" x2="990" y2="250" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="930" y1="390" x2="990" y2="330" stroke="#666" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
