@@ -142,18 +142,8 @@ const Graph = {
         const paths = this.findAllPaths(graph, entry.id, target.id);
         
         paths.forEach(path => {
-          // Find threats along this path - match by component name or ID
-          const pathComponents = path.map(nodeId => 
-            components.find(c => c.id === nodeId)
-          ).filter(Boolean);
-          
-          const pathThreats = threats.filter(t => {
-            return pathComponents.some(c => 
-              t.component === c.name || 
-              t.component === c.id ||
-              (c.name && t.component && c.name.toLowerCase().includes(t.component.toLowerCase()))
-            );
-          });
+          // Find threats along this path - match by component ID
+          const pathThreats = threats.filter(t => path.includes(t.component));
           
           if (pathThreats.length > 0) {
             chains.push({

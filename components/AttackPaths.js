@@ -6,6 +6,17 @@ function AttackPaths({ project }) {
   const [attackChains, setAttackChains] = useState([]);
 
   useEffect(() => {
+    console.log('AttackPaths - Project data:', {
+      hasComponents: !!project.components,
+      componentCount: project.components?.length || 0,
+      hasFlows: !!project.flows,
+      flowCount: project.flows?.length || 0,
+      hasThreats: !!project.threats,
+      threatCount: project.threats?.length || 0,
+      components: project.components?.map(c => ({ id: c.id, name: c.name, type: c.type })),
+      threats: project.threats?.map(t => ({ id: t.id, component: t.component }))
+    });
+    
     if (project.components && project.flows && project.threats) {
       try {
         const chains = Graph.generateAttackChains(
@@ -20,7 +31,7 @@ function AttackPaths({ project }) {
         setAttackChains([]);
       }
     } else {
-      console.log('Missing data:', {
+      console.log('Missing data for attack paths:', {
         components: !!project.components,
         flows: !!project.flows,
         threats: !!project.threats

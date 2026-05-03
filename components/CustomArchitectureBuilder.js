@@ -219,7 +219,7 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
         
         // Generate STRIDE threats for each component
         comps.forEach(component => {
-          const componentType = component.type.toLowerCase();
+          const componentType = (component.type || '').toLowerCase();
           
           // Spoofing
           if (componentType.includes('api') || componentType.includes('auth') || componentType.includes('user')) {
@@ -227,7 +227,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               id: `threat_${component.id}_spoofing`,
               title: `Spoofing Identity - ${component.name}`,
               description: `Attacker could impersonate legitimate users or services to access ${component.name}`,
-              component: component.name,
+              component: component.id,  // Use ID for consistency
+              componentName: component.name,  // Keep name for display
               stride: 'S',
               likelihood: 3,
               impact: 4,
@@ -242,7 +243,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               id: `threat_${component.id}_tampering`,
               title: `Data Tampering - ${component.name}`,
               description: `Attacker could modify data in ${component.name} without authorization`,
-              component: component.name,
+              component: component.id,
+              componentName: component.name,
               stride: 'T',
               likelihood: 3,
               impact: 4,
@@ -257,7 +259,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               id: `threat_${component.id}_disclosure`,
               title: `Information Disclosure - ${component.name}`,
               description: `Sensitive data in ${component.name} could be exposed to unauthorized parties`,
-              component: component.name,
+              component: component.id,
+              componentName: component.name,
               stride: 'I',
               likelihood: 3,
               impact: 5,
@@ -271,7 +274,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
             id: `threat_${component.id}_dos`,
             title: `Denial of Service - ${component.name}`,
             description: `Attacker could overwhelm ${component.name} making it unavailable`,
-            component: component.name,
+            component: component.id,
+            componentName: component.name,
             stride: 'D',
             likelihood: 3,
             impact: 3,
@@ -285,7 +289,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               id: `threat_${component.id}_privilege`,
               title: `Elevation of Privilege - ${component.name}`,
               description: `Attacker could gain unauthorized elevated access to ${component.name}`,
-              component: component.name,
+              component: component.id,
+              componentName: component.name,
               stride: 'E',
               likelihood: 2,
               impact: 5,
