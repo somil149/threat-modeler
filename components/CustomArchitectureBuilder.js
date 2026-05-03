@@ -31,18 +31,27 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
   }, []);
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    console.log('useEffect - svgRef.current:', svgRef.current);
+    if (!svgRef.current) {
+      console.log('svgRef not ready yet');
+      return;
+    }
+    console.log('Calling renderDiagram with components:', components.length, 'flows:', flows.length);
     renderDiagram();
   }, [components, flows, connectMode, deleteMode, connectFrom, isFinalized]);
 
   const renderDiagram = () => {
+    console.log('renderDiagram called');
     const svg = d3.select(svgRef.current);
+    console.log('D3 svg selection:', svg.node());
     svg.selectAll('*').remove();
 
+    console.log('Drawing', flows.length, 'flows');
     // Draw flows
     flows.forEach(flow => {
       const from = components.find(c => c.id === flow.from);
       const to = components.find(c => c.id === flow.to);
+      console.log('Flow:', flow.from, '->', flow.to, 'from:', from, 'to:', to);
       if (from && to) {
         svg.append('line')
           .attr('x1', from.x)
