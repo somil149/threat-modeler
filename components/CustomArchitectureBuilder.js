@@ -237,25 +237,28 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
         // Generate STRIDE threats for each component
         comps.forEach(component => {
           const componentType = (component.type || '').toLowerCase();
+          const isExternal = componentType.includes('external') || (component.trustBoundary || '').toLowerCase() === 'external';
+          const isDataStore = componentType.includes('datastore') || componentType.includes('database') || componentType.includes('storage');
+          const isProcess = componentType.includes('process') || componentType.includes('service') || componentType.includes('api');
           
-          // Spoofing
-          if (componentType.includes('api') || componentType.includes('auth') || componentType.includes('user')) {
+          // Spoofing - for all components that handle identity
+          if (isProcess || isExternal || componentType.includes('auth') || componentType.includes('user')) {
             threats.push({
               id: `threat_${component.id}_spoofing`,
               title: `Spoofing Identity - ${component.name}`,
               description: `Attacker could impersonate legitimate users or services to access ${component.name}`,
-              component: component.id,  // Use ID for consistency
-              componentName: component.name,  // Keep name for display
+              component: component.id,
+              componentName: component.name,
               stride: 'S',
               likelihood: 3,
               impact: 4,
-              mitigation: 'Implement strong authentication (MFA, certificates)',
-              detection: 'Monitor for unusual authentication patterns'
+              mitigation: 'Implement strong authentication (MFA, certificates, API keys)',
+              detection: 'Monitor for unusual authentication patterns and failed login attempts'
             });
           }
           
-          // Tampering
-          if (componentType.includes('database') || componentType.includes('storage') || componentType.includes('api')) {
+          // Tampering - for data stores and processes
+          if (isDataStore || isProcess) {
             threats.push({
               id: `threat_${component.id}_tampering`,
               title: `Data Tampering - ${component.name}`,
@@ -265,13 +268,29 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               stride: 'T',
               likelihood: 3,
               impact: 4,
-              mitigation: 'Implement integrity checks, digital signatures, and access controls',
-              detection: 'Monitor for unauthorized data modifications'
+              mitigation: 'Implement integrity checks, digital signatures, checksums, and access controls',
+              detection: 'Monitor for unauthorized data modifications and integrity violations'
             });
           }
           
-          // Information Disclosure
-          if (componentType.includes('database') || componentType.includes('api') || componentType.includes('storage')) {
+          // Repudiation - for processes and data stores
+          if (isProcess || isDataStore) {
+            threats.push({
+              id: `threat_${component.id}_repudiation`,
+              title: `Repudiation - ${component.name}`,
+              description: `Users could deny performing actions in ${component.name} without proper audit trail`,
+              component: component.id,
+              componentName: component.name,
+              stride: 'R',
+              likelihood: 2,
+              impact: 3,
+              mitigation: 'Implement comprehensive logging, audit trails, and non-repudiation mechanisms',
+              detection: 'Maintain tamper-proof logs with timestamps and user attribution'
+            });
+          }
+          
+          // Information Disclosure - for all components handling sensitive data
+          if (isDataStore || isProcess || componentType.includes('cache')) {
             threats.push({
               id: `threat_${component.id}_disclosure`,
               title: `Information Disclosure - ${component.name}`,
@@ -281,12 +300,12 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               stride: 'I',
               likelihood: 3,
               impact: 5,
-              mitigation: 'Encrypt data at rest and in transit, implement proper access controls',
-              detection: 'Monitor for data exfiltration attempts'
+              mitigation: 'Encrypt data at rest and in transit (TLS/SSL), implement proper access controls and data masking',
+              detection: 'Monitor for data exfiltration attempts and unauthorized access'
             });
           }
           
-          // Denial of Service
+          // Denial of Service - for ALL components
           threats.push({
             id: `threat_${component.id}_dos`,
             title: `Denial of Service - ${component.name}`,
@@ -296,12 +315,12 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
             stride: 'D',
             likelihood: 3,
             impact: 3,
-            mitigation: 'Implement rate limiting, auto-scaling, and DDoS protection',
-            detection: 'Monitor resource usage and availability metrics'
+            mitigation: 'Implement rate limiting, auto-scaling, DDoS protection, and resource quotas',
+            detection: 'Monitor resource usage, availability metrics, and traffic patterns'
           });
           
-          // Elevation of Privilege
-          if (componentType.includes('api') || componentType.includes('service') || componentType.includes('auth')) {
+          // Elevation of Privilege - for processes and services
+          if (isProcess || componentType.includes('auth')) {
             threats.push({
               id: `threat_${component.id}_privilege`,
               title: `Elevation of Privilege - ${component.name}`,
@@ -311,8 +330,8 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
               stride: 'E',
               likelihood: 2,
               impact: 5,
-              mitigation: 'Implement least privilege, proper authorization checks',
-              detection: 'Monitor for privilege escalation attempts'
+              mitigation: 'Implement least privilege principle, proper authorization checks, and role-based access control',
+              detection: 'Monitor for privilege escalation attempts and unauthorized role changes'
             });
           }
         });
