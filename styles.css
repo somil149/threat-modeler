@@ -422,6 +422,10 @@ body {
 
 @media (max-width: 768px) {
   /* Mobile Layout */
+  .app-container {
+    display: block !important;
+  }
+  
   .sidebar {
     position: fixed !important;
     left: 0;
