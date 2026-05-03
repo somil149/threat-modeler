@@ -1,0 +1,165 @@
+{
+  "cloud_threats": {
+    "aws": [
+      {
+        "title": "S3 Bucket Misconfiguration",
+        "description": "Publicly accessible S3 buckets exposing sensitive data",
+        "mitigation": "Block public access, bucket policies, encryption at rest, access logging",
+        "stride": ["I"],
+        "likelihood": 5,
+        "impact": 5,
+        "components": ["S3", "storage", "bucket"]
+      },
+      {
+        "title": "IAM Over-Privileged Roles",
+        "description": "IAM roles with excessive permissions violating least privilege",
+        "mitigation": "Regular IAM audits, use IAM Access Analyzer, principle of least privilege",
+        "stride": ["E"],
+        "likelihood": 4,
+        "impact": 4,
+        "components": ["IAM", "role", "permission"]
+      },
+      {
+        "title": "Lambda Function Injection",
+        "description": "Serverless functions vulnerable to injection attacks",
+        "mitigation": "Input validation, use Lambda layers securely, environment variable encryption",
+        "stride": ["T", "E"],
+        "likelihood": 3,
+        "impact": 4,
+        "components": ["Lambda", "serverless", "function"]
+      },
+      {
+        "title": "RDS Snapshot Exposure",
+        "description": "Database snapshots shared publicly or with unauthorized accounts",
+        "mitigation": "Encrypt snapshots, restrict sharing, regular snapshot audits",
+        "stride": ["I"],
+        "likelihood": 3,
+        "impact": 5,
+        "components": ["RDS", "database", "snapshot"]
+      },
+      {
+        "title": "EC2 Instance Metadata Service (IMDS) Abuse",
+        "description": "SSRF attacks accessing EC2 metadata to steal credentials",
+        "mitigation": "Use IMDSv2, disable metadata endpoint if not needed, network policies",
+        "stride": ["I", "E"],
+        "likelihood": 3,
+        "impact": 5,
+        "components": ["EC2", "instance", "metadata"]
+      },
+      {
+        "title": "CloudTrail Logging Disabled",
+        "description": "Audit logging disabled, preventing detection of malicious activity",
+        "mitigation": "Enable CloudTrail in all regions, log file validation, centralized logging",
+        "stride": ["R", "D"],
+        "likelihood": 3,
+        "impact": 4,
+        "components": ["CloudTrail", "logging", "audit"]
+      }
+    ],
+    "azure": [
+      {
+        "title": "Azure Storage Account Public Access",
+        "description": "Storage containers accessible without authentication",
+        "mitigation": "Disable public access, use SAS tokens, enable firewall rules",
+        "stride": ["I"],
+        "likelihood": 5,
+        "impact": 5,
+        "components": ["Storage", "blob", "container"]
+      },
+      {
+        "title": "Managed Identity Misconfiguration",
+        "description": "Managed identities with excessive permissions",
+        "mitigation": "Least privilege, regular reviews, use Azure AD PIM",
+        "stride": ["E"],
+        "likelihood": 4,
+        "impact": 4,
+        "components": ["Identity", "managed", "AAD"]
+      },
+      {
+        "title": "Key Vault Secrets Exposure",
+        "description": "Secrets accessible to unauthorized users or applications",
+        "mitigation": "Access policies, RBAC, audit logging, secret rotation",
+        "stride": ["I"],
+        "likelihood": 3,
+        "impact": 5,
+        "components": ["KeyVault", "secret", "vault"]
+      }
+    ],
+    "gcp": [
+      {
+        "title": "GCS Bucket AllUsers Permission",
+        "description": "Cloud Storage buckets accessible to all internet users",
+        "mitigation": "Remove allUsers/allAuthenticatedUsers, use IAM conditions, uniform bucket-level access",
+        "stride": ["I"],
+        "likelihood": 5,
+        "impact": 5,
+        "components": ["GCS", "storage", "bucket"]
+      },
+      {
+        "title": "Service Account Key Exposure",
+        "description": "Service account keys leaked or stored insecurely",
+        "mitigation": "Use Workload Identity, rotate keys, avoid downloading keys",
+        "stride": ["I", "E"],
+        "likelihood": 4,
+        "impact": 5,
+        "components": ["ServiceAccount", "key", "credential"]
+      },
+      {
+        "title": "Compute Engine Default Service Account",
+        "description": "VMs using default service account with editor role",
+        "mitigation": "Create custom service accounts, minimal permissions, disable default SA",
+        "stride": ["E"],
+        "likelihood": 4,
+        "impact": 4,
+        "components": ["ComputeEngine", "VM", "serviceaccount"]
+      }
+    ],
+    "kubernetes": [
+      {
+        "title": "Exposed Kubernetes Dashboard",
+        "description": "Dashboard accessible without authentication",
+        "mitigation": "Disable dashboard, use RBAC, require authentication, network policies",
+        "stride": ["S", "E"],
+        "likelihood": 4,
+        "impact": 5,
+        "components": ["dashboard", "kubernetes", "k8s"]
+      },
+      {
+        "title": "Privileged Container",
+        "description": "Containers running with privileged flag or root user",
+        "mitigation": "Drop capabilities, use security contexts, Pod Security Standards",
+        "stride": ["E"],
+        "likelihood": 4,
+        "impact": 5,
+        "components": ["pod", "container", "docker"]
+      },
+      {
+        "title": "Secrets in Environment Variables",
+        "description": "Sensitive data exposed in container environment variables",
+        "mitigation": "Use Kubernetes Secrets, external secret managers, encrypt etcd",
+        "stride": ["I"],
+        "likelihood": 5,
+        "impact": 4,
+        "components": ["secret", "configmap", "environment"]
+      },
+      {
+        "title": "Unrestricted Network Policies",
+        "description": "Pods can communicate with any other pod without restrictions",
+        "mitigation": "Implement NetworkPolicies, zero-trust networking, service mesh",
+        "stride": ["E", "T"],
+        "likelihood": 4,
+        "impact": 4,
+        "components": ["network", "policy", "pod"]
+      },
+      {
+        "title": "Vulnerable Container Images",
+        "description": "Container images with known CVEs",
+        "mitigation": "Image scanning, admission controllers, use minimal base images",
+        "stride": ["E"],
+        "likelihood": 5,
+        "impact": 4,
+        "components": ["image", "container", "registry"]
+      }
+    ]
+  }
+}

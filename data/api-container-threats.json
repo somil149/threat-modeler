@@ -1,0 +1,150 @@
+{
+  "api_threats": [
+    {
+      "title": "Broken Object Level Authorization (BOLA)",
+      "description": "API endpoints don't verify if user has access to specific object",
+      "mitigation": "Implement authorization checks on every API call, use indirect references",
+      "stride": ["S", "E"],
+      "likelihood": 5,
+      "impact": 5,
+      "components": ["API", "REST", "GraphQL", "endpoint"]
+    },
+    {
+      "title": "Broken Authentication",
+      "description": "Weak authentication mechanisms in API",
+      "mitigation": "Use OAuth 2.0, JWT with proper validation, API keys with rotation",
+      "stride": ["S"],
+      "likelihood": 4,
+      "impact": 5,
+      "components": ["API", "authentication", "token"]
+    },
+    {
+      "title": "Excessive Data Exposure",
+      "description": "API returns more data than necessary",
+      "mitigation": "Implement response filtering, use DTOs, principle of least privilege",
+      "stride": ["I"],
+      "likelihood": 5,
+      "impact": 4,
+      "components": ["API", "response", "data"]
+    },
+    {
+      "title": "Lack of Rate Limiting",
+      "description": "No protection against brute force or DoS attacks",
+      "mitigation": "Implement rate limiting, throttling, API quotas",
+      "stride": ["D"],
+      "likelihood": 5,
+      "impact": 4,
+      "components": ["API", "gateway", "rate"]
+    },
+    {
+      "title": "Mass Assignment",
+      "description": "API allows updating fields that should be read-only",
+      "mitigation": "Whitelist allowed fields, use DTOs, validate input",
+      "stride": ["T"],
+      "likelihood": 4,
+      "impact": 4,
+      "components": ["API", "update", "PUT", "PATCH"]
+    },
+    {
+      "title": "Security Misconfiguration",
+      "description": "Missing security headers, CORS misconfiguration, verbose errors",
+      "mitigation": "Configure security headers, restrict CORS, generic error messages",
+      "stride": ["I", "E"],
+      "likelihood": 5,
+      "impact": 3,
+      "components": ["API", "CORS", "headers"]
+    },
+    {
+      "title": "Injection Flaws",
+      "description": "SQL, NoSQL, command injection through API parameters",
+      "mitigation": "Input validation, parameterized queries, sanitization",
+      "stride": ["T", "E"],
+      "likelihood": 4,
+      "impact": 5,
+      "components": ["API", "input", "query"]
+    },
+    {
+      "title": "Improper Assets Management",
+      "description": "Old API versions still accessible, undocumented endpoints",
+      "mitigation": "API inventory, version deprecation policy, documentation",
+      "stride": ["I", "E"],
+      "likelihood": 4,
+      "impact": 4,
+      "components": ["API", "version", "endpoint"]
+    },
+    {
+      "title": "Insufficient Logging & Monitoring",
+      "description": "API calls not logged, no alerting on suspicious activity",
+      "mitigation": "Log all API calls, SIEM integration, anomaly detection",
+      "stride": ["R", "D"],
+      "likelihood": 4,
+      "impact": 3,
+      "components": ["API", "logging", "monitoring"]
+    },
+    {
+      "title": "GraphQL Query Depth Attack",
+      "description": "Deeply nested queries causing DoS",
+      "mitigation": "Query depth limiting, complexity analysis, query cost calculation",
+      "stride": ["D"],
+      "likelihood": 3,
+      "impact": 4,
+      "components": ["GraphQL", "query", "API"]
+    }
+  ],
+  "container_threats": [
+    {
+      "title": "Container Escape",
+      "description": "Attacker breaks out of container to access host system",
+      "mitigation": "Use security profiles (AppArmor/SELinux), drop capabilities, read-only root filesystem",
+      "stride": ["E"],
+      "likelihood": 2,
+      "impact": 5,
+      "components": ["container", "docker", "runtime"]
+    },
+    {
+      "title": "Malicious Container Images",
+      "description": "Using untrusted or backdoored container images",
+      "mitigation": "Use trusted registries, image signing, vulnerability scanning",
+      "stride": ["T", "E"],
+      "likelihood": 3,
+      "impact": 5,
+      "components": ["image", "registry", "docker"]
+    },
+    {
+      "title": "Secrets in Images",
+      "description": "Credentials or API keys baked into container images",
+      "mitigation": "Use secret management, scan images for secrets, .dockerignore",
+      "stride": ["I"],
+      "likelihood": 5,
+      "impact": 5,
+      "components": ["image", "secret", "dockerfile"]
+    },
+    {
+      "title": "Unrestricted Container Resources",
+      "description": "No CPU/memory limits allowing resource exhaustion",
+      "mitigation": "Set resource limits and requests, use resource quotas",
+      "stride": ["D"],
+      "likelihood": 4,
+      "impact": 3,
+      "components": ["container", "resources", "limits"]
+    },
+    {
+      "title": "Exposed Docker Socket",
+      "description": "Docker socket mounted in container giving full host access",
+      "mitigation": "Never mount docker.sock, use Docker-in-Docker alternatives",
+      "stride": ["E"],
+      "likelihood": 3,
+      "impact": 5,
+      "components": ["docker", "socket", "volume"]
+    },
+    {
+      "title": "Insecure Container Registry",
+      "description": "Registry accessible without authentication or over HTTP",
+      "mitigation": "Use authentication, TLS, private registries, access controls",
+      "stride": ["I", "T"],
+      "likelihood": 4,
+      "impact": 4,
+      "components": ["registry", "harbor", "ECR"]
+    }
+  ]
+}
