@@ -76,13 +76,17 @@ function ThreatIntelligence({ project }) {
     const results = [];
     const seenCVEs = new Set();
     
-    // Get date range for last 3 years
+    // Get date range for last 3 years (NVD API format: YYYY-MM-DDTHH:MM:SS.000 UTC-05:00)
     const endDate = new Date();
     const startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 3);
     
-    const pubStartDate = startDate.toISOString().split('T')[0] + 'T00:00:00.000';
-    const pubEndDate = endDate.toISOString().split('T')[0] + 'T23:59:59.999';
+    const formatDate = (date) => {
+      return date.toISOString().replace('Z', ' UTC-05:00');
+    };
+    
+    const pubStartDate = formatDate(startDate);
+    const pubEndDate = formatDate(endDate);
     
     // Fetch up to 5 keywords with 20 results each
     for (let i = 0; i < Math.min(keywords.length, 5); i++) {
@@ -90,9 +94,11 @@ function ThreatIntelligence({ project }) {
       setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${Math.min(keywords.length, 5)})...`);
       
       try {
-        const response = await fetch(
-          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&pubStartDate=${pubStartDate}&pubEndDate=${pubEndDate}&resultsPerPage=20`
-        );
+        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&pubStartDate=${encodeURIComponent(pubStartDate)}&pubEndDate=${encodeURIComponent(pubEndDate)}&resultsPerPage=20`;
+        
+        console.log('Fetching:', url);
+        
+        const response = await fetch(url);
         
         if (!response.ok) {
           console.warn(`NVD API error for "${keyword}": ${response.status}`);
@@ -100,6 +106,8 @@ function ThreatIntelligence({ project }) {
         }
         
         const data = await response.json();
+        
+        console.log(`Found ${data.vulnerabilities?.length || 0} CVEs for "${keyword}"`);
         
         if (data.vulnerabilities) {
           data.vulnerabilities.forEach(vuln => {
