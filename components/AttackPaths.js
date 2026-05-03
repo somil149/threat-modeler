@@ -4,6 +4,14 @@
 
 function AttackPaths({ project }) {
   const [attackChains, setAttackChains] = useState([]);
+  const [expandedMitigations, setExpandedMitigations] = useState({});
+
+  const toggleMitigations = (index) => {
+    setExpandedMitigations(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
 
   useEffect(() => {
     console.log('AttackPaths - Project data:', {
@@ -116,7 +124,7 @@ function AttackPaths({ project }) {
                     </div>
                   </div>
 
-                  <div style={{ background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '0.375rem' }}>
+                  <div style={{ background: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '0.375rem', marginBottom: '1rem' }}>
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
                       Exploitable Threats:
                     </div>
@@ -125,6 +133,149 @@ function AttackPaths({ project }) {
                         <li key={i} style={{ marginBottom: '0.25rem' }}>{threat}</li>
                       ))}
                     </ul>
+                  </div>
+
+                  {/* Mitigation Section */}
+                  <div>
+                    <button
+                      onClick={() => toggleMitigations(index)}
+                      style={{
+                        width: '100%',
+                        padding: '0.75rem',
+                        background: 'var(--accent-bg)',
+                        border: '1px solid var(--accent)',
+                        borderRadius: '0.375rem',
+                        color: 'var(--accent)',
+                        fontWeight: 600,
+                        fontSize: '0.875rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <i className={`fas fa-shield-alt`}></i>
+                      {expandedMitigations[index] ? 'Hide Mitigations' : 'View Mitigations'}
+                      <i className={`fas fa-chevron-${expandedMitigations[index] ? 'up' : 'down'}`}></i>
+                    </button>
+
+                    {expandedMitigations[index] && (
+                      <div style={{ 
+                        marginTop: '1rem', 
+                        padding: '1rem', 
+                        background: 'var(--bg-tertiary)', 
+                        borderRadius: '0.375rem',
+                        border: '2px solid var(--accent)'
+                      }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem', marginBottom: '1rem', color: 'var(--accent)' }}>
+                          <i className="fas fa-shield-alt"></i> Recommended Mitigations (Priority Order)
+                        </div>
+
+                        {/* Get unique mitigations from threats in this path */}
+                        {(() => {
+                          const pathThreats = project.threats?.filter(t => 
+                            chain.path.includes(t.component)
+                          ) || [];
+
+                          // Group mitigations by priority
+                          const criticalMitigations = [];
+                          const highMitigations = [];
+                          const mediumMitigations = [];
+
+                          pathThreats.forEach((threat, idx) => {
+                            const priority = threat.likelihood * threat.impact >= 15 ? 'critical' :
+                                           threat.likelihood * threat.impact >= 9 ? 'high' : 'medium';
+                            
+                            const mitigation = {
+                              threat: threat.title,
+                              mitigation: threat.mitigation,
+                              detection: threat.detection,
+                              component: threat.componentName || threat.component,
+                              priority: priority
+                            };
+
+                            if (priority === 'critical') criticalMitigations.push(mitigation);
+                            else if (priority === 'high') highMitigations.push(mitigation);
+                            else mediumMitigations.push(mitigation);
+                          });
+
+                          const allMitigations = [...criticalMitigations, ...highMitigations, ...mediumMitigations];
+
+                          return allMitigations.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                              {allMitigations.map((m, idx) => (
+                                <div key={idx} style={{ 
+                                  padding: '0.75rem', 
+                                  background: 'var(--bg-secondary)', 
+                                  borderRadius: '0.375rem',
+                                  borderLeft: `4px solid ${
+                                    m.priority === 'critical' ? '#dc2626' :
+                                    m.priority === 'high' ? '#ea580c' : '#f59e0b'
+                                  }`
+                                }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                    <span style={{
+                                      padding: '0.25rem 0.5rem',
+                                      borderRadius: '0.25rem',
+                                      fontSize: '0.75rem',
+                                      fontWeight: 600,
+                                      textTransform: 'uppercase',
+                                      background: m.priority === 'critical' ? '#dc262620' :
+                                                 m.priority === 'high' ? '#ea580c20' : '#f59e0b20',
+                                      color: m.priority === 'critical' ? '#dc2626' :
+                                             m.priority === 'high' ? '#ea580c' : '#f59e0b'
+                                    }}>
+                                      {m.priority}
+                                    </span>
+                                    <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                                      {m.component}
+                                    </span>
+                                  </div>
+                                  <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>
+                                    <strong>Threat:</strong> {m.threat}
+                                  </div>
+                                  <div style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                                    <strong style={{ color: 'var(--accent)' }}>
+                                      <i className="fas fa-shield-alt"></i> Mitigation:
+                                    </strong> {m.mitigation}
+                                  </div>
+                                  <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                    <strong>
+                                      <i className="fas fa-search"></i> Detection:
+                                    </strong> {m.detection}
+                                  </div>
+                                </div>
+                              ))}
+
+                              {/* Impact Analysis */}
+                              <div style={{ 
+                                marginTop: '0.5rem', 
+                                padding: '0.75rem', 
+                                background: 'var(--success-bg)', 
+                                borderRadius: '0.375rem',
+                                border: '1px solid var(--success)'
+                              }}>
+                                <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--success)', marginBottom: '0.25rem' }}>
+                                  <i className="fas fa-lightbulb"></i> Impact Analysis
+                                </div>
+                                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                  Implementing {criticalMitigations.length > 0 ? 'critical' : 'high'} priority mitigations 
+                                  will break this attack chain and reduce risk by approximately{' '}
+                                  <strong style={{ color: 'var(--success)' }}>
+                                    {Math.min(80, criticalMitigations.length * 30 + highMitigations.length * 20)}%
+                                  </strong>
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', textAlign: 'center', padding: '1rem' }}>
+                              No specific mitigations available. Generate threats first.
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
