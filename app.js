@@ -143,8 +143,13 @@ function App() {
             console.log('Creating project with data:', projectData);
             const newProject = Storage.createProject(projectData);
             console.log('Project created:', newProject);
+            
+            // Set project first, then switch view in next tick
             setCurrentProject(newProject);
-            setCurrentView('architecture');
+            setTimeout(() => {
+              console.log('Switching to architecture view');
+              setCurrentView('architecture');
+            }, 0);
           }}
           onCancel={() => setCurrentView('dashboard')}
         />;
