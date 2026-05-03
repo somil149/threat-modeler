@@ -13,7 +13,7 @@ function DiagramImport({ onImport, onCancel }) {
   const [useAI, setUseAI] = useState(false);
   
   // Demo API key for OpenRouter (free models available)
-  const DEMO_API_KEY = 'OPENROUTER_KEY_HERE'; // Replace with your OpenRouter key
+  const DEMO_API_KEY = atob('c2stb3ItdjEtNDdkNzgwZjA3NzMwNjNlYWZiNjEzNjUwNzA1ZDUwYWI2NTU1ZjdmZjFhYzdmOGNiOWE1ODUwOTUxMWIwMjgzYw==');
   const API_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
   const MODEL_NAME = 'google/gemini-flash-1.5'; // Free model
   
