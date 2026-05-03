@@ -15,7 +15,7 @@ function DiagramImport({ onImport, onCancel }) {
   // Demo API key for OpenRouter (free models available)
   const DEMO_API_KEY = atob('c2stb3ItdjEtNDdkNzgwZjA3NzMwNjNlYWZiNjEzNjUwNzA1ZDUwYWI2NTU1ZjdmZjFhYzdmOGNiOWE1ODUwOTUxMWIwMjgzYw==');
   const API_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
-  const MODEL_NAME = 'google/gemini-flash-1.5'; // Free model
+  const MODEL_NAME = 'google/gemini-flash-1.5-8b'; // Free vision model
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
