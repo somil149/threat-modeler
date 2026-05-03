@@ -68,6 +68,25 @@ function App() {
     if (project) {
       setCurrentProject(project);
     }
+
+    // Handle shareable links
+    const hash = window.location.hash;
+    if (hash.startsWith('#share/')) {
+      const shareData = Storage.parseShareableLink(hash);
+      if (shareData) {
+        if (confirm(`Import shared project "${shareData.name}"?`)) {
+          const imported = Storage.importFromShare(shareData);
+          setCurrentProject(imported);
+          Storage.setCurrentProject(imported.id);
+          setCurrentView('architecture');
+          // Clear hash
+          window.location.hash = '';
+        }
+      } else {
+        alert('Invalid share link');
+        window.location.hash = '';
+      }
+    }
   }, []);
 
   const toggleTheme = () => {
