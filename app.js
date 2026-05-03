@@ -113,12 +113,40 @@ function App() {
 
   const renderView = () => {
     if (!currentProject && currentView !== 'dashboard') {
-      return <Dashboard onProjectSelect={handleProjectSelect} />;
+      return <Dashboard 
+        onProjectSelect={handleProjectSelect} 
+        onImportDiagram={() => setCurrentView('diagramimport')}
+      />;
     }
 
     switch (currentView) {
       case 'dashboard':
-        return <Dashboard onProjectSelect={handleProjectSelect} />;
+        return <Dashboard 
+          onProjectSelect={handleProjectSelect} 
+          onImportDiagram={() => setCurrentView('diagramimport')}
+        />;
+      case 'diagramimport':
+        return <DiagramImport 
+          onImport={(data) => {
+            // Create new project from imported diagram
+            const newProject = {
+              id: Date.now().toString(),
+              name: data.name,
+              description: data.description,
+              template: 'custom',
+              components: data.components,
+              flows: data.flows,
+              threats: [],
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              isFinalized: false
+            };
+            Storage.saveProject(newProject);
+            setCurrentProject(newProject);
+            setCurrentView('architecture');
+          }}
+          onCancel={() => setCurrentView('dashboard')}
+        />;
       case 'architecture':
         // Use CustomArchitectureBuilder for custom template
         if (currentProject && currentProject.template === 'custom') {
@@ -142,7 +170,10 @@ function App() {
       case 'export':
         return <ExportPanel project={currentProject} />;
       default:
-        return <Dashboard onProjectSelect={handleProjectSelect} />;
+        return <Dashboard 
+        onProjectSelect={handleProjectSelect} 
+        onImportDiagram={() => setCurrentView('diagramimport')}
+      />;
     }
   };
 

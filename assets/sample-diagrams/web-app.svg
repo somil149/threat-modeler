@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <!-- Title -->
+  <text x="400" y="30" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">Web Application Architecture</text>
+  
+  <!-- User -->
+  <circle cx="100" cy="150" r="40" fill="#4A90E2" stroke="#2E5C8A" stroke-width="2"/>
+  <text x="100" y="155" font-size="14" font-weight="bold" text-anchor="middle" fill="white">User</text>
+  
+  <!-- Load Balancer -->
+  <rect x="250" y="110" width="120" height="80" rx="5" fill="#50C878" stroke="#2E7D4E" stroke-width="2"/>
+  <text x="310" y="145" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Load</text>
+  <text x="310" y="165" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Balancer</text>
+  
+  <!-- Web Server -->
+  <rect x="450" y="110" width="120" height="80" rx="5" fill="#FF6B6B" stroke="#C92A2A" stroke-width="2"/>
+  <text x="510" y="145" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Web</text>
+  <text x="510" y="165" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Server</text>
+  
+  <!-- API Server -->
+  <rect x="450" y="250" width="120" height="80" rx="5" fill="#FFA500" stroke="#CC8400" stroke-width="2"/>
+  <text x="510" y="285" font-size="14" font-weight="bold" text-anchor="middle" fill="white">API</text>
+  <text x="510" y="305" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Server</text>
+  
+  <!-- Database -->
+  <ellipse cx="510" cy="450" rx="80" ry="50" fill="#9B59B6" stroke="#6C3483" stroke-width="2"/>
+  <text x="510" y="445" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Database</text>
+  <text x="510" y="465" font-size="12" text-anchor="middle" fill="white">(PostgreSQL)</text>
+  
+  <!-- Cache -->
+  <rect x="650" y="250" width="100" height="80" rx="5" fill="#E74C3C" stroke="#A93226" stroke-width="2"/>
+  <text x="700" y="285" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Redis</text>
+  <text x="700" y="305" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Cache</text>
+  
+  <!-- Arrows -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <line x1="140" y1="150" x2="250" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="370" y1="150" x2="450" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="510" y1="190" x2="510" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="510" y1="330" x2="510" y2="400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="570" y1="290" x2="650" y2="290" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- Labels -->
+  <text x="195" y="135" font-size="11" fill="#666">HTTPS</text>
+  <text x="410" y="135" font-size="11" fill="#666">HTTP</text>
+  <text x="525" y="220" font-size="11" fill="#666">REST</text>
+  <text x="525" y="370" font-size="11" fill="#666">SQL</text>
+  <text x="610" y="275" font-size="11" fill="#666">Cache</text>
+</svg>

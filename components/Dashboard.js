@@ -2,7 +2,7 @@
 // Dashboard Component
 // ========================================
 
-function Dashboard({ onProjectSelect }) {
+function Dashboard({ onProjectSelect, onImportDiagram }) {
   const [projects, setProjects] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [showNewProject, setShowNewProject] = useState(false);
@@ -63,10 +63,20 @@ function Dashboard({ onProjectSelect }) {
             Create and manage your threat models
           </p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowNewProject(true)}>
-          <i className="fas fa-plus"></i>
-          New Project
-        </button>
+        <div className="flex gap-2">
+          <button className="btn btn-primary" onClick={() => setShowNewProject(true)}>
+            <i className="fas fa-plus"></i>
+            New Project
+          </button>
+          <button 
+            className="btn btn-secondary" 
+            onClick={onImportDiagram}
+            style={{ background: 'var(--accent)', color: 'white', border: 'none' }}
+          >
+            <i className="fas fa-file-import"></i>
+            Import Diagram
+          </button>
+        </div>
       </div>
 
       {/* Projects Grid */}
