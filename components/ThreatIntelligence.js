@@ -76,27 +76,13 @@ function ThreatIntelligence({ project }) {
     const results = [];
     const seenCVEs = new Set();
     
-    // Get date range for last 3 years (NVD API format: YYYY-MM-DDTHH:MM:SS.000 UTC-05:00)
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 3);
-    
-    const formatDate = (date) => {
-      return date.toISOString().replace('Z', ' UTC-05:00');
-    };
-    
-    const pubStartDate = formatDate(startDate);
-    const pubEndDate = formatDate(endDate);
-    
     // Fetch up to 5 keywords with 20 results each
     for (let i = 0; i < Math.min(keywords.length, 5); i++) {
       const keyword = keywords[i];
       setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${Math.min(keywords.length, 5)})...`);
       
       try {
-        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&pubStartDate=${encodeURIComponent(pubStartDate)}&pubEndDate=${encodeURIComponent(pubEndDate)}&resultsPerPage=20`;
-        
-        console.log('Fetching:', url);
+        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=50`;
         
         const response = await fetch(url);
         
@@ -107,8 +93,6 @@ function ThreatIntelligence({ project }) {
         
         const data = await response.json();
         
-        console.log(`Found ${data.vulnerabilities?.length || 0} CVEs for "${keyword}"`);
-        
         if (data.vulnerabilities) {
           data.vulnerabilities.forEach(vuln => {
             const cve = vuln.cve;
@@ -118,6 +102,13 @@ function ThreatIntelligence({ project }) {
             seenCVEs.add(cve.id);
             
             const metrics = cve.metrics?.cvssMetricV31?.[0] || cve.metrics?.cvssMetricV2?.[0];
+            const publishedDate = new Date(cve.published);
+            
+            // Only include CVEs from last 3 years
+            const threeYearsAgo = new Date();
+            threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+            
+            if (publishedDate < threeYearsAgo) return;
             
             results.push({
               id: cve.id,
@@ -125,12 +116,13 @@ function ThreatIntelligence({ project }) {
               severity: metrics?.cvssData?.baseSeverity || 'UNKNOWN',
               score: metrics?.cvssData?.baseScore || 0,
               published: cve.published,
+              publishedDate: publishedDate,
               keyword: keyword
             });
           });
         }
         
-        // Add delay to avoid rate limiting (NVD allows 5 requests per 30 seconds without API key)
+        // Add delay to avoid rate limiting
         if (i < Math.min(keywords.length, 5) - 1) {
           await new Promise(resolve => setTimeout(resolve, 6000));
         }
@@ -140,7 +132,11 @@ function ThreatIntelligence({ project }) {
       }
     }
     
-    return results.sort((a, b) => b.score - a.score);
+    // Sort by date (newest first), then by score
+    return results.sort((a, b) => {
+      const dateDiff = b.publishedDate - a.publishedDate;
+      return dateDiff !== 0 ? dateDiff : b.score - a.score;
+    });
   };
 
   // Filter CVEs
