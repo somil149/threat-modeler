@@ -217,6 +217,9 @@ function DiagramImport({ onImport, onCancel }) {
     });
 
     // Call Hugging Face Inference API
+    console.log('Calling HF API with endpoint:', API_ENDPOINT);
+    console.log('Using model:', MODEL_NAME);
+    
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -262,7 +265,12 @@ Return ONLY the JSON, no other text.`
           return_full_text: false
         }
       })
+    }).catch(err => {
+      console.error('Fetch error:', err);
+      throw new Error('Network error: ' + err.message);
     });
+
+    console.log('Response received:', response);
 
     if (!response.ok) {
       const error = await response.json();
