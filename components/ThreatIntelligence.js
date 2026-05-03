@@ -34,70 +34,106 @@ function ThreatIntelligence({ project }) {
 
   // Extract keywords from project threats (STRIDE categories + components)
   const extractKeywordsFromThreats = (project) => {
-    const keywords = new Set();
+    const keywordMap = {}; // keyword -> relevance score
     
     // Analyze threats
     project.threats.forEach(threat => {
       const desc = threat.description.toLowerCase();
       const title = threat.title.toLowerCase();
       const component = threat.component?.toLowerCase() || '';
+      const riskScore = (threat.likelihood || 3) * (threat.impact || 3); // Higher risk = more relevant
       
-      // STRIDE-based keywords
+      // STRIDE-based keywords with risk weighting
       if (threat.stride?.includes('S') || title.includes('spoof') || desc.includes('authentication')) {
-        keywords.add('authentication bypass');
+        keywordMap['authentication bypass'] = (keywordMap['authentication bypass'] || 0) + riskScore;
+        if (desc.includes('oauth') || component.includes('oauth')) {
+          keywordMap['oauth vulnerability'] = (keywordMap['oauth vulnerability'] || 0) + riskScore;
+        }
       }
       if (threat.stride?.includes('T') || title.includes('tamper') || desc.includes('integrity')) {
-        keywords.add('data tampering');
-      }
-      if (threat.stride?.includes('R') || title.includes('repudiation')) {
-        keywords.add('audit logging');
+        if (desc.includes('sql') || component.includes('database')) {
+          keywordMap['sql injection'] = (keywordMap['sql injection'] || 0) + riskScore;
+        }
+        if (desc.includes('code') || desc.includes('script')) {
+          keywordMap['code injection'] = (keywordMap['code injection'] || 0) + riskScore;
+        }
       }
       if (threat.stride?.includes('I') || title.includes('information') || desc.includes('disclosure')) {
-        keywords.add('information disclosure');
+        keywordMap['information disclosure'] = (keywordMap['information disclosure'] || 0) + riskScore;
+        if (desc.includes('path traversal') || desc.includes('directory')) {
+          keywordMap['path traversal'] = (keywordMap['path traversal'] || 0) + riskScore;
+        }
       }
       if (threat.stride?.includes('D') || title.includes('denial') || desc.includes('availability')) {
-        keywords.add('denial of service');
+        keywordMap['denial of service'] = (keywordMap['denial of service'] || 0) + riskScore;
       }
       if (threat.stride?.includes('E') || title.includes('elevation') || desc.includes('privilege')) {
-        keywords.add('privilege escalation');
+        keywordMap['privilege escalation'] = (keywordMap['privilege escalation'] || 0) + riskScore;
       }
       
-      // Component-specific keywords
-      if (component.includes('api') || desc.includes('api')) keywords.add('api security');
-      if (component.includes('database') || desc.includes('sql')) keywords.add('sql injection');
-      if (component.includes('web') || desc.includes('xss')) keywords.add('cross site scripting');
-      if (component.includes('auth') || desc.includes('oauth')) keywords.add('oauth');
-      if (component.includes('container') || desc.includes('docker')) keywords.add('container escape');
-      if (component.includes('kubernetes')) keywords.add('kubernetes');
-      if (component.includes('llm') || desc.includes('prompt')) keywords.add('prompt injection');
-      if (desc.includes('csrf')) keywords.add('csrf');
-      if (desc.includes('injection')) keywords.add('code injection');
-      if (desc.includes('deserialization')) keywords.add('deserialization');
+      // Specific vulnerability types
+      if (desc.includes('xss') || desc.includes('cross-site scripting')) {
+        keywordMap['cross site scripting'] = (keywordMap['cross site scripting'] || 0) + riskScore;
+      }
+      if (desc.includes('csrf') || desc.includes('cross-site request')) {
+        keywordMap['csrf'] = (keywordMap['csrf'] || 0) + riskScore;
+      }
+      if (desc.includes('deserialization')) {
+        keywordMap['deserialization'] = (keywordMap['deserialization'] || 0) + riskScore;
+      }
+      if (desc.includes('xxe') || desc.includes('xml external')) {
+        keywordMap['xxe'] = (keywordMap['xxe'] || 0) + riskScore;
+      }
+      if (desc.includes('ssrf') || desc.includes('server-side request')) {
+        keywordMap['ssrf'] = (keywordMap['ssrf'] || 0) + riskScore;
+      }
+      if (desc.includes('rce') || desc.includes('remote code execution')) {
+        keywordMap['remote code execution'] = (keywordMap['remote code execution'] || 0) + riskScore;
+      }
+      
+      // Component-specific
+      if (component.includes('api') || desc.includes('api')) {
+        keywordMap['api security'] = (keywordMap['api security'] || 0) + riskScore;
+      }
+      if (component.includes('container') || desc.includes('docker')) {
+        keywordMap['container escape'] = (keywordMap['container escape'] || 0) + riskScore;
+      }
+      if (component.includes('kubernetes')) {
+        keywordMap['kubernetes'] = (keywordMap['kubernetes'] || 0) + riskScore;
+      }
+      if (component.includes('llm') || desc.includes('prompt')) {
+        keywordMap['prompt injection'] = (keywordMap['prompt injection'] || 0) + riskScore;
+      }
     });
     
-    // If no specific keywords found, use general ones
-    if (keywords.size === 0) {
-      keywords.add('web application security');
-      keywords.add('api security');
+    // Sort by relevance score and return top keywords
+    const sortedKeywords = Object.entries(keywordMap)
+      .sort((a, b) => b[1] - a[1])
+      .map(([keyword, score]) => ({ keyword, score }));
+    
+    // If no specific keywords found, use general high-risk ones
+    if (sortedKeywords.length === 0) {
+      return [
+        { keyword: 'remote code execution', score: 10 },
+        { keyword: 'sql injection', score: 9 },
+        { keyword: 'authentication bypass', score: 8 }
+      ];
     }
     
-    return Array.from(keywords);
+    return sortedKeywords.slice(0, 5); // Top 5 most relevant
   };
 
   // Fetch CVEs from NVD API
-  const fetchCVEsFromNVD = async (keywords) => {
+  const fetchCVEsFromNVD = async (keywordObjects) => {
     const results = [];
     const seenCVEs = new Set();
     
-    // Limit to top 3 most relevant keywords
-    const topKeywords = keywords.slice(0, 3);
-    
-    for (let i = 0; i < topKeywords.length; i++) {
-      const keyword = topKeywords[i];
-      setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${topKeywords.length})...`);
+    for (let i = 0; i < keywordObjects.length; i++) {
+      const { keyword, score: relevanceScore } = keywordObjects[i];
+      setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${keywordObjects.length})...`);
       
       try {
-        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=30`;
+        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=20`;
         
         const response = await fetch(url);
         
@@ -126,26 +162,32 @@ function ThreatIntelligence({ project }) {
             if (publishedDate < fiveYearsAgo) return;
             
             const severity = metrics?.cvssData?.baseSeverity || 'MEDIUM';
-            const score = metrics?.cvssData?.baseScore || 5.0;
+            const cvssScore = metrics?.cvssData?.baseScore || 5.0;
             
             // Only show CRITICAL and HIGH severity CVEs
             if (severity !== 'CRITICAL' && severity !== 'HIGH') return;
+            
+            // Calculate relevance score: CVSS score * threat relevance * recency factor
+            const monthsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 30);
+            const recencyFactor = Math.max(0.5, 1 - (monthsOld / 60)); // Newer = more relevant
+            const finalRelevance = cvssScore * (relevanceScore / 10) * recencyFactor;
             
             results.push({
               id: cve.id,
               description: cve.descriptions?.[0]?.value || 'No description',
               severity: severity,
-              score: score,
+              score: cvssScore,
               published: cve.published,
               publishedDate: publishedDate,
               keyword: keyword,
-              matchedThreat: keyword
+              matchedThreat: keyword,
+              relevanceScore: finalRelevance
             });
           });
         }
         
         // Add delay to avoid rate limiting
-        if (i < topKeywords.length - 1) {
+        if (i < keywordObjects.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 6000));
         }
         
@@ -154,11 +196,8 @@ function ThreatIntelligence({ project }) {
       }
     }
     
-    // Sort by severity score (highest first), then by date
-    return results.sort((a, b) => {
-      const scoreDiff = b.score - a.score;
-      return scoreDiff !== 0 ? scoreDiff : b.publishedDate - a.publishedDate;
-    });
+    // Sort by relevance score (highest first)
+    return results.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 30); // Top 30 most relevant
   };
 
   // Filter CVEs
@@ -194,7 +233,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-exclamation-triangle"></i> Showing only <strong>CRITICAL</strong> and <strong>HIGH</strong> severity CVEs matching your threats
+        <i className="fas fa-brain"></i> Intelligent matching: Shows top 30 <strong>CRITICAL/HIGH</strong> CVEs ranked by relevance to your threats
       </p>
 
       {cveData.length > 0 && (
@@ -262,7 +301,17 @@ function ThreatIntelligence({ project }) {
                   background: 'var(--accent-bg)',
                   color: 'var(--accent)'
                 }}>
-                  {cve.score.toFixed(1)}
+                  CVSS: {cve.score.toFixed(1)}
+                </span>
+                <span style={{ 
+                  padding: '0.25rem 0.75rem', 
+                  borderRadius: '4px', 
+                  fontSize: '0.75rem', 
+                  fontWeight: 600,
+                  background: '#10b98120',
+                  color: '#10b981'
+                }} title="Relevance to your threats">
+                  <i className="fas fa-bullseye"></i> {cve.relevanceScore.toFixed(1)}
                 </span>
               </div>
             </div>
