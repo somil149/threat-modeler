@@ -70,7 +70,14 @@ function Dashboard({ onProjectSelect, onImportDiagram }) {
           </button>
           <button 
             className="btn btn-secondary" 
-            onClick={onImportDiagram}
+            onClick={() => {
+              console.log('Import Diagram clicked, onImportDiagram:', onImportDiagram);
+              if (onImportDiagram) {
+                onImportDiagram();
+              } else {
+                console.error('onImportDiagram is not defined!');
+              }
+            }}
             style={{ background: 'var(--accent)', color: 'white', border: 'none' }}
           >
             <i className="fas fa-file-import"></i>
