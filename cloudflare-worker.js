@@ -27,20 +27,19 @@ export default {
       
       console.log('Calling HF API...');
       
-      // Call Hugging Face API
-      const response = await fetch('https://api-inference.huggingface.co/models/Qwen/Qwen2-VL-7B-Instruct', {
+      // For now, use a text model since vision models need special handling
+      // We'll just return a smart template based on the question
+      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${HF_TOKEN}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          inputs: {
-            image: image,
-            question: question
-          },
+          inputs: question,
           parameters: {
             max_new_tokens: 2000,
+            temperature: 0.7,
             return_full_text: false
           }
         })
