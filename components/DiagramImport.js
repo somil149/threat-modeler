@@ -248,18 +248,37 @@ Return ONLY the JSON, no other text.`;
     }
 
     const data = await response.json();
-    console.log('HF API Response:', data);
+    console.log('Worker API Response:', data);
     
-    // Hugging Face returns array with generated_text
-    const content = data[0]?.generated_text || data.generated_text || JSON.stringify(data);
-    
-    // Parse JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Failed to parse AI response');
+    // Handle different response formats
+    let content = '';
+    if (Array.isArray(data)) {
+      content = data[0]?.generated_text || data[0]?.text || JSON.stringify(data[0]);
+    } else if (data.generated_text) {
+      content = data.generated_text;
+    } else if (data.error) {
+      throw new Error(data.error);
+    } else {
+      content = JSON.stringify(data);
     }
     
-    const parsed = JSON.parse(jsonMatch[0]);
+    console.log('Extracted content:', content);
+    
+    // Parse JSON from response - handle markdown code blocks
+    let jsonMatch = content.match(/```json\s*(\{[\s\S]*?\})\s*```/);
+    if (!jsonMatch) {
+      jsonMatch = content.match(/\{[\s\S]*\}/);
+    }
+    
+    if (!jsonMatch) {
+      console.error('No JSON found in response:', content);
+      throw new Error('AI did not return valid JSON. Using starter template instead.');
+    }
+    
+    const jsonStr = jsonMatch[1] || jsonMatch[0];
+    console.log('Extracted JSON:', jsonStr);
+    
+    const parsed = JSON.parse(jsonStr);
     
     // Convert to our format with IDs and positions
     const components = parsed.components.map((comp, idx) => ({
