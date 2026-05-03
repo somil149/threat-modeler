@@ -22,36 +22,41 @@ export default {
     try {
       const { image, question } = await request.json();
 
-      // Hugging Face token from environment variable
-      const HF_TOKEN = env.HF_TOKEN || 'YOUR_TOKEN_HERE';
+      // Gemini API key from environment variable
+      const GEMINI_API_KEY = env.GEMINI_API_KEY || 'YOUR_KEY_HERE';
       
-      console.log('Calling HF API...');
+      console.log('Calling Gemini API...');
       
-      // For now, use a text model since vision models need special handling
-      // We'll just return a smart template based on the question
-      const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+      // Call Gemini API
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${HF_TOKEN}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          inputs: question,
-          parameters: {
-            max_new_tokens: 2000,
-            temperature: 0.7,
-            return_full_text: false
-          }
+          contents: [{
+            parts: [
+              {
+                text: question
+              },
+              {
+                inline_data: {
+                  mime_type: "image/png",
+                  data: image
+                }
+              }
+            ]
+          }]
         })
       });
 
-      console.log('HF Response status:', response.status);
+      console.log('Gemini Response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('HF API Error:', errorText);
+        console.error('Gemini API Error:', errorText);
         return new Response(JSON.stringify({ 
-          error: `HF API Error: ${response.status} - ${errorText}` 
+          error: `Gemini API Error: ${response.status} - ${errorText}` 
         }), {
           status: 500,
           headers: {
@@ -62,9 +67,12 @@ export default {
       }
 
       const data = await response.json();
-      console.log('HF Response data:', data);
+      console.log('Gemini Response data:', data);
 
-      return new Response(JSON.stringify(data), {
+      // Extract text from Gemini response
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || JSON.stringify(data);
+
+      return new Response(JSON.stringify({ generated_text: text }), {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
