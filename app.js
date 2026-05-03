@@ -137,6 +137,8 @@ function App() {
         return <AttackPaths project={currentProject} />;
       case 'compliance':
         return <Compliance project={currentProject} />;
+      case '3dview':
+        return <Architecture3D project={currentProject} />;
       case 'export':
         return <ExportPanel project={currentProject} />;
       default:
@@ -303,6 +305,14 @@ function App() {
               >
                 <i className="fas fa-check-circle"></i>
                 <span>Compliance</span>
+              </button>
+
+              <button
+                className={`nav-item ${currentView === '3dview' ? 'active' : ''}`}
+                onClick={() => setCurrentView('3dview')}
+              >
+                <i className="fas fa-cube"></i>
+                <span>3D View</span>
               </button>
 
               <button
