@@ -337,11 +337,11 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
     return <div>Loading component library...</div>;
   }
 
-  const categories = componentLibrary.categories;
-  const currentCategory = categories[selectedCategory];
+  const categories = componentLibrary?.categories || {};
+  const currentCategory = categories[selectedCategory] || { components: [] };
   
   // Filter components by search
-  const filteredComponents = currentCategory.components.filter(c =>
+  const filteredComponents = (currentCategory.components || []).filter(c =>
     c.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
