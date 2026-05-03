@@ -1,0 +1,94 @@
+{
+  "categories": {
+    "infrastructure": {
+      "name": "Infrastructure",
+      "icon": "fa-network-wired",
+      "components": [
+        { "id": "load-balancer", "name": "Load Balancer", "type": "server", "icon": "⚖️" },
+        { "id": "firewall", "name": "Firewall", "type": "security", "icon": "🔥" },
+        { "id": "waf", "name": "WAF", "type": "security", "icon": "🛡️" },
+        { "id": "cdn", "name": "CDN", "type": "server", "icon": "🌐" },
+        { "id": "proxy", "name": "Proxy", "type": "server", "icon": "🔄" },
+        { "id": "vpn", "name": "VPN Gateway", "type": "server", "icon": "🔐" },
+        { "id": "api-gateway", "name": "API Gateway", "type": "api", "icon": "🚪" }
+      ]
+    },
+    "compute": {
+      "name": "Compute",
+      "icon": "fa-server",
+      "components": [
+        { "id": "web-server", "name": "Web Server", "type": "server", "icon": "🌐" },
+        { "id": "app-server", "name": "App Server", "type": "server", "icon": "⚙️" },
+        { "id": "container", "name": "Container", "type": "service", "icon": "📦" },
+        { "id": "kubernetes", "name": "Kubernetes", "type": "service", "icon": "☸️" },
+        { "id": "lambda", "name": "Serverless Function", "type": "service", "icon": "λ" },
+        { "id": "vm", "name": "Virtual Machine", "type": "server", "icon": "💻" },
+        { "id": "microservice", "name": "Microservice", "type": "service", "icon": "🔷" }
+      ]
+    },
+    "data": {
+      "name": "Data Storage",
+      "icon": "fa-database",
+      "components": [
+        { "id": "sql-db", "name": "SQL Database", "type": "database", "icon": "🗄️" },
+        { "id": "nosql-db", "name": "NoSQL Database", "type": "database", "icon": "📊" },
+        { "id": "cache", "name": "Cache (Redis)", "type": "database", "icon": "⚡" },
+        { "id": "data-lake", "name": "Data Lake", "type": "database", "icon": "🏞️" },
+        { "id": "vector-db", "name": "Vector Database", "type": "database", "icon": "🔢" },
+        { "id": "object-storage", "name": "Object Storage (S3)", "type": "database", "icon": "📁" },
+        { "id": "queue", "name": "Message Queue", "type": "service", "icon": "📬" },
+        { "id": "blob-storage", "name": "Blob Storage", "type": "database", "icon": "💾" }
+      ]
+    },
+    "ai_ml": {
+      "name": "AI/ML",
+      "icon": "fa-brain",
+      "components": [
+        { "id": "llm-api", "name": "LLM API", "type": "external", "icon": "🤖" },
+        { "id": "rag-pipeline", "name": "RAG Pipeline", "type": "service", "icon": "🔍" },
+        { "id": "vector-search", "name": "Vector Search", "type": "service", "icon": "🎯" },
+        { "id": "model-serving", "name": "Model Serving", "type": "service", "icon": "🧠" },
+        { "id": "training-pipeline", "name": "Training Pipeline", "type": "service", "icon": "📈" },
+        { "id": "agent-orchestrator", "name": "Agent Orchestrator", "type": "service", "icon": "🎭" },
+        { "id": "embedding-service", "name": "Embedding Service", "type": "service", "icon": "🔤" }
+      ]
+    },
+    "security": {
+      "name": "Security",
+      "icon": "fa-shield-alt",
+      "components": [
+        { "id": "idp", "name": "Identity Provider", "type": "service", "icon": "🆔" },
+        { "id": "auth-service", "name": "Auth Service", "type": "service", "icon": "🔑" },
+        { "id": "secrets-manager", "name": "Secrets Manager", "type": "service", "icon": "🔒" },
+        { "id": "hsm", "name": "HSM", "type": "security", "icon": "🔐" },
+        { "id": "siem", "name": "SIEM", "type": "service", "icon": "👁️" },
+        { "id": "dlp", "name": "DLP", "type": "security", "icon": "🛡️" },
+        { "id": "mfa", "name": "MFA Service", "type": "service", "icon": "📱" }
+      ]
+    },
+    "external": {
+      "name": "External",
+      "icon": "fa-globe",
+      "components": [
+        { "id": "user", "name": "User/Client", "type": "external", "icon": "👤" },
+        { "id": "mobile-app", "name": "Mobile App", "type": "external", "icon": "📱" },
+        { "id": "browser", "name": "Web Browser", "type": "external", "icon": "🌐" },
+        { "id": "third-party-api", "name": "Third-Party API", "type": "external", "icon": "🔌" },
+        { "id": "payment-gateway", "name": "Payment Gateway", "type": "external", "icon": "💳" },
+        { "id": "email-service", "name": "Email Service", "type": "external", "icon": "📧" },
+        { "id": "sms-service", "name": "SMS Service", "type": "external", "icon": "💬" }
+      ]
+    },
+    "monitoring": {
+      "name": "Monitoring",
+      "icon": "fa-chart-line",
+      "components": [
+        { "id": "logging", "name": "Logging Service", "type": "service", "icon": "📝" },
+        { "id": "metrics", "name": "Metrics", "type": "service", "icon": "📊" },
+        { "id": "apm", "name": "APM", "type": "service", "icon": "🔍" },
+        { "id": "alerting", "name": "Alerting", "type": "service", "icon": "🚨" },
+        { "id": "tracing", "name": "Distributed Tracing", "type": "service", "icon": "🔗" }
+      ]
+    }
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "stride": {
+    "Spoofing": [
+      {
+        "title": "Weak Authentication Mechanism",
+        "description": "System uses weak or no authentication, allowing attackers to impersonate legitimate users",
+        "mitigation": "Implement multi-factor authentication (MFA) and strong password policies",
+        "detection": "Monitor failed login attempts and unusual access patterns",
+        "likelihood": 4,
+        "impact": 5
+      },
+      {
+        "title": "Session Token Theft",
+        "description": "Session tokens transmitted insecurely or stored improperly",
+        "mitigation": "Use HTTPS, secure cookies, implement token rotation",
+        "detection": "Monitor for concurrent sessions from different locations",
+        "likelihood": 3,
+        "impact": 4
+      }
+    ],
+    "Tampering": [
+      {
+        "title": "Data Manipulation in Transit",
+        "description": "Attacker intercepts and modifies data during transmission",
+        "mitigation": "Use TLS/SSL for all communications, implement message signing",
+        "detection": "Implement integrity checks and anomaly detection",
+        "likelihood": 3,
+        "impact": 5
+      },
+      {
+        "title": "SQL Injection",
+        "description": "Malicious SQL code injected through user inputs",
+        "mitigation": "Use parameterized queries, input validation, ORM frameworks",
+        "detection": "WAF rules, database query monitoring",
+        "likelihood": 4,
+        "impact": 5
+      }
+    ],
+    "Repudiation": [
+      {
+        "title": "Insufficient Logging",
+        "description": "Critical actions not logged, preventing audit trails",
+        "mitigation": "Implement comprehensive logging, use centralized log management",
+        "detection": "Regular log audits and compliance checks",
+        "likelihood": 3,
+        "impact": 3
+      }
+    ],
+    "Information Disclosure": [
+      {
+        "title": "Sensitive Data Exposure",
+        "description": "Sensitive data transmitted or stored without encryption",
+        "mitigation": "Encrypt data at rest and in transit, implement data classification",
+        "detection": "DLP tools, network traffic analysis",
+        "likelihood": 4,
+        "impact": 5
+      },
+      {
+        "title": "API Information Leakage",
+        "description": "API responses contain excessive or sensitive information",
+        "mitigation": "Implement response filtering, minimize data exposure",
+        "detection": "API security testing, response monitoring",
+        "likelihood": 3,
+        "impact": 4
+      }
+    ],
+    "Denial of Service": [
+      {
+        "title": "Resource Exhaustion",
+        "description": "Attacker overwhelms system resources causing service disruption",
+        "mitigation": "Implement rate limiting, auto-scaling, DDoS protection",
+        "detection": "Monitor resource utilization, traffic patterns",
+        "likelihood": 4,
+        "impact": 4
+      }
+    ],
+    "Elevation of Privilege": [
+      {
+        "title": "Privilege Escalation",
+        "description": "Attacker gains unauthorized elevated access",
+        "mitigation": "Implement least privilege, regular access reviews, RBAC",
+        "detection": "Monitor privilege changes, unusual admin activity",
+        "likelihood": 3,
+        "impact": 5
+      }
+    ]
+  },
+  "owasp_top10": [
+    {
+      "title": "Broken Access Control",
+      "description": "Restrictions on authenticated users not properly enforced",
+      "mitigation": "Implement proper authorization checks, deny by default",
+      "stride": "Elevation of Privilege",
+      "likelihood": 4,
+      "impact": 5
+    },
+    {
+      "title": "Cryptographic Failures",
+      "description": "Sensitive data exposed due to weak or missing encryption",
+      "mitigation": "Use strong encryption algorithms, proper key management",
+      "stride": "Information Disclosure",
+      "likelihood": 3,
+      "impact": 5
+    },
+    {
+      "title": "Injection",
+      "description": "Untrusted data sent to interpreter as part of command or query",
+      "mitigation": "Use parameterized queries, input validation, escaping",
+      "stride": "Tampering",
+      "likelihood": 4,
+      "impact": 5
+    }
+  ],
+  "ai_llm_threats": [
+    {
+      "title": "Prompt Injection",
+      "description": "Malicious prompts manipulate LLM to bypass safety controls",
+      "mitigation": "Input sanitization, prompt templates, output filtering",
+      "detection": "Monitor for unusual prompt patterns, output anomalies",
+      "stride": "Tampering",
+      "likelihood": 5,
+      "impact": 4
+    },
+    {
+      "title": "Training Data Poisoning",
+      "description": "Malicious data injected into training set to compromise model",
+      "mitigation": "Data validation, provenance tracking, model monitoring",
+      "detection": "Model behavior analysis, performance degradation monitoring",
+      "stride": "Tampering",
+      "likelihood": 2,
+      "impact": 5
+    },
+    {
+      "title": "Model Inversion Attack",
+      "description": "Attacker extracts training data from model outputs",
+      "mitigation": "Differential privacy, output filtering, access controls",
+      "detection": "Query pattern analysis, unusual inference requests",
+      "stride": "Information Disclosure",
+      "likelihood": 3,
+      "impact": 5
+    },
+    {
+      "title": "Insecure Plugin/Tool Use",
+      "description": "LLM uses external tools without proper validation",
+      "mitigation": "Tool whitelisting, input/output validation, sandboxing",
+      "detection": "Monitor tool invocations, unexpected API calls",
+      "stride": "Elevation of Privilege",
+      "likelihood": 4,
+      "impact": 5
+    },
+    {
+      "title": "Sensitive Data Leakage",
+      "description": "LLM inadvertently exposes sensitive information in responses",
+      "mitigation": "Data filtering, PII detection, response sanitization",
+      "detection": "Output monitoring, DLP integration",
+      "stride": "Information Disclosure",
+      "likelihood": 4,
+      "impact": 5
+    }
+  ],
+  "cloud_threats": [
+    {
+      "title": "Misconfigured S3 Bucket",
+      "description": "Cloud storage publicly accessible due to misconfiguration",
+      "mitigation": "Enable bucket policies, block public access, regular audits",
+      "detection": "Cloud security posture management tools",
+      "stride": "Information Disclosure",
+      "likelihood": 4,
+      "impact": 5
+    },
+    {
+      "title": "Excessive IAM Permissions",
+      "description": "Overly permissive IAM roles grant unnecessary access",
+      "mitigation": "Implement least privilege, regular permission reviews",
+      "detection": "IAM access analyzer, unused permission detection",
+      "stride": "Elevation of Privilege",
+      "likelihood": 3,
+      "impact": 4
+    }
+  ]
+}

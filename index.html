@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThreatModeler - Modern Threat Modeling Tool</title>
+  <meta name="description" content="Client-side threat modeling tool for security architects">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+  
+  <!-- React (CDN) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel Standalone for JSX -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- D3.js for visualization -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  
+  <!-- Chart.js for charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Utilities -->
+  <script src="utils/storage.js"></script>
+  <script src="utils/scoring.js"></script>
+  <script src="utils/graph.js"></script>
+  <script src="utils/export.js"></script>
+  
+  <!-- Components -->
+  <script type="text/babel" src="components/SearchFilter.js"></script>
+  <script type="text/babel" src="components/Dashboard.js"></script>
+  <script type="text/babel" src="components/CustomArchitectureBuilder.js"></script>
+  <script type="text/babel" src="components/ArchitectureCanvas.js"></script>
+  <script type="text/babel" src="components/ThreatList.js"></script>
+  <script type="text/babel" src="components/RiskMatrix.js"></script>
+  <script type="text/babel" src="components/AttackPaths.js"></script>
+  <script type="text/babel" src="components/Compliance.js"></script>
+  <script type="text/babel" src="components/Tutorial.js"></script>
+  <script type="text/babel" src="components/ExportPanel.js"></script>
+  
+  <!-- Main App -->
+  <script type="text/babel" src="app.js"></script>
+</body>
+</html>
