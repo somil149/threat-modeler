@@ -332,7 +332,10 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
       });
   };
 
-  if (!componentLibrary) return <div>Loading...</div>;
+  // Don't block render if we already have components (e.g., from import)
+  if (!componentLibrary && components.length === 0) {
+    return <div>Loading component library...</div>;
+  }
 
   const categories = componentLibrary.categories;
   const currentCategory = categories[selectedCategory];
