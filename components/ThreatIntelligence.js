@@ -174,8 +174,13 @@ function ThreatIntelligence({ project }) {
         console.log(`NVD API returned ${data.vulnerabilities?.length || 0} CVEs for "${keyword}"`);
         
         if (data.vulnerabilities) {
+          let processedCount = 0;
+          let filteredBySeverity = 0;
+          let filteredByDate = 0;
+          
           data.vulnerabilities.forEach(vuln => {
             const cve = vuln.cve;
+            processedCount++;
             
             // Skip duplicates
             if (seenCVEs.has(cve.id)) return;
@@ -189,6 +194,7 @@ function ThreatIntelligence({ project }) {
             
             // Show HIGH and CRITICAL, but also MEDIUM if score >= 7.0
             if (severity === 'LOW' || (severity === 'MEDIUM' && cvssScore < 7.0)) {
+              filteredBySeverity++;
               return;
             }
             
@@ -197,6 +203,7 @@ function ThreatIntelligence({ project }) {
             threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
             
             if (publishedDate < threeYearsAgo) {
+              filteredByDate++;
               return;
             }
             
@@ -217,6 +224,8 @@ function ThreatIntelligence({ project }) {
               relevanceScore: finalRelevance
             });
           });
+          
+          console.log(`Processed ${processedCount} CVEs for "${keyword}": ${filteredBySeverity} filtered by severity, ${filteredByDate} filtered by date, ${results.length} kept`);
         }
         
         // Add delay to avoid rate limiting
