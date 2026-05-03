@@ -201,8 +201,15 @@ function ThreatIntelligence({ project }) {
             // No date filter - we'll sort by recency instead
             
             // Calculate relevance score: CVSS score * threat relevance * recency factor
-            const monthsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 30);
-            const recencyFactor = Math.max(0.1, 1 - (monthsOld / 120)); // Heavily favor recent (last 10 years)
+            const yearsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 365);
+            
+            // Heavily favor recent CVEs (exponential decay)
+            let recencyFactor;
+            if (yearsOld < 2) recencyFactor = 10; // Last 2 years: 10x weight
+            else if (yearsOld < 5) recencyFactor = 5; // 2-5 years: 5x weight
+            else if (yearsOld < 10) recencyFactor = 2; // 5-10 years: 2x weight
+            else recencyFactor = 0.5; // 10+ years: 0.5x weight
+            
             const finalRelevance = cvssScore * (relevanceScore / 10) * recencyFactor;
             
             results.push({
