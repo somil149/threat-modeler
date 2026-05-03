@@ -147,7 +147,18 @@ const Storage = {
 
   // Export project as JSON
   exportProject(project) {
-    const dataStr = JSON.stringify(project, null, 2);
+    const exportData = {
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      project: {
+        ...project,
+        // Remove user-specific IDs for portability
+        id: undefined,
+        createdAt: undefined,
+        updatedAt: undefined
+      }
+    };
+    const dataStr = JSON.stringify(exportData, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -160,12 +171,58 @@ const Storage = {
   // Import project from JSON
   importProject(jsonString) {
     try {
-      const project = JSON.parse(jsonString);
+      const data = JSON.parse(jsonString);
+      // Support both old and new format
+      const project = data.project || data;
+      
+      // Validate required fields
+      if (!project.name || !project.components) {
+        throw new Error('Invalid project format: missing required fields');
+      }
+      
       return this.createProject(project);
     } catch (error) {
       console.error('Failed to import project:', error);
+      throw error;
+    }
+  },
+
+  // Generate shareable link (read-only)
+  generateShareableLink(project) {
+    const shareData = {
+      v: '1.0',
+      name: project.name,
+      template: project.template,
+      components: project.components,
+      flows: project.flows,
+      threats: project.threats || []
+    };
+    const compressed = btoa(encodeURIComponent(JSON.stringify(shareData)));
+    const baseUrl = window.location.origin + window.location.pathname;
+    return `${baseUrl}#share/${compressed}`;
+  },
+
+  // Parse shareable link
+  parseShareableLink(hash) {
+    try {
+      const compressed = hash.replace('#share/', '');
+      const jsonString = decodeURIComponent(atob(compressed));
+      return JSON.parse(jsonString);
+    } catch (error) {
+      console.error('Failed to parse shareable link:', error);
       return null;
     }
+  },
+
+  // Import from shareable link
+  importFromShare(shareData) {
+    return this.createProject({
+      name: shareData.name + ' (Shared)',
+      template: shareData.template,
+      components: shareData.components,
+      flows: shareData.flows,
+      threats: shareData.threats || []
+    });
   },
 
   // Template Builder (user-specific)
