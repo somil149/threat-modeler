@@ -131,22 +131,18 @@ function App() {
             console.log('DiagramImport - onImport called with data:', data);
             
             // Create new project from imported diagram
-            const newProject = {
-              id: Date.now().toString(),
+            const projectData = {
               name: data.name,
               description: data.description,
               template: 'custom',
               components: data.components,
               flows: data.flows,
-              threats: [],
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              isFinalized: false
+              threats: []
             };
             
-            console.log('Created new project:', newProject);
-            Storage.saveProject(newProject);
-            console.log('Project saved, setting current project and view');
+            console.log('Creating project with data:', projectData);
+            const newProject = Storage.createProject(projectData);
+            console.log('Project created:', newProject);
             setCurrentProject(newProject);
             setCurrentView('architecture');
           }}
