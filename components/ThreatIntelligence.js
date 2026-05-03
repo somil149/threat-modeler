@@ -76,6 +76,14 @@ function ThreatIntelligence({ project }) {
     const results = [];
     const seenCVEs = new Set();
     
+    // Get date range for last 3 years
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setFullYear(startDate.getFullYear() - 3);
+    
+    const pubStartDate = startDate.toISOString().split('T')[0] + 'T00:00:00.000';
+    const pubEndDate = endDate.toISOString().split('T')[0] + 'T23:59:59.999';
+    
     // Fetch up to 5 keywords with 20 results each
     for (let i = 0; i < Math.min(keywords.length, 5); i++) {
       const keyword = keywords[i];
@@ -83,7 +91,7 @@ function ThreatIntelligence({ project }) {
       
       try {
         const response = await fetch(
-          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=20`
+          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&pubStartDate=${pubStartDate}&pubEndDate=${pubEndDate}&resultsPerPage=20`
         );
         
         if (!response.ok) {
@@ -158,6 +166,10 @@ function ThreatIntelligence({ project }) {
           {loading ? 'Fetching...' : 'Fetch Latest CVEs'}
         </button>
       </div>
+
+      <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+        <i className="fas fa-info-circle"></i> Showing CVEs from the last 3 years relevant to your architecture
+      </p>
 
       {cveData.length > 0 && (
         <div className="filters" style={{ marginBottom: '1rem' }}>
