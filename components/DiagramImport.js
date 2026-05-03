@@ -9,13 +9,13 @@ function DiagramImport({ onImport, onCancel }) {
   const [detectedComponents, setDetectedComponents] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openrouter_api_key') || '');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('huggingface_token') || '');
   const [useAI, setUseAI] = useState(false);
   
-  // Demo API key for OpenRouter (free models available)
-  const DEMO_API_KEY = atob('c2stb3ItdjEtNDdkNzgwZjA3NzMwNjNlYWZiNjEzNjUwNzA1ZDUwYWI2NTU1ZjdmZjFhYzdmOGNiOWE1ODUwOTUxMWIwMjgzYw==');
-  const API_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
-  const MODEL_NAME = 'meta-llama/llama-3.2-11b-vision-instruct'; // Vision model
+  // Demo API key for Hugging Face (completely free)
+  const DEMO_API_KEY = 'HF_KEY_HERE'; // Your HF token
+  const API_ENDPOINT = 'https://api-inference.huggingface.co/models/Qwen/Qwen2-VL-7B-Instruct';
+  const MODEL_NAME = 'Qwen/Qwen2-VL-7B-Instruct'; // Free vision model
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
@@ -105,7 +105,7 @@ function DiagramImport({ onImport, onCancel }) {
     setUploadedImage(imageUrl);
 
     // Check if user wants AI detection
-    const hasApiKey = localStorage.getItem('openrouter_api_key');
+    const hasApiKey = localStorage.getItem('huggingface_token');
     if (hasApiKey || useAI) {
       setIsProcessing(true);
       try {
@@ -144,12 +144,12 @@ function DiagramImport({ onImport, onCancel }) {
 
   const handleUseAI = async () => {
     if (!apiKey) {
-      alert('Please enter your OpenRouter API key');
+      alert('Please enter your Hugging Face token');
       return;
     }
     
     // Save API key
-    localStorage.setItem('openrouter_api_key', apiKey);
+    localStorage.setItem('huggingface_token', apiKey);
     setShowApiKeyDialog(false);
     setIsProcessing(true);
 
@@ -204,9 +204,9 @@ function DiagramImport({ onImport, onCancel }) {
   };
 
   const extractComponentsWithAI = async (file, apiKeyToUse) => {
-    const key = apiKeyToUse || localStorage.getItem('openrouter_api_key');
+    const key = apiKeyToUse || localStorage.getItem('huggingface_token');
     if (!key) {
-      throw new Error('OpenRouter API key not found');
+      throw new Error('Hugging Face token not found');
     }
 
     // Convert image to base64
@@ -216,24 +216,17 @@ function DiagramImport({ onImport, onCancel }) {
       reader.readAsDataURL(file);
     });
 
-    // Call OpenRouter API (supports free models like Gemini Flash)
+    // Call Hugging Face Inference API
     const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${key}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'ThreatModeler'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: MODEL_NAME,
-        messages: [
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'text',
-                text: `Analyze this architecture/data flow diagram and extract all components and data flows. 
+        inputs: {
+          image: base64.split(',')[1], // Remove data:image/png;base64, prefix
+          question: `Analyze this architecture/data flow diagram and extract all components and data flows. 
 
 Return a JSON object with this exact structure:
 {
@@ -263,17 +256,11 @@ Guidelines:
 - Be thorough and accurate
 
 Return ONLY the JSON, no other text.`
-              },
-              {
-                type: 'image_url',
-                image_url: {
-                  url: base64
-                }
-              }
-            ]
-          }
-        ],
-        max_tokens: 2000
+        },
+        parameters: {
+          max_new_tokens: 2000,
+          return_full_text: false
+        }
       })
     });
 
@@ -286,7 +273,10 @@ Return ONLY the JSON, no other text.`
     }
 
     const data = await response.json();
-    const content = data.choices[0].message.content;
+    console.log('HF API Response:', data);
+    
+    // Hugging Face returns array with generated_text
+    const content = data[0]?.generated_text || data.generated_text || JSON.stringify(data);
     
     // Parse JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -636,19 +626,19 @@ Return ONLY the JSON, no other text.`
               </div>
 
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                Your OpenRouter API Key (optional):
+                Your Hugging Face API Token (optional):
               </label>
               <input
                 type="password"
                 className="input"
-                placeholder="sk-or-... (for unlimited access)"
+                placeholder="hf_... (for unlimited access)"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 style={{ marginBottom: '0.5rem' }}
               />
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                Your API key is stored locally and never sent to our servers. 
-                Get a free key at <a href="https://openrouter.ai/keys" target="_blank" style={{ color: 'var(--accent)' }}>openrouter.ai/keys</a> (supports free models)
+                Your token is stored locally and never sent to our servers. 
+                Get a free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style={{ color: 'var(--accent)' }}>huggingface.co/settings/tokens</a> (completely free, no credit card)
               </p>
 
               <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
