@@ -13,13 +13,16 @@ const Storage = {
 
   // Get current user ID for data isolation
   getCurrentUserId() {
-    const user = GitHubAuth?.getUser();
-    return user ? user.id : 'anonymous';
+    const user = FirebaseAuth?.getUser();
+    return user ? user.id : null;
   },
 
   // Get user-specific storage key
   getUserKey(baseKey) {
     const userId = this.getCurrentUserId();
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
     return `${baseKey}_user_${userId}`;
   },
 
