@@ -9,7 +9,7 @@ function DiagramImport({ onImport, onCancel }) {
   const [detectedComponents, setDetectedComponents] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem('huggingface_token') || '');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   const [useAI, setUseAI] = useState(false);
   
   // Cloudflare Worker endpoint (bypasses CORS)
@@ -153,12 +153,12 @@ function DiagramImport({ onImport, onCancel }) {
 
   const handleUseAI = async () => {
     if (!apiKey) {
-      alert('Please enter your Hugging Face token');
+      alert('Please enter your Google Gemini API key');
       return;
     }
     
     // Save API key
-    localStorage.setItem('huggingface_token', apiKey);
+    localStorage.setItem('gemini_api_key', apiKey);
     setShowApiKeyDialog(false);
     setIsProcessing(true);
 
@@ -603,7 +603,6 @@ Return ONLY the JSON, no other text.`;
                 </ul>
               </div>
 
-              {/* Demo Key Option */}
               <div style={{ 
                 padding: '1rem', 
                 background: 'var(--success-bg)', 
@@ -612,10 +611,10 @@ Return ONLY the JSON, no other text.`;
                 border: '1px solid var(--success)'
               }}>
                 <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--success)' }}>
-                  <i className="fas fa-gift"></i> Try Demo (Free)
+                  <i className="fas fa-gift"></i> Try AI Detection (Free)
                 </div>
                 <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                  Use our demo token to try AI detection without signing up. Powered by Hugging Face.
+                  Use our AI to automatically detect all components and flows from your diagram. Powered by Google Gemini.
                 </p>
                 <p style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
                   Remaining uses today: <span style={{ color: 'var(--success)' }}>{getRemainingUses()}/5</span>
@@ -623,19 +622,19 @@ Return ONLY the JSON, no other text.`;
               </div>
 
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                Your Hugging Face API Token (optional):
+                Your Google Gemini API Key (optional):
               </label>
               <input
                 type="password"
                 className="input"
-                placeholder="hf_... (for unlimited access)"
+                placeholder="AIza... (for unlimited access)"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 style={{ marginBottom: '0.5rem' }}
               />
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                Your token is stored locally and never sent to our servers. 
-                Get a free token at <a href="https://huggingface.co/settings/tokens" target="_blank" style={{ color: 'var(--accent)' }}>huggingface.co/settings/tokens</a> (completely free, no credit card)
+                Your API key is stored locally and never sent to our servers. 
+                Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style={{ color: 'var(--accent)' }}>aistudio.google.com</a> (free tier: 1500 requests/day)
               </p>
 
               <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
