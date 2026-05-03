@@ -160,7 +160,7 @@ function ThreatIntelligence({ project }) {
       setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${keywordObjects.length})...`);
       
       try {
-        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=20`;
+        const url = `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=50`;
         
         const response = await fetch(url);
         
@@ -184,22 +184,21 @@ function ThreatIntelligence({ project }) {
             const metrics = cve.metrics?.cvssMetricV31?.[0] || cve.metrics?.cvssMetricV2?.[0];
             const publishedDate = new Date(cve.published);
             
-            // Only include CVEs from last 5 years
-            const fiveYearsAgo = new Date();
-            fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-            
-            if (publishedDate < fiveYearsAgo) return;
-            
             const severity = metrics?.cvssData?.baseSeverity || 'MEDIUM';
             const cvssScore = metrics?.cvssData?.baseScore || 5.0;
             
             // Show HIGH and CRITICAL, but also MEDIUM if score >= 7.0
             if (severity === 'LOW' || (severity === 'MEDIUM' && cvssScore < 7.0)) {
-              console.log(`Skipping ${cve.id}: ${severity} (${cvssScore})`);
               return;
             }
             
-            console.log(`Including ${cve.id}: ${severity} (${cvssScore})`);
+            // Only include CVEs from last 3 years (more lenient)
+            const threeYearsAgo = new Date();
+            threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
+            
+            if (publishedDate < threeYearsAgo) {
+              return;
+            }
             
             // Calculate relevance score: CVSS score * threat relevance * recency factor
             const monthsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 30);
@@ -273,7 +272,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-brain"></i> Intelligent matching: Shows <strong>HIGH/CRITICAL</strong> and <strong>MEDIUM (7.0+)</strong> CVEs ranked by relevance
+        <i className="fas fa-brain"></i> Shows <strong>HIGH/CRITICAL</strong> and <strong>MEDIUM (7.0+)</strong> CVEs from last 3 years
       </p>
 
       {cveData.length > 0 && (
