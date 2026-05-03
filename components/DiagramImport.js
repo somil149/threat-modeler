@@ -135,6 +135,8 @@ function DiagramImport({ onImport, onCancel }) {
       setIsProcessing(false);
     }
   };
+
+  const handleUseStarterTemplate = async () => {
     setShowApiKeyDialog(false);
     setIsProcessing(true);
     try {
