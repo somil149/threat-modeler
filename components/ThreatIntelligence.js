@@ -193,8 +193,13 @@ function ThreatIntelligence({ project }) {
             const severity = metrics?.cvssData?.baseSeverity || 'MEDIUM';
             const cvssScore = metrics?.cvssData?.baseScore || 5.0;
             
-            // Only show CRITICAL and HIGH severity CVEs
-            if (severity !== 'CRITICAL' && severity !== 'HIGH') return;
+            // Show HIGH and CRITICAL, but also MEDIUM if score >= 7.0
+            if (severity === 'LOW' || (severity === 'MEDIUM' && cvssScore < 7.0)) {
+              console.log(`Skipping ${cve.id}: ${severity} (${cvssScore})`);
+              return;
+            }
+            
+            console.log(`Including ${cve.id}: ${severity} (${cvssScore})`);
             
             // Calculate relevance score: CVSS score * threat relevance * recency factor
             const monthsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 30);
@@ -268,7 +273,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-brain"></i> Intelligent matching: Shows top 30 <strong>CRITICAL/HIGH</strong> CVEs ranked by relevance to your threats
+        <i className="fas fa-brain"></i> Intelligent matching: Shows <strong>HIGH/CRITICAL</strong> and <strong>MEDIUM (7.0+)</strong> CVEs ranked by relevance
       </p>
 
       {cveData.length > 0 && (
