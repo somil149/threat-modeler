@@ -15,7 +15,7 @@ function DiagramImport({ onImport, onCancel }) {
   // Demo API key for OpenRouter (free models available)
   const DEMO_API_KEY = atob('c2stb3ItdjEtNDdkNzgwZjA3NzMwNjNlYWZiNjEzNjUwNzA1ZDUwYWI2NTU1ZjdmZjFhYzdmOGNiOWE1ODUwOTUxMWIwMjgzYw==');
   const API_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
-  const MODEL_NAME = 'meta-llama/llama-3.2-11b-vision-instruct:free'; // Free vision model
+  const MODEL_NAME = 'meta-llama/llama-3.2-11b-vision-instruct'; // Vision model
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
@@ -279,7 +279,10 @@ Return ONLY the JSON, no other text.`
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error?.message || 'API request failed');
+      console.error('OpenRouter API Error:', error);
+      console.error('Response status:', response.status);
+      console.error('Response headers:', response.headers);
+      throw new Error(error.error?.message || JSON.stringify(error) || 'API request failed');
     }
 
     const data = await response.json();
