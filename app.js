@@ -140,13 +140,20 @@ function App() {
               <button
                 className="btn btn-primary"
                 onClick={() => GitHubAuth.login()}
-                style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+                style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '1rem' }}
               >
                 <i className="fab fa-github" style={{ marginRight: '0.5rem' }}></i>
                 Sign in with GitHub
               </button>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowLogin(false)}
+                style={{ width: '100%', padding: '1rem', fontSize: '1rem' }}
+              >
+                Continue without login
+              </button>
               <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Your data is stored locally. GitHub login is used for identity only.
+                Your data is stored locally. GitHub login is optional.
               </p>
             </div>
           </div>
