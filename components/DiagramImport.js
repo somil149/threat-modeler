@@ -8,6 +8,9 @@ function DiagramImport({ onImport, onCancel }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedComponents, setDetectedComponents] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
+  const [useAI, setUseAI] = useState(false);
 
   const sampleDiagrams = [
     {
@@ -60,22 +63,189 @@ function DiagramImport({ onImport, onCancel }) {
       return;
     }
 
-    setIsProcessing(true);
     const imageUrl = URL.createObjectURL(file);
     setUploadedImage(imageUrl);
 
+    // Check if user wants AI detection
+    const hasApiKey = localStorage.getItem('openai_api_key');
+    if (hasApiKey || useAI) {
+      setIsProcessing(true);
+      try {
+        const components = await extractComponentsWithAI(file);
+        setDetectedComponents(components);
+        setShowPreview(true);
+      } catch (error) {
+        console.error('AI detection failed:', error);
+        alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
+        const components = await extractComponentsFromImage(imageUrl, file.type);
+        setDetectedComponents(components);
+        setShowPreview(true);
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      // Show API key dialog
+      setShowApiKeyDialog(true);
+    }
+  };
+
+  const handleUseStarterTemplate = async () => {
+    setShowApiKeyDialog(false);
+    setIsProcessing(true);
     try {
-      // For now, show a simple component extraction UI
-      // User can manually identify components from the image
-      const components = await extractComponentsFromImage(imageUrl, file.type);
+      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
       setDetectedComponents(components);
       setShowPreview(true);
     } catch (error) {
-      console.error('Error processing uploaded image:', error);
-      alert('Failed to process image. Please try again or use a sample diagram.');
+      console.error('Error:', error);
+      alert('Failed to create template.');
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleUseAI = async () => {
+    if (!apiKey) {
+      alert('Please enter your OpenAI API key');
+      return;
+    }
+    
+    // Save API key
+    localStorage.setItem('openai_api_key', apiKey);
+    setShowApiKeyDialog(false);
+    setIsProcessing(true);
+
+    try {
+      // Re-fetch the file from uploadedImage URL
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      const file = new File([blob], 'diagram.png', { type: blob.type });
+      
+      const components = await extractComponentsWithAI(file);
+      setDetectedComponents(components);
+      setShowPreview(true);
+    } catch (error) {
+      console.error('AI detection failed:', error);
+      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
+      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
+      setDetectedComponents(components);
+      setShowPreview(true);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const extractComponentsWithAI = async (file) => {
+    const apiKey = localStorage.getItem('openai_api_key');
+    if (!apiKey) {
+      throw new Error('OpenAI API key not found');
+    }
+
+    // Convert image to base64
+    const base64 = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    });
+
+    // Call OpenAI Vision API
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: `Analyze this architecture/data flow diagram and extract all components and data flows. 
+
+Return a JSON object with this exact structure:
+{
+  "components": [
+    {
+      "name": "Component Name",
+      "type": "process|datastore|external-entity",
+      "trustBoundary": "external|dmz|internal",
+      "description": "Brief description"
+    }
+  ],
+  "flows": [
+    {
+      "from": "Source Component Name",
+      "to": "Target Component Name", 
+      "protocol": "HTTPS|HTTP|SQL|REST|etc",
+      "data": "What data flows"
+    }
+  ]
+}
+
+Guidelines:
+- Identify ALL components (boxes, circles, cylinders, clouds, etc.)
+- Determine component type: "process" for services/apps, "datastore" for databases/storage, "external-entity" for users/external systems
+- Set trustBoundary: "external" for internet/users, "dmz" for load balancers/gateways, "internal" for backend services
+- Extract ALL arrows/connections as flows
+- Be thorough and accurate
+
+Return ONLY the JSON, no other text.`
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: base64
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 2000
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'API request failed');
+    }
+
+    const data = await response.json();
+    const content = data.choices[0].message.content;
+    
+    // Parse JSON from response
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Failed to parse AI response');
+    }
+    
+    const parsed = JSON.parse(jsonMatch[0]);
+    
+    // Convert to our format with IDs and positions
+    const components = parsed.components.map((comp, idx) => ({
+      id: `comp_${idx + 1}`,
+      name: comp.name,
+      type: comp.type || 'process',
+      trustBoundary: comp.trustBoundary || 'internal',
+      x: 100 + (idx % 4) * 200,
+      y: 100 + Math.floor(idx / 4) * 150
+    }));
+
+    const flows = parsed.flows.map((flow, idx) => {
+      const fromComp = components.find(c => c.name === flow.from);
+      const toComp = components.find(c => c.name === flow.to);
+      return {
+        id: `flow_${idx + 1}`,
+        from: fromComp?.id || components[0]?.id,
+        to: toComp?.id || components[1]?.id,
+        protocol: flow.protocol || 'HTTPS',
+        data: flow.data || 'Data flow'
+      };
+    });
+
+    return { components, flows };
   };
 
   const extractComponentsFromImage = async (imageUrl, fileType) => {
@@ -343,6 +513,77 @@ function DiagramImport({ onImport, onCancel }) {
         Import Architecture Diagram
       </h2>
 
+      {/* API Key Dialog */}
+      {showApiKeyDialog && (
+        <div className="modal-overlay">
+          <div className="modal" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h2>
+                <i className="fas fa-robot" style={{ color: 'var(--accent)', marginRight: '0.5rem' }}></i>
+                AI-Powered Detection
+              </h2>
+            </div>
+            <div className="modal-body">
+              <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)' }}>
+                Use AI to automatically detect components and flows from your diagram, or use a starter template.
+              </p>
+
+              <div style={{ 
+                padding: '1rem', 
+                background: 'var(--info-bg)', 
+                borderRadius: '0.5rem', 
+                marginBottom: '1rem',
+                border: '1px solid var(--info)'
+              }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+                  <i className="fas fa-magic"></i> AI Detection Benefits:
+                </div>
+                <ul style={{ fontSize: '0.875rem', margin: 0, paddingLeft: '1.5rem' }}>
+                  <li>Automatically identifies all components</li>
+                  <li>Detects data flows and connections</li>
+                  <li>Determines component types and trust boundaries</li>
+                  <li>Saves manual mapping time</li>
+                </ul>
+              </div>
+
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                OpenAI API Key (optional):
+              </label>
+              <input
+                type="password"
+                className="input"
+                placeholder="sk-..."
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                style={{ marginBottom: '0.5rem' }}
+              />
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                Your API key is stored locally and never sent to our servers. 
+                Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style={{ color: 'var(--accent)' }}>platform.openai.com</a>
+              </p>
+
+              <div className="flex gap-2">
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleUseAI}
+                  disabled={!apiKey}
+                  style={{ flex: 1 }}
+                >
+                  <i className="fas fa-robot"></i> Use AI Detection
+                </button>
+                <button 
+                  className="btn btn-secondary" 
+                  onClick={handleUseStarterTemplate}
+                  style={{ flex: 1 }}
+                >
+                  <i className="fas fa-layer-group"></i> Use Starter Template
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="card mb-2">
         <h3 className="card-title">
           <i className="fas fa-images"></i> Sample Diagrams
@@ -401,17 +642,21 @@ function DiagramImport({ onImport, onCancel }) {
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
           Upload your own architecture diagram (PNG, JPG, or SVG)
         </p>
-        <p style={{ 
-          fontSize: '0.875rem', 
-          color: 'var(--info)', 
-          background: 'var(--info-bg)',
-          padding: '0.75rem',
-          borderRadius: '0.375rem',
-          marginBottom: '1rem'
+        <div style={{ 
+          padding: '1rem', 
+          background: 'var(--success-bg)', 
+          borderRadius: '0.5rem', 
+          marginBottom: '1rem',
+          border: '1px solid var(--success)'
         }}>
-          <i className="fas fa-info-circle"></i> <strong>Basic Detection:</strong> The system will create starter components 
-          that you can rename and customize in the architecture canvas. For best results, use the sample diagrams above.
-        </p>
+          <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--success)' }}>
+            <i className="fas fa-sparkles"></i> AI-Powered Detection Available!
+          </div>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Upload your diagram and choose between AI-powered automatic detection (requires OpenAI API key) 
+            or use a comprehensive starter template to build from.
+          </p>
+        </div>
         <input
           type="file"
           accept="image/*,.svg"
