@@ -3,6 +3,8 @@
 // ========================================
 
 function CustomArchitectureBuilder({ project, onUpdate }) {
+  console.log('CustomArchitectureBuilder mounted with project:', project);
+  
   const svgRef = React.useRef(null);
   const [componentLibrary, setComponentLibrary] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('infrastructure');
@@ -14,6 +16,12 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
   const [connectFrom, setConnectFrom] = useState(null);
   const [isFinalized, setIsFinalized] = useState(project.isFinalized || false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+
+  console.log('CustomArchitectureBuilder state:', {
+    componentsCount: components.length,
+    flowsCount: flows.length,
+    isFinalized
+  });
 
   useEffect(() => {
     fetch('data/component-library.json')
