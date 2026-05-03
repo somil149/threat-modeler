@@ -198,18 +198,11 @@ function ThreatIntelligence({ project }) {
               return;
             }
             
-            // Only include CVEs from last 3 years (more lenient)
-            const threeYearsAgo = new Date();
-            threeYearsAgo.setFullYear(threeYearsAgo.getFullYear() - 3);
-            
-            if (publishedDate < threeYearsAgo) {
-              filteredByDate++;
-              return;
-            }
+            // No date filter - we'll sort by recency instead
             
             // Calculate relevance score: CVSS score * threat relevance * recency factor
             const monthsOld = (Date.now() - publishedDate) / (1000 * 60 * 60 * 24 * 30);
-            const recencyFactor = Math.max(0.5, 1 - (monthsOld / 60)); // Newer = more relevant
+            const recencyFactor = Math.max(0.1, 1 - (monthsOld / 120)); // Heavily favor recent (last 10 years)
             const finalRelevance = cvssScore * (relevanceScore / 10) * recencyFactor;
             
             results.push({
@@ -238,7 +231,7 @@ function ThreatIntelligence({ project }) {
       }
     }
     
-    console.log(`Total CVEs found: ${results.length} (after filtering for CRITICAL/HIGH from last 5 years)`);
+    console.log(`Total CVEs found: ${results.length} (HIGH/CRITICAL/MEDIUM 7.0+, sorted by relevance)`);
     
     // Sort by relevance score (highest first)
     const sorted = results.sort((a, b) => b.relevanceScore - a.relevanceScore).slice(0, 30); // Top 30 most relevant
@@ -281,7 +274,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-brain"></i> Shows <strong>HIGH/CRITICAL</strong> and <strong>MEDIUM (7.0+)</strong> CVEs from last 3 years
+        <i className="fas fa-brain"></i> Shows <strong>HIGH/CRITICAL</strong> and <strong>MEDIUM (7.0+)</strong> CVEs, sorted by relevance and recency
       </p>
 
       {cveData.length > 0 && (
