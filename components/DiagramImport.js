@@ -55,20 +55,55 @@ function DiagramImport({ onImport, onCancel }) {
     const file = event.target.files[0];
     if (!file) return;
 
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload an image file (PNG, JPG, or SVG)');
+      return;
+    }
+
     setIsProcessing(true);
-    setUploadedImage(URL.createObjectURL(file));
+    const imageUrl = URL.createObjectURL(file);
+    setUploadedImage(imageUrl);
 
     try {
-      // For now, show a placeholder message
-      // In production, this would use TensorFlow.js + Tesseract.js
-      alert('Custom image upload is coming soon! For now, please use the sample diagrams.');
-      setIsProcessing(false);
-      setUploadedImage(null);
+      // For now, show a simple component extraction UI
+      // User can manually identify components from the image
+      const components = await extractComponentsFromImage(imageUrl, file.type);
+      setDetectedComponents(components);
+      setShowPreview(true);
     } catch (error) {
       console.error('Error processing uploaded image:', error);
-      alert('Failed to process image. Please try a sample diagram instead.');
+      alert('Failed to process image. Please try again or use a sample diagram.');
+    } finally {
       setIsProcessing(false);
     }
+  };
+
+  const extractComponentsFromImage = async (imageUrl, fileType) => {
+    // Simple extraction: create a blank architecture for user to fill
+    // In a real implementation, this would use OCR and shape detection
+    
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create a simple grid of placeholder components
+        const components = [
+          { id: 'comp_1', name: 'Component 1', type: 'process', trustBoundary: 'external', x: 100, y: 100 },
+          { id: 'comp_2', name: 'Component 2', type: 'process', trustBoundary: 'internal', x: 300, y: 100 },
+          { id: 'comp_3', name: 'Component 3', type: 'datastore', trustBoundary: 'internal', x: 200, y: 300 }
+        ];
+        
+        const flows = [
+          { id: 'flow_1', from: 'comp_1', to: 'comp_2', protocol: 'HTTPS', data: 'Data flow 1' },
+          { id: 'flow_2', from: 'comp_2', to: 'comp_3', protocol: 'SQL', data: 'Data flow 2' }
+        ];
+        
+        resolve({ components, flows });
+      };
+      img.onerror = () => {
+        resolve({ components: [], flows: [] });
+      };
+      img.src = imageUrl;
+    });
   };
 
   const parseSVGDiagram = (svgText, diagramType) => {
@@ -186,8 +221,8 @@ function DiagramImport({ onImport, onCancel }) {
       onImport({
         components: detectedComponents.components,
         flows: detectedComponents.flows || [],
-        name: selectedSample.name,
-        description: selectedSample.description
+        name: selectedSample ? selectedSample.name : 'Custom Architecture',
+        description: selectedSample ? selectedSample.description : 'Imported from custom diagram'
       });
     } else {
       console.error('No components detected!');
@@ -203,10 +238,19 @@ function DiagramImport({ onImport, onCancel }) {
         </h2>
 
         <div className="card mb-2">
-          <h3 className="card-title">{selectedSample.name}</h3>
+          <h3 className="card-title">
+            {selectedSample ? selectedSample.name : 'Custom Diagram'}
+          </h3>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            {selectedSample.description}
+            {selectedSample ? selectedSample.description : 'Uploaded custom architecture diagram'}
           </p>
+
+          {/* Show uploaded image if available */}
+          {uploadedImage && (
+            <div style={{ marginBottom: '1rem', maxHeight: '300px', overflow: 'auto', background: 'white', padding: '1rem', borderRadius: '0.5rem' }}>
+              <img src={uploadedImage} alt="Uploaded diagram" style={{ maxWidth: '100%', height: 'auto' }} />
+            </div>
+          )}
 
           <div className="grid grid-2" style={{ marginBottom: '1rem' }}>
             <div>
@@ -222,6 +266,24 @@ function DiagramImport({ onImport, onCancel }) {
               </div>
             </div>
           </div>
+
+          {uploadedImage && (
+            <div style={{ 
+              padding: '1rem', 
+              background: 'var(--warning-bg)', 
+              borderRadius: '0.5rem', 
+              marginBottom: '1rem',
+              border: '1px solid var(--warning)'
+            }}>
+              <div style={{ fontSize: '0.875rem', color: 'var(--warning)', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <i className="fas fa-info-circle"></i> Manual Detection
+              </div>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
+                Basic components have been created. After import, you can rename them, add more components, 
+                and adjust connections in the architecture canvas.
+              </p>
+            </div>
+          )}
 
           <div style={{ marginBottom: '1rem' }}>
             <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>Components:</h4>
@@ -242,6 +304,7 @@ function DiagramImport({ onImport, onCancel }) {
               setShowPreview(false);
               setSelectedSample(null);
               setDetectedComponents([]);
+              setUploadedImage(null);
             }}>
               <i className="fas fa-times"></i> Cancel
             </button>
@@ -317,21 +380,21 @@ function DiagramImport({ onImport, onCancel }) {
         </p>
         <p style={{ 
           fontSize: '0.875rem', 
-          color: 'var(--warning)', 
-          background: 'var(--warning-bg)',
+          color: 'var(--info)', 
+          background: 'var(--info-bg)',
           padding: '0.75rem',
           borderRadius: '0.375rem',
           marginBottom: '1rem'
         }}>
-          <i className="fas fa-info-circle"></i> Custom image detection is coming soon! 
-          For now, please use the sample diagrams above.
+          <i className="fas fa-info-circle"></i> <strong>Basic Detection:</strong> The system will create starter components 
+          that you can rename and customize in the architecture canvas. For best results, use the sample diagrams above.
         </p>
         <input
           type="file"
           accept="image/*,.svg"
           onChange={handleFileUpload}
-          disabled={true}
-          style={{ opacity: 0.5, cursor: 'not-allowed' }}
+          className="input"
+          style={{ cursor: 'pointer' }}
         />
       </div>
 
