@@ -108,7 +108,17 @@ function App() {
     setCurrentProject(project);
     Storage.setCurrentProject(project.id);
     setCurrentView('architecture');
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) setSidebarOpen(false);
+
   };
+
+  const handleNavClick = (view) => {
+    setCurrentView(view);
+    // Close sidebar on mobile
+    if (window.innerWidth <= 768) setSidebarOpen(false);
+  };
+
 
   const handleProjectUpdate = (updates) => {
     if (currentProject) {
@@ -325,7 +335,7 @@ function App() {
         <div className="sidebar-nav">
           <button
             className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`}
-            onClick={() => setCurrentView('dashboard')}
+            onClick={() => handleNavClick('dashboard')}
           >
             <i className="fas fa-th-large"></i>
             <span>Dashboard</span>
@@ -335,7 +345,7 @@ function App() {
             <>
               <button
                 className={`nav-item ${currentView === 'architecture' ? 'active' : ''}`}
-                onClick={() => setCurrentView('architecture')}
+                onClick={() => handleNavClick('architecture')}
               >
                 <i className="fas fa-project-diagram"></i>
                 <span>Architecture</span>
@@ -343,7 +353,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'threats' ? 'active' : ''}`}
-                onClick={() => setCurrentView('threats')}
+                onClick={() => handleNavClick('threats')}
               >
                 <i className="fas fa-exclamation-triangle"></i>
                 <span>Threats</span>
@@ -351,7 +361,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'intelligence' ? 'active' : ''}`}
-                onClick={() => setCurrentView('intelligence')}
+                onClick={() => handleNavClick('intelligence')}
               >
                 <i className="fas fa-shield-virus"></i>
                 <span>Threat Intel</span>
@@ -359,7 +369,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'aisuggestions' ? 'active' : ''}`}
-                onClick={() => setCurrentView('aisuggestions')}
+                onClick={() => handleNavClick('aisuggestions')}
               >
                 <i className="fas fa-magic"></i>
                 <span>AI Suggestions</span>
@@ -367,7 +377,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'risk' ? 'active' : ''}`}
-                onClick={() => setCurrentView('risk')}
+                onClick={() => handleNavClick('risk')}
               >
                 <i className="fas fa-chart-bar"></i>
                 <span>Risk Matrix</span>
@@ -375,7 +385,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'attackpaths' ? 'active' : ''}`}
-                onClick={() => setCurrentView('attackpaths')}
+                onClick={() => handleNavClick('attackpaths')}
               >
                 <i className="fas fa-route"></i>
                 <span>Attack Paths</span>
@@ -383,7 +393,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'compliance' ? 'active' : ''}`}
-                onClick={() => setCurrentView('compliance')}
+                onClick={() => handleNavClick('compliance')}
               >
                 <i className="fas fa-check-circle"></i>
                 <span>Compliance</span>
@@ -391,7 +401,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === '3dview' ? 'active' : ''}`}
-                onClick={() => setCurrentView('3dview')}
+                onClick={() => handleNavClick('3dview')}
               >
                 <i className="fas fa-cube"></i>
                 <span>3D View</span>
@@ -399,7 +409,7 @@ function App() {
 
               <button
                 className={`nav-item ${currentView === 'export' ? 'active' : ''}`}
-                onClick={() => setCurrentView('export')}
+                onClick={() => handleNavClick('export')}
               >
                 <i className="fas fa-file-export"></i>
                 <span>Export</span>
