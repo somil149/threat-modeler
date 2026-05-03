@@ -174,9 +174,12 @@ function AttackPaths({ project }) {
 
                         {/* Get unique mitigations from threats in this path */}
                         {(() => {
-                          const pathThreats = project.threats?.filter(t => 
-                            chain.path.includes(t.component)
-                          ) || [];
+                          // Match threats by component name OR component ID
+                          const pathThreats = project.threats?.filter(t => {
+                            const componentName = t.componentName || t.component;
+                            const componentId = t.component;
+                            return chain.path.includes(componentName) || chain.path.includes(componentId);
+                          }) || [];
 
                           // Group mitigations by priority
                           const criticalMitigations = [];
