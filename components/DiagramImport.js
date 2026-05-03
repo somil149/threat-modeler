@@ -12,10 +12,8 @@ function DiagramImport({ onImport, onCancel }) {
   const [apiKey, setApiKey] = useState(localStorage.getItem('huggingface_token') || '');
   const [useAI, setUseAI] = useState(false);
   
-  // Demo API key for Hugging Face (completely free) - obfuscated to bypass GitHub detection
-  const DEMO_API_KEY = ['hf_qhSEw', 'NUMfQkPD', 'HNIEgkRt', 'NEPoDdn', 'FzwGlx'].join('');
-  const API_ENDPOINT = 'https://api-inference.huggingface.co/models/Qwen/Qwen2-VL-7B-Instruct';
-  const MODEL_NAME = 'Qwen/Qwen2-VL-7B-Instruct'; // Free vision model
+  // Cloudflare Worker endpoint (bypasses CORS)
+  const WORKER_ENDPOINT = 'https://threat-modeler.goyal-somil2011.workers.dev';
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
@@ -103,22 +101,40 @@ function DiagramImport({ onImport, onCancel }) {
 
     const imageUrl = URL.createObjectURL(file);
     setUploadedImage(imageUrl);
+    
+    // Show AI detection dialog
+    setShowApiKeyDialog(true);
+  };
+
+  const handleUseDemoKey = async () => {
+    if (!checkRateLimit()) {
+      alert('Demo limit reached (5 uses per day). Please try again tomorrow or use the starter template.');
+      return;
+    }
+    
+    setShowApiKeyDialog(false);
     setIsProcessing(true);
 
     try {
-      // Use starter template directly
-      const components = await extractComponentsFromImage(imageUrl, file.type);
+      // Re-fetch the file from uploadedImage URL
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      const file = new File([blob], 'diagram.png', { type: blob.type });
+      
+      const components = await extractComponentsWithAI(file);
+      incrementUsage();
       setDetectedComponents(components);
       setShowPreview(true);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create template.');
+      console.error('AI detection failed:', error);
+      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
+      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
+      setDetectedComponents(components);
+      setShowPreview(true);
     } finally {
       setIsProcessing(false);
     }
   };
-
-  const handleUseStarterTemplate = async () => {
     setShowApiKeyDialog(false);
     setIsProcessing(true);
     try {
@@ -194,12 +210,7 @@ function DiagramImport({ onImport, onCancel }) {
     }
   };
 
-  const extractComponentsWithAI = async (file, apiKeyToUse) => {
-    const key = apiKeyToUse || localStorage.getItem('huggingface_token');
-    if (!key) {
-      throw new Error('Hugging Face token not found');
-    }
-
+  const extractComponentsWithAI = async (file) => {
     // Convert image to base64
     const base64 = await new Promise((resolve) => {
       const reader = new FileReader();
@@ -207,20 +218,9 @@ function DiagramImport({ onImport, onCancel }) {
       reader.readAsDataURL(file);
     });
 
-    // Call Hugging Face Inference API
-    console.log('Calling HF API with endpoint:', API_ENDPOINT);
-    console.log('Using model:', MODEL_NAME);
-    
-    const response = await fetch(API_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        inputs: {
-          image: base64.split(',')[1], // Remove data:image/png;base64, prefix
-          question: `Analyze this architecture/data flow diagram and extract all components and data flows. 
+    const imageData = base64.split(',')[1]; // Remove data:image/png;base64, prefix
+
+    const question = `Analyze this architecture/data flow diagram and extract all components and data flows. 
 
 Return a JSON object with this exact structure:
 {
@@ -249,16 +249,20 @@ Guidelines:
 - Extract ALL arrows/connections as flows
 - Be thorough and accurate
 
-Return ONLY the JSON, no other text.`
-        },
-        parameters: {
-          max_new_tokens: 2000,
-          return_full_text: false
-        }
+Return ONLY the JSON, no other text.`;
+
+    // Call Cloudflare Worker
+    console.log('Calling Cloudflare Worker:', WORKER_ENDPOINT);
+    
+    const response = await fetch(WORKER_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        image: imageData,
+        question: question
       })
-    }).catch(err => {
-      console.error('Fetch error:', err);
-      throw new Error('Network error: ' + err.message);
     });
 
     console.log('Response received:', response);
