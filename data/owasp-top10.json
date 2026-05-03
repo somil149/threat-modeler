@@ -1,0 +1,294 @@
+{
+  "owasp_top10_2021": [
+    {
+      "id": "A01",
+      "name": "Broken Access Control",
+      "description": "Restrictions on what authenticated users are allowed to do are often not properly enforced",
+      "stride": ["S", "T", "E"],
+      "threats": [
+        {
+          "title": "Insecure Direct Object References (IDOR)",
+          "description": "Users can access resources by manipulating IDs without authorization checks",
+          "mitigation": "Implement proper authorization checks, use indirect references, validate user permissions",
+          "likelihood": 5,
+          "impact": 5
+        },
+        {
+          "title": "Missing Function Level Access Control",
+          "description": "API endpoints or functions accessible without proper role verification",
+          "mitigation": "Implement role-based access control (RBAC), verify permissions on every request",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "Privilege Escalation",
+          "description": "Users can elevate their privileges beyond intended permissions",
+          "mitigation": "Principle of least privilege, regular permission audits, secure session management",
+          "likelihood": 3,
+          "impact": 5
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "name": "Cryptographic Failures",
+      "description": "Failures related to cryptography which often lead to exposure of sensitive data",
+      "stride": ["I", "T"],
+      "threats": [
+        {
+          "title": "Weak Encryption Algorithms",
+          "description": "Use of outdated or weak encryption (MD5, SHA1, DES)",
+          "mitigation": "Use AES-256, SHA-256 or stronger, TLS 1.3, modern key management",
+          "likelihood": 3,
+          "impact": 5
+        },
+        {
+          "title": "Hardcoded Secrets",
+          "description": "API keys, passwords, or certificates hardcoded in source code",
+          "mitigation": "Use secret management systems (Vault, AWS Secrets Manager), environment variables",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "Insufficient Transport Layer Protection",
+          "description": "Sensitive data transmitted without encryption or with weak TLS",
+          "mitigation": "Enforce HTTPS everywhere, use HSTS, disable weak ciphers",
+          "likelihood": 4,
+          "impact": 5
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "name": "Injection",
+      "description": "User-supplied data is not validated, filtered, or sanitized by the application",
+      "stride": ["T", "E"],
+      "threats": [
+        {
+          "title": "SQL Injection",
+          "description": "Malicious SQL queries executed through unsanitized inputs",
+          "mitigation": "Parameterized queries, ORM, input validation, least privilege DB accounts",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "NoSQL Injection",
+          "description": "Injection attacks against NoSQL databases (MongoDB, Cassandra)",
+          "mitigation": "Input validation, use database-specific sanitization, parameterized queries",
+          "likelihood": 3,
+          "impact": 4
+        },
+        {
+          "title": "Command Injection",
+          "description": "OS commands executed through unsanitized user input",
+          "mitigation": "Avoid system calls, use safe APIs, input validation, sandboxing",
+          "likelihood": 3,
+          "impact": 5
+        },
+        {
+          "title": "LDAP Injection",
+          "description": "LDAP queries manipulated through user input",
+          "mitigation": "Input validation, escape special characters, use safe LDAP APIs",
+          "likelihood": 2,
+          "impact": 4
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "name": "Insecure Design",
+      "description": "Missing or ineffective control design",
+      "stride": ["S", "T", "R", "I", "D", "E"],
+      "threats": [
+        {
+          "title": "Missing Rate Limiting",
+          "description": "No protection against brute force or resource exhaustion attacks",
+          "mitigation": "Implement rate limiting, CAPTCHA, account lockout policies",
+          "likelihood": 5,
+          "impact": 4
+        },
+        {
+          "title": "Insecure Password Recovery",
+          "description": "Password reset mechanism vulnerable to account takeover",
+          "mitigation": "Multi-factor verification, secure tokens, time-limited reset links",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "Business Logic Flaws",
+          "description": "Application logic can be abused to bypass security controls",
+          "mitigation": "Threat modeling, security reviews, abuse case testing",
+          "likelihood": 3,
+          "impact": 4
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "name": "Security Misconfiguration",
+      "description": "Missing appropriate security hardening or improperly configured permissions",
+      "stride": ["I", "D", "E"],
+      "threats": [
+        {
+          "title": "Default Credentials",
+          "description": "Systems deployed with default usernames and passwords",
+          "mitigation": "Force password change on first login, disable default accounts",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "Unnecessary Features Enabled",
+          "description": "Unused services, ports, or features left enabled",
+          "mitigation": "Disable unused features, minimal installation, regular audits",
+          "likelihood": 4,
+          "impact": 3
+        },
+        {
+          "title": "Verbose Error Messages",
+          "description": "Error messages expose sensitive system information",
+          "mitigation": "Generic error messages, detailed logs server-side only",
+          "likelihood": 5,
+          "impact": 3
+        },
+        {
+          "title": "Missing Security Headers",
+          "description": "HTTP security headers not configured (CSP, HSTS, X-Frame-Options)",
+          "mitigation": "Configure all security headers, use security.txt",
+          "likelihood": 5,
+          "impact": 3
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "name": "Vulnerable and Outdated Components",
+      "description": "Using components with known vulnerabilities",
+      "stride": ["T", "E"],
+      "threats": [
+        {
+          "title": "Unpatched Dependencies",
+          "description": "Third-party libraries with known CVEs not updated",
+          "mitigation": "Dependency scanning (Snyk, Dependabot), regular updates, SCA tools",
+          "likelihood": 5,
+          "impact": 4
+        },
+        {
+          "title": "End-of-Life Software",
+          "description": "Using software that no longer receives security updates",
+          "mitigation": "Maintain inventory, plan migrations, monitor EOL dates",
+          "likelihood": 3,
+          "impact": 4
+        }
+      ]
+    },
+    {
+      "id": "A07",
+      "name": "Identification and Authentication Failures",
+      "stride": ["S"],
+      "description": "Confirmation of the user's identity, authentication, and session management is critical",
+      "threats": [
+        {
+          "title": "Weak Password Policy",
+          "description": "Allows weak passwords, no complexity requirements",
+          "mitigation": "Enforce strong passwords, password strength meter, breach detection",
+          "likelihood": 5,
+          "impact": 4
+        },
+        {
+          "title": "Credential Stuffing",
+          "description": "Automated injection of breached username/password pairs",
+          "mitigation": "Rate limiting, CAPTCHA, breach password detection, MFA",
+          "likelihood": 4,
+          "impact": 5
+        },
+        {
+          "title": "Session Fixation",
+          "description": "Attacker sets user's session ID before authentication",
+          "mitigation": "Regenerate session ID after login, secure session management",
+          "likelihood": 2,
+          "impact": 4
+        }
+      ]
+    },
+    {
+      "id": "A08",
+      "name": "Software and Data Integrity Failures",
+      "description": "Code and infrastructure that does not protect against integrity violations",
+      "stride": ["T", "R"],
+      "threats": [
+        {
+          "title": "Insecure Deserialization",
+          "description": "Untrusted data deserialized leading to RCE",
+          "mitigation": "Avoid deserialization of untrusted data, integrity checks, type validation",
+          "likelihood": 2,
+          "impact": 5
+        },
+        {
+          "title": "Supply Chain Attack",
+          "description": "Compromised dependencies or build pipeline",
+          "mitigation": "Verify package signatures, use private registries, SBOM",
+          "likelihood": 2,
+          "impact": 5
+        },
+        {
+          "title": "Unsigned Code/Updates",
+          "description": "Software updates not cryptographically signed",
+          "mitigation": "Code signing, secure update mechanism, checksum verification",
+          "likelihood": 3,
+          "impact": 4
+        }
+      ]
+    },
+    {
+      "id": "A09",
+      "name": "Security Logging and Monitoring Failures",
+      "description": "Without logging and monitoring, breaches cannot be detected",
+      "stride": ["R", "D"],
+      "threats": [
+        {
+          "title": "Insufficient Logging",
+          "description": "Critical events not logged or logs incomplete",
+          "mitigation": "Log all security events, centralized logging, log retention policy",
+          "likelihood": 4,
+          "impact": 3
+        },
+        {
+          "title": "No Alerting on Suspicious Activity",
+          "description": "Anomalies not detected or alerted",
+          "mitigation": "SIEM, automated alerting, anomaly detection, SOC",
+          "likelihood": 4,
+          "impact": 4
+        },
+        {
+          "title": "Log Injection",
+          "description": "Attackers inject malicious data into logs",
+          "mitigation": "Sanitize log inputs, structured logging, log integrity",
+          "likelihood": 3,
+          "impact": 2
+        }
+      ]
+    },
+    {
+      "id": "A10",
+      "name": "Server-Side Request Forgery (SSRF)",
+      "description": "Application fetches remote resources without validating user-supplied URL",
+      "stride": ["T", "I", "E"],
+      "threats": [
+        {
+          "title": "Internal Network Scanning",
+          "description": "Attacker uses SSRF to scan internal network",
+          "mitigation": "URL whitelist, disable unnecessary protocols, network segmentation",
+          "likelihood": 3,
+          "impact": 4
+        },
+        {
+          "title": "Cloud Metadata Access",
+          "description": "SSRF used to access cloud instance metadata (AWS, Azure, GCP)",
+          "mitigation": "IMDSv2, network policies, URL validation, disable metadata endpoint",
+          "likelihood": 3,
+          "impact": 5
+        }
+      ]
+    }
+  ]
+}

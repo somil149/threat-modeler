@@ -4,14 +4,34 @@
 
 function ThreatList({ project, onUpdate }) {
   const [filter, setFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [severityFilter, setSeverityFilter] = useState('all');
   const [editingThreat, setEditingThreat] = useState(null);
   const [threatStatus, setThreatStatus] = useState({});
   const [threatComments, setThreatComments] = useState({});
   const threats = project.threats || [];
 
-  const filteredThreats = filter === 'all' 
-    ? threats 
-    : threats.filter(t => t.stride === filter);
+  // Enhanced filtering with search and severity
+  const filteredThreats = threats.filter(t => {
+    // STRIDE filter
+    const strideMatch = filter === 'all' || t.stride === filter;
+    
+    // Search filter
+    const searchMatch = searchQuery === '' || 
+      t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t.mitigation.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Severity filter
+    let severityMatch = true;
+    if (severityFilter !== 'all') {
+      const risk = Scoring.calculateRisk(t.likelihood, t.impact);
+      const level = Scoring.getRiskLevel(risk);
+      severityMatch = level.toLowerCase() === severityFilter;
+    }
+    
+    return strideMatch && searchMatch && severityMatch;
+  });
 
   const riskSummary = Scoring.calculateProjectRisk(threats);
 
@@ -54,15 +74,56 @@ function ThreatList({ project, onUpdate }) {
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-1 mb-2">
-        {['all', 'Spoofing', 'Tampering', 'Repudiation', 'Information Disclosure', 'Denial of Service', 'Elevation of Privilege'].map(f => (
+      {/* Search and Filters */}
+      <div className="card mb-2">
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1', minWidth: '200px' }}>
+            <input
+              type="text"
+              className="input"
+              placeholder="Search threats..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: '100%' }}
+            />
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Severity:</span>
+            <select 
+              className="select" 
+              value={severityFilter} 
+              onChange={(e) => setSeverityFilter(e.target.value)}
+              style={{ minWidth: '120px' }}
+            >
+              <option value="all">All</option>
+              <option value="critical">Critical</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+            Showing {filteredThreats.length} of {threats.length} threats
+          </div>
+        </div>
+      </div>
+
+      {/* STRIDE Filter */}
+      <div className="flex gap-1 mb-2" style={{ flexWrap: 'wrap' }}>
+        {['all', 'S', 'T', 'R', 'I', 'D', 'E'].map(f => (
           <button
             key={f}
             className={`btn btn-sm ${filter === f ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setFilter(f)}
+            title={f === 'all' ? 'All' : 
+                   f === 'S' ? 'Spoofing' :
+                   f === 'T' ? 'Tampering' :
+                   f === 'R' ? 'Repudiation' :
+                   f === 'I' ? 'Information Disclosure' :
+                   f === 'D' ? 'Denial of Service' :
+                   'Elevation of Privilege'}
           >
-            {f}
+            {f === 'all' ? 'All' : f}
           </button>
         ))}
       </div>
