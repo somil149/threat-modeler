@@ -187,15 +187,127 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
 
   const confirmFinalize = () => {
     setIsFinalized(true);
-    onUpdate({ components, flows, isFinalized: true });
+    const updatedProject = { 
+      ...project,
+      components, 
+      flows, 
+      isFinalized: true 
+    };
+    onUpdate(updatedProject);
     setShowSaveDialog(false);
-    // Prompt to discover threats
+    
+    // Generate threats automatically
     setTimeout(() => {
-      if (confirm('Architecture finalized! Would you like to discover threats now?')) {
-        // Trigger threat generation
-        window.location.hash = '#generate-threats';
-      }
+      generateThreats(updatedProject);
     }, 500);
+  };
+
+  const handleUnlock = () => {
+    if (confirm('Unlock architecture for editing? This will allow you to modify components and flows.')) {
+      setIsFinalized(false);
+      onUpdate({ ...project, components, flows, isFinalized: false });
+    }
+  };
+
+  const generateThreats = (projectData) => {
+    // Load threat patterns
+    fetch('data/threat-patterns.json')
+      .then(res => res.json())
+      .then(patterns => {
+        const threats = [];
+        const comps = projectData.components || components;
+        
+        // Generate STRIDE threats for each component
+        comps.forEach(component => {
+          const componentType = component.type.toLowerCase();
+          
+          // Spoofing
+          if (componentType.includes('api') || componentType.includes('auth') || componentType.includes('user')) {
+            threats.push({
+              id: `threat_${component.id}_spoofing`,
+              title: `Spoofing Identity - ${component.name}`,
+              description: `Attacker could impersonate legitimate users or services to access ${component.name}`,
+              component: component.name,
+              stride: 'S',
+              likelihood: 3,
+              impact: 4,
+              mitigation: 'Implement strong authentication (MFA, certificates)',
+              detection: 'Monitor for unusual authentication patterns'
+            });
+          }
+          
+          // Tampering
+          if (componentType.includes('database') || componentType.includes('storage') || componentType.includes('api')) {
+            threats.push({
+              id: `threat_${component.id}_tampering`,
+              title: `Data Tampering - ${component.name}`,
+              description: `Attacker could modify data in ${component.name} without authorization`,
+              component: component.name,
+              stride: 'T',
+              likelihood: 3,
+              impact: 4,
+              mitigation: 'Implement integrity checks, digital signatures, and access controls',
+              detection: 'Monitor for unauthorized data modifications'
+            });
+          }
+          
+          // Information Disclosure
+          if (componentType.includes('database') || componentType.includes('api') || componentType.includes('storage')) {
+            threats.push({
+              id: `threat_${component.id}_disclosure`,
+              title: `Information Disclosure - ${component.name}`,
+              description: `Sensitive data in ${component.name} could be exposed to unauthorized parties`,
+              component: component.name,
+              stride: 'I',
+              likelihood: 3,
+              impact: 5,
+              mitigation: 'Encrypt data at rest and in transit, implement proper access controls',
+              detection: 'Monitor for data exfiltration attempts'
+            });
+          }
+          
+          // Denial of Service
+          threats.push({
+            id: `threat_${component.id}_dos`,
+            title: `Denial of Service - ${component.name}`,
+            description: `Attacker could overwhelm ${component.name} making it unavailable`,
+            component: component.name,
+            stride: 'D',
+            likelihood: 3,
+            impact: 3,
+            mitigation: 'Implement rate limiting, auto-scaling, and DDoS protection',
+            detection: 'Monitor resource usage and availability metrics'
+          });
+          
+          // Elevation of Privilege
+          if (componentType.includes('api') || componentType.includes('service') || componentType.includes('auth')) {
+            threats.push({
+              id: `threat_${component.id}_privilege`,
+              title: `Elevation of Privilege - ${component.name}`,
+              description: `Attacker could gain unauthorized elevated access to ${component.name}`,
+              component: component.name,
+              stride: 'E',
+              likelihood: 2,
+              impact: 5,
+              mitigation: 'Implement least privilege, proper authorization checks',
+              detection: 'Monitor for privilege escalation attempts'
+            });
+          }
+        });
+        
+        // Update project with threats
+        const finalProject = {
+          ...projectData,
+          threats: threats
+        };
+        onUpdate(finalProject);
+        
+        alert(`Generated ${threats.length} threats! Go to Threats view to review them.`);
+      })
+      .catch(err => {
+        console.error('Failed to generate threats:', err);
+        alert('Failed to generate threats. Please try again.');
+      });
   };
 
   if (!componentLibrary) return <div>Loading...</div>;
@@ -311,8 +423,18 @@ function CustomArchitectureBuilder({ project, onUpdate }) {
           )}
 
           {isFinalized && (
-            <div style={{ padding: '0.5rem 1rem', background: 'var(--success)', color: 'white', borderRadius: '0.375rem', fontWeight: 600 }}>
-              <i className="fas fa-lock"></i> Architecture Finalized
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ padding: '0.5rem 1rem', background: 'var(--success)', color: 'white', borderRadius: '0.375rem', fontWeight: 600 }}>
+                <i className="fas fa-lock"></i> Architecture Finalized
+              </div>
+              <button
+                className="btn btn-sm btn-secondary"
+                onClick={handleUnlock}
+                title="Unlock to edit architecture"
+              >
+                <i className="fas fa-unlock"></i>
+                Unlock & Edit
+              </button>
             </div>
           )}
         </div>
