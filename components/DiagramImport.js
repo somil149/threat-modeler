@@ -103,27 +103,18 @@ function DiagramImport({ onImport, onCancel }) {
 
     const imageUrl = URL.createObjectURL(file);
     setUploadedImage(imageUrl);
+    setIsProcessing(true);
 
-    // Check if user wants AI detection
-    const hasApiKey = localStorage.getItem('huggingface_token');
-    if (hasApiKey || useAI) {
-      setIsProcessing(true);
-      try {
-        const components = await extractComponentsWithAI(file);
-        setDetectedComponents(components);
-        setShowPreview(true);
-      } catch (error) {
-        console.error('AI detection failed:', error);
-        alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
-        const components = await extractComponentsFromImage(imageUrl, file.type);
-        setDetectedComponents(components);
-        setShowPreview(true);
-      } finally {
-        setIsProcessing(false);
-      }
-    } else {
-      // Show API key dialog
-      setShowApiKeyDialog(true);
+    try {
+      // Use starter template directly
+      const components = await extractComponentsFromImage(imageUrl, file.type);
+      setDetectedComponents(components);
+      setShowPreview(true);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to create template.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
