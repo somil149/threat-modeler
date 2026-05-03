@@ -1,0 +1,245 @@
+{
+  "categories": [
+    {
+      "id": "web-applications",
+      "name": "Web Applications",
+      "icon": "🌐",
+      "description": "Modern and legacy web application architectures"
+    },
+    {
+      "id": "mobile-applications",
+      "name": "Mobile Applications",
+      "icon": "📱",
+      "description": "Native and cross-platform mobile app architectures"
+    },
+    {
+      "id": "api-microservices",
+      "name": "API & Microservices",
+      "icon": "🔌",
+      "description": "API gateways and microservices architectures"
+    },
+    {
+      "id": "cloud-native",
+      "name": "Cloud Native",
+      "icon": "☁️",
+      "description": "Cloud-native and serverless architectures"
+    },
+    {
+      "id": "ai-ml-data",
+      "name": "AI/ML & Data",
+      "icon": "🤖",
+      "description": "AI, machine learning, and data pipeline architectures"
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise",
+      "icon": "🏢",
+      "description": "Enterprise and legacy system architectures"
+    },
+    {
+      "id": "financial",
+      "name": "Financial Services",
+      "icon": "💰",
+      "description": "Banking, payment, and financial system architectures"
+    },
+    {
+      "id": "iot-realtime",
+      "name": "IoT & Real-Time",
+      "icon": "📡",
+      "description": "IoT devices and real-time data processing"
+    },
+    {
+      "id": "security-identity",
+      "name": "Security & Identity",
+      "icon": "🔒",
+      "description": "Security, authentication, and identity management"
+    }
+  ],
+  "templates": [
+    {
+      "id": "custom",
+      "name": "Custom Architecture",
+      "description": "Build your own architecture from scratch using component library",
+      "components": [],
+      "flows": []
+    },
+    {
+      "id": "web-app-3tier",
+      "name": "Web Application (3-Tier)",
+      "description": "Traditional 3-tier web application architecture",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 200 },
+        { "id": "web", "name": "Web Server", "type": "server", "trustBoundary": "dmz", "x": 300, "y": 200 },
+        { "id": "app", "name": "Application Server", "type": "server", "trustBoundary": "internal", "x": 500, "y": 200 },
+        { "id": "db", "name": "Database", "type": "database", "trustBoundary": "internal", "x": 700, "y": 200 }
+      ],
+      "flows": [
+        { "from": "user", "to": "web", "label": "HTTPS", "protocol": "HTTPS" },
+        { "from": "web", "to": "app", "label": "API Call", "protocol": "HTTP" },
+        { "from": "app", "to": "db", "label": "SQL Query", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "mobile-app",
+      "name": "Mobile Application",
+      "description": "Mobile app with API backend",
+      "components": [
+        { "id": "mobile", "name": "Mobile App", "type": "external", "trustBoundary": "external", "x": 100, "y": 200 },
+        { "id": "api-gateway", "name": "API Gateway", "type": "api", "trustBoundary": "dmz", "x": 300, "y": 200 },
+        { "id": "auth", "name": "Auth Service", "type": "service", "trustBoundary": "internal", "x": 500, "y": 150 },
+        { "id": "backend", "name": "Backend Service", "type": "service", "trustBoundary": "internal", "x": 500, "y": 250 },
+        { "id": "db", "name": "Database", "type": "database", "trustBoundary": "internal", "x": 700, "y": 200 }
+      ],
+      "flows": [
+        { "from": "mobile", "to": "api-gateway", "label": "HTTPS/REST", "protocol": "HTTPS" },
+        { "from": "api-gateway", "to": "auth", "label": "Auth Request", "protocol": "HTTP" },
+        { "from": "api-gateway", "to": "backend", "label": "API Call", "protocol": "HTTP" },
+        { "from": "backend", "to": "db", "label": "Query", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "microservices",
+      "name": "Microservices Architecture",
+      "description": "Cloud-native microservices with service mesh",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "lb", "name": "Load Balancer", "type": "server", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "svc1", "name": "Service A", "type": "service", "trustBoundary": "internal", "x": 400, "y": 200 },
+        { "id": "svc2", "name": "Service B", "type": "service", "trustBoundary": "internal", "x": 400, "y": 300 },
+        { "id": "svc3", "name": "Service C", "type": "service", "trustBoundary": "internal", "x": 400, "y": 400 },
+        { "id": "cache", "name": "Redis Cache", "type": "database", "trustBoundary": "internal", "x": 600, "y": 250 },
+        { "id": "db", "name": "Database", "type": "database", "trustBoundary": "internal", "x": 600, "y": 350 }
+      ],
+      "flows": [
+        { "from": "user", "to": "lb", "label": "HTTPS", "protocol": "HTTPS" },
+        { "from": "lb", "to": "svc1", "label": "Route", "protocol": "HTTP" },
+        { "from": "lb", "to": "svc2", "label": "Route", "protocol": "HTTP" },
+        { "from": "svc1", "to": "svc2", "label": "gRPC", "protocol": "gRPC" },
+        { "from": "svc2", "to": "svc3", "label": "gRPC", "protocol": "gRPC" },
+        { "from": "svc2", "to": "cache", "label": "Cache", "protocol": "Redis" },
+        { "from": "svc3", "to": "db", "label": "Query", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "rag-pipeline",
+      "name": "RAG Pipeline",
+      "description": "Retrieval Augmented Generation system",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 250 },
+        { "id": "api", "name": "API Gateway", "type": "api", "trustBoundary": "dmz", "x": 250, "y": 250 },
+        { "id": "rag", "name": "RAG Service", "type": "service", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "vector", "name": "Vector DB", "type": "database", "trustBoundary": "internal", "x": 550, "y": 200 },
+        { "id": "llm", "name": "LLM API", "type": "external", "trustBoundary": "external", "x": 550, "y": 300 }
+      ],
+      "flows": [
+        { "from": "user", "to": "api", "label": "Query", "protocol": "HTTPS" },
+        { "from": "api", "to": "rag", "label": "Process", "protocol": "HTTP" },
+        { "from": "rag", "to": "vector", "label": "Retrieve", "protocol": "HTTP" },
+        { "from": "rag", "to": "llm", "label": "Generate", "protocol": "HTTPS" }
+      ]
+    },
+    {
+      "id": "llm-app",
+      "name": "LLM Application",
+      "description": "LLM-powered application with prompt management",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 250 },
+        { "id": "frontend", "name": "Frontend", "type": "server", "trustBoundary": "dmz", "x": 250, "y": 250 },
+        { "id": "backend", "name": "Backend", "type": "service", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "prompt-mgr", "name": "Prompt Manager", "type": "service", "trustBoundary": "internal", "x": 550, "y": 200 },
+        { "id": "llm", "name": "LLM Provider", "type": "external", "trustBoundary": "external", "x": 700, "y": 250 },
+        { "id": "db", "name": "Database", "type": "database", "trustBoundary": "internal", "x": 550, "y": 300 }
+      ],
+      "flows": [
+        { "from": "user", "to": "frontend", "label": "Input", "protocol": "HTTPS" },
+        { "from": "frontend", "to": "backend", "label": "API", "protocol": "HTTPS" },
+        { "from": "backend", "to": "prompt-mgr", "label": "Get Prompt", "protocol": "HTTP" },
+        { "from": "backend", "to": "llm", "label": "LLM Call", "protocol": "HTTPS" },
+        { "from": "backend", "to": "db", "label": "Store", "protocol": "SQL" }
+      ]
+    },
+    {
+      "id": "ai-agent",
+      "name": "AI Agent System",
+      "description": "Multi-agent AI system with tool access",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "orchestrator", "name": "Agent Orchestrator", "type": "service", "trustBoundary": "internal", "x": 300, "y": 300 },
+        { "id": "agent1", "name": "Research Agent", "type": "service", "trustBoundary": "internal", "x": 500, "y": 200 },
+        { "id": "agent2", "name": "Code Agent", "type": "service", "trustBoundary": "internal", "x": 500, "y": 300 },
+        { "id": "agent3", "name": "Tool Agent", "type": "service", "trustBoundary": "internal", "x": 500, "y": 400 },
+        { "id": "tools", "name": "External Tools", "type": "external", "trustBoundary": "external", "x": 700, "y": 300 }
+      ],
+      "flows": [
+        { "from": "user", "to": "orchestrator", "label": "Task", "protocol": "HTTPS" },
+        { "from": "orchestrator", "to": "agent1", "label": "Delegate", "protocol": "HTTP" },
+        { "from": "orchestrator", "to": "agent2", "label": "Delegate", "protocol": "HTTP" },
+        { "from": "orchestrator", "to": "agent3", "label": "Delegate", "protocol": "HTTP" },
+        { "from": "agent3", "to": "tools", "label": "Execute", "protocol": "HTTPS" }
+      ]
+    },
+    {
+      "id": "cloud-native",
+      "name": "Cloud-Native (AWS)",
+      "description": "AWS cloud architecture with managed services",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 250 },
+        { "id": "cloudfront", "name": "CloudFront", "type": "server", "trustBoundary": "dmz", "x": 250, "y": 250 },
+        { "id": "alb", "name": "ALB", "type": "server", "trustBoundary": "dmz", "x": 400, "y": 250 },
+        { "id": "ecs", "name": "ECS/Fargate", "type": "service", "trustBoundary": "internal", "x": 550, "y": 250 },
+        { "id": "rds", "name": "RDS", "type": "database", "trustBoundary": "internal", "x": 700, "y": 200 },
+        { "id": "s3", "name": "S3", "type": "database", "trustBoundary": "internal", "x": 700, "y": 300 }
+      ],
+      "flows": [
+        { "from": "user", "to": "cloudfront", "label": "HTTPS", "protocol": "HTTPS" },
+        { "from": "cloudfront", "to": "alb", "label": "Forward", "protocol": "HTTPS" },
+        { "from": "alb", "to": "ecs", "label": "Route", "protocol": "HTTP" },
+        { "from": "ecs", "to": "rds", "label": "Query", "protocol": "SQL" },
+        { "from": "ecs", "to": "s3", "label": "Store", "protocol": "S3" }
+      ]
+    },
+    {
+      "id": "cicd-pipeline",
+      "name": "CI/CD Pipeline",
+      "description": "Continuous integration and deployment pipeline",
+      "components": [
+        { "id": "dev", "name": "Developer", "type": "external", "trustBoundary": "external", "x": 100, "y": 250 },
+        { "id": "scm", "name": "Git/SCM", "type": "server", "trustBoundary": "dmz", "x": 250, "y": 250 },
+        { "id": "ci", "name": "CI Server", "type": "service", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "registry", "name": "Container Registry", "type": "database", "trustBoundary": "internal", "x": 550, "y": 200 },
+        { "id": "deploy", "name": "Deployment", "type": "service", "trustBoundary": "internal", "x": 550, "y": 300 },
+        { "id": "prod", "name": "Production", "type": "server", "trustBoundary": "dmz", "x": 700, "y": 250 }
+      ],
+      "flows": [
+        { "from": "dev", "to": "scm", "label": "Push", "protocol": "HTTPS" },
+        { "from": "scm", "to": "ci", "label": "Webhook", "protocol": "HTTPS" },
+        { "from": "ci", "to": "registry", "label": "Push Image", "protocol": "HTTPS" },
+        { "from": "ci", "to": "deploy", "label": "Trigger", "protocol": "HTTP" },
+        { "from": "deploy", "to": "prod", "label": "Deploy", "protocol": "SSH" }
+      ]
+    },
+    {
+      "id": "zero-trust",
+      "name": "Zero Trust Architecture",
+      "description": "Zero trust network architecture",
+      "components": [
+        { "id": "user", "name": "User", "type": "external", "trustBoundary": "external", "x": 100, "y": 300 },
+        { "id": "idp", "name": "Identity Provider", "type": "service", "trustBoundary": "dmz", "x": 250, "y": 200 },
+        { "id": "gateway", "name": "Zero Trust Gateway", "type": "server", "trustBoundary": "dmz", "x": 250, "y": 300 },
+        { "id": "policy", "name": "Policy Engine", "type": "service", "trustBoundary": "internal", "x": 400, "y": 250 },
+        { "id": "app1", "name": "Application 1", "type": "service", "trustBoundary": "internal", "x": 550, "y": 200 },
+        { "id": "app2", "name": "Application 2", "type": "service", "trustBoundary": "internal", "x": 550, "y": 300 },
+        { "id": "data", "name": "Data Store", "type": "database", "trustBoundary": "internal", "x": 700, "y": 250 }
+      ],
+      "flows": [
+        { "from": "user", "to": "idp", "label": "Authenticate", "protocol": "HTTPS" },
+        { "from": "user", "to": "gateway", "label": "Access", "protocol": "HTTPS" },
+        { "from": "gateway", "to": "policy", "label": "Authorize", "protocol": "HTTP" },
+        { "from": "gateway", "to": "app1", "label": "Proxy", "protocol": "HTTPS" },
+        { "from": "gateway", "to": "app2", "label": "Proxy", "protocol": "HTTPS" },
+        { "from": "app1", "to": "data", "label": "Query", "protocol": "SQL" },
+        { "from": "app2", "to": "data", "label": "Query", "protocol": "SQL" }
+      ]
+    }
+  ]
+}
