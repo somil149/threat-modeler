@@ -1,237 +1,167 @@
-# ThreatModeler Testing Guide
+# Testing Guide
 
-## Test Environment
-- **URL:** https://somil149.github.io/threat-modeler/
-- **Browser:** Chrome/Firefox/Edge (latest)
-- **Requirements:** Firebase Auth enabled (Google provider)
+## Test Structure
 
----
+```
+tests/
+├── unit/
+│   ├── scoring.test.js
+│   ├── storage.test.js
+│   └── graph.test.js
+├── integration/
+│   └── threat-generation.test.js
+└── e2e/
+    └── user-flows.test.js
+```
 
-## Phase 1: Quick Wins Testing
+## Running Tests
 
-### ✅ Test 1: Version History
-1. Create a new project
-2. Add 2-3 components
-3. Click version history icon (top right)
-4. Make changes to the project
-5. Save and check version history again
-6. Restore a previous version
-7. **Expected:** Project reverts to previous state
+```bash
+# Install dependencies
+npm install --save-dev jest @testing-library/react @testing-library/jest-dom
 
-### ✅ Test 2: Template Builder
-1. Create a custom architecture
-2. Add 5+ components and connect them
-3. Click "Save as Template" icon
-4. Go to Dashboard
-5. Create new project from your custom template
-6. **Expected:** New project has same architecture
+# Run all tests
+npm test
 
-### ✅ Test 3: Search & Filter
-1. Create multiple projects
-2. Use search bar to find specific project
-3. Search for component names
-4. Search for threat keywords
-5. **Expected:** Fuzzy search returns relevant results
+# Run with coverage
+npm test -- --coverage
 
-### ✅ Test 4: Threat Heatmap
-1. Open a project with threats
-2. Generate threats if none exist
-3. Toggle "Show Heatmap" button
-4. **Expected:** Components colored by risk level (red=high, yellow=medium, green=low)
+# Watch mode
+npm test -- --watch
+```
 
----
+## Example Tests
 
-## Phase 2: Core Features Testing
+### Unit Test (scoring.test.js)
+```javascript
+describe('Scoring', () => {
+  test('calculateRisk returns correct value', () => {
+    expect(Scoring.calculateRisk(5, 5)).toBe(25);
+    expect(Scoring.calculateRisk(1, 1)).toBe(1);
+  });
 
-### ✅ Test 5: Custom Architecture Builder
-1. Create new project → Select "Custom Architecture"
-2. Browse component library (7 categories)
-3. Click components to add to canvas
-4. Drag components to reposition
-5. Click "Connect" → Select source → Select target
-6. Click "Delete" → Click component to remove
-7. Click "Save & Finalize"
-8. **Expected:** Architecture saved, prompted to generate threats
+  test('getRiskLevel categorizes correctly', () => {
+    expect(Scoring.getRiskLevel(25)).toBe('CRITICAL');
+    expect(Scoring.getRiskLevel(15)).toBe('HIGH');
+    expect(Scoring.getRiskLevel(8)).toBe('MEDIUM');
+    expect(Scoring.getRiskLevel(3)).toBe('LOW');
+  });
+});
+```
 
-### ✅ Test 6: Attack Path Visualization
-1. Open project with threats
-2. Navigate to "Attack Paths" view
-3. Review attack chains
-4. Check risk scores
-5. **Expected:** Visual graph showing attack progression
+### Integration Test
+```javascript
+describe('Threat Generation', () => {
+  test('generates STRIDE threats for components', () => {
+    const component = { id: '1', type: 'API', name: 'User API' };
+    const threats = generateThreats([component]);
+    
+    expect(threats.length).toBeGreaterThan(0);
+    expect(threats[0]).toHaveProperty('stride');
+    expect(threats[0]).toHaveProperty('title');
+  });
+});
+```
 
-### ✅ Test 7: Compliance Mapping
-1. Navigate to "Compliance" view
-2. Review NIST CSF mappings
-3. Check ISO 27001 controls
-4. Review PCI-DSS requirements
-5. **Expected:** Threats mapped to compliance frameworks
+## CI/CD Integration
 
-### ✅ Test 8: Interactive Tutorial
-1. Click tutorial icon (top right)
-2. Follow 9-step walkthrough
-3. Complete each step
-4. **Expected:** Guided tour of all features
+### GitHub Actions (.github/workflows/test.yml)
+```yaml
+name: Tests
 
-### ✅ Test 9: Threat Status Tracking
-1. Open "Threats" view
-2. Select a threat
-3. Change status to "Mitigated"
-4. Add mitigation comment
-5. Save changes
-6. **Expected:** Threat marked as mitigated with comment
+on: [push, pull_request]
 
----
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm test -- --coverage
+```
 
-## Phase 3: Advanced Features Testing
+## Coverage Goals
 
-### ✅ Test 10: Image Upload → Auto Mapping
-1. Navigate to Architecture view
-2. Click "Upload Image" (if available)
-3. Upload architecture diagram
-4. **Expected:** Components auto-detected and mapped
+- **Unit Tests:** > 70%
+- **Integration Tests:** > 50%
+- **Critical Paths:** 100%
 
-### ✅ Test 11: Threat Intelligence
-1. Generate threats for a project
-2. Navigate to "Threat Intel" view
-3. Click "Fetch Latest CVEs"
-4. Wait 30-60 seconds
-5. Review CVE results
-6. Check severity filters
-7. Click CVE link to view on NVD
-8. **Expected:** Relevant HIGH/CRITICAL CVEs displayed
+## Test Best Practices
 
-### ✅ Test 12: AI-Powered Suggestions
-1. Navigate to "AI Suggestions" view
-2. Click "Generate Suggestions"
-3. Review architecture suggestions
-4. Check threat coverage suggestions
-5. Review data flow recommendations
-6. Filter by category
-7. **Expected:** Actionable security recommendations with priority levels
+1. **Arrange-Act-Assert** pattern
+2. **One assertion per test** (when possible)
+3. **Descriptive test names**
+4. **Mock external dependencies**
+5. **Test edge cases**
 
-### ✅ Test 13: 3D Architecture View
-1. Navigate to "3D View"
-2. Click "Show 3D View"
-3. Observe 3D rendering
-4. Check component shapes (cylinders=DB, spheres=users, etc.)
-5. View connections between components
-6. Watch auto-rotation
-7. **Expected:** Interactive 3D visualization
+## Manual Testing Checklist
 
----
+### Authentication
+- [ ] Login with Google
+- [ ] Login with GitHub
+- [ ] Logout
+- [ ] Session persistence
 
-## Authentication Testing
+### Project Management
+- [ ] Create new project
+- [ ] Edit project
+- [ ] Delete project
+- [ ] Export project
+- [ ] Import project
+- [ ] Share project link
 
-### ✅ Test 14: Firebase Auth
-1. Visit app (logged out)
-2. See login modal
-3. Click "Continue with Google"
-4. Authenticate with Google
-5. **Expected:** Logged in, see user avatar in topbar
+### Threat Modeling
+- [ ] Generate threats
+- [ ] Edit threat
+- [ ] Delete threat
+- [ ] Filter by STRIDE
+- [ ] Search threats
+- [ ] Filter by severity
 
-### ✅ Test 15: User Data Isolation
-1. Login as User A
-2. Create 2 projects
-3. Logout
-4. Login as User B
-5. **Expected:** Empty dashboard (User A's projects not visible)
-6. Create different projects
-7. Logout and login as User A
-8. **Expected:** Only User A's projects visible
+### Diagram Import
+- [ ] Upload diagram
+- [ ] AI detection
+- [ ] Manual component addition
+- [ ] Component connections
 
-### ✅ Test 16: Multi-Provider Auth
-1. Test Google login
-2. Test GitHub login (if enabled)
-3. Test Microsoft login (if enabled)
-4. **Expected:** All enabled providers work
-
----
-
-## Export & Integration Testing
-
-### ✅ Test 17: Export Functionality
-1. Navigate to "Export" view
-2. Export as PDF
-3. Export as CSV
-4. Export as JSON
-5. Export as Markdown
-6. **Expected:** All formats download successfully
-
-### ✅ Test 18: Data Persistence
-1. Create project with threats
-2. Close browser
-3. Reopen app
-4. **Expected:** Project data persists in localStorage
-
----
+### Export
+- [ ] Export to PDF
+- [ ] Export to JSON
+- [ ] Export to CSV
 
 ## Performance Testing
 
-### ✅ Test 19: Large Project
-1. Create project with 20+ components
-2. Add 50+ threats
-3. Generate threat intelligence
-4. View 3D visualization
-5. **Expected:** App remains responsive
+### Metrics to Track
+- Page load time: < 2s
+- Threat generation: < 1s for 10 components
+- Search response: < 100ms
+- Export generation: < 3s
 
-### ✅ Test 20: Offline Functionality
-1. Load app
-2. Disconnect internet
-3. Create/edit projects
-4. **Expected:** App works offline (except Threat Intel)
+## Security Testing
 
----
+### Checklist
+- [ ] XSS prevention
+- [ ] CSRF protection
+- [ ] Input validation
+- [ ] Secure storage (localStorage encryption)
+- [ ] API key protection
+- [ ] Content Security Policy
 
 ## Browser Compatibility
 
-### ✅ Test 21: Cross-Browser
-- [ ] Chrome (latest)
-- [ ] Firefox (latest)
-- [ ] Edge (latest)
-- [ ] Safari (latest)
-- **Expected:** Consistent behavior across browsers
+Test on:
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
 
----
+## Accessibility Testing
 
-## Known Issues & Limitations
-
-1. **Threat Intelligence:** May show some hardware CVEs due to generic keywords
-2. **3D View:** Performance may degrade with 50+ components
-3. **NVD API:** Rate limited to 5 requests per 30 seconds
-4. **Firebase Auth:** Requires internet connection
-5. **localStorage:** 5-10MB limit per domain
-
----
-
-## Bug Reporting
-
-If you find issues:
-1. Open browser console (F12)
-2. Note any error messages
-3. Document steps to reproduce
-4. Create GitHub issue with details
-
----
-
-## Test Results Summary
-
-| Phase | Feature | Status | Notes |
-|-------|---------|--------|-------|
-| 1 | Version History | ⏳ | Pending test |
-| 1 | Template Builder | ⏳ | Pending test |
-| 1 | Search & Filter | ⏳ | Pending test |
-| 1 | Threat Heatmap | ⏳ | Pending test |
-| 2 | Custom Builder | ⏳ | Pending test |
-| 2 | Attack Paths | ⏳ | Pending test |
-| 2 | Compliance | ⏳ | Pending test |
-| 2 | Tutorial | ⏳ | Pending test |
-| 2 | Threat Status | ⏳ | Pending test |
-| 3 | Image Upload | ⏳ | Pending test |
-| 3 | Threat Intel | ⏳ | Pending test |
-| 3 | AI Suggestions | ⏳ | Pending test |
-| 3 | 3D View | ⏳ | Pending test |
-| Auth | Firebase Auth | ⏳ | Pending test |
-| Auth | Data Isolation | ⏳ | Pending test |
-
-**Update this table as you complete tests!**
+- [ ] Keyboard navigation
+- [ ] Screen reader compatibility
+- [ ] Color contrast (WCAG AA)
+- [ ] Focus indicators
+- [ ] ARIA labels
