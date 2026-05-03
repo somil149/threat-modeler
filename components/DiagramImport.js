@@ -11,6 +11,43 @@ function DiagramImport({ onImport, onCancel }) {
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
   const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
   const [useAI, setUseAI] = useState(false);
+  
+  // Demo API key (obfuscated, but not truly secure - extractable from network)
+  // TODO: Replace with your actual OpenAI API key encoded in base64
+  const DEMO_API_KEY = 'REPLACE_WITH_YOUR_KEY'; // atob('base64_encoded_key_here');
+  
+  const checkRateLimit = () => {
+    const today = new Date().toDateString();
+    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
+    
+    if (usage.date !== today) {
+      // Reset daily limit
+      localStorage.setItem('demo_api_usage', JSON.stringify({ date: today, count: 0 }));
+      return true;
+    }
+    
+    if (usage.count >= 5) {
+      return false; // Limit: 5 uses per day
+    }
+    
+    return true;
+  };
+  
+  const incrementUsage = () => {
+    const today = new Date().toDateString();
+    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
+    localStorage.setItem('demo_api_usage', JSON.stringify({ 
+      date: today, 
+      count: (usage.count || 0) + 1 
+    }));
+  };
+  
+  const getRemainingUses = () => {
+    const today = new Date().toDateString();
+    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
+    if (usage.date !== today) return 5;
+    return Math.max(0, 5 - (usage.count || 0));
+  };
 
   const sampleDiagrams = [
     {
@@ -121,7 +158,7 @@ function DiagramImport({ onImport, onCancel }) {
       const blob = await response.blob();
       const file = new File([blob], 'diagram.png', { type: blob.type });
       
-      const components = await extractComponentsWithAI(file);
+      const components = await extractComponentsWithAI(file, apiKey);
       setDetectedComponents(components);
       setShowPreview(true);
     } catch (error) {
@@ -135,9 +172,39 @@ function DiagramImport({ onImport, onCancel }) {
     }
   };
 
-  const extractComponentsWithAI = async (file) => {
-    const apiKey = localStorage.getItem('openai_api_key');
-    if (!apiKey) {
+  const handleUseDemoKey = async () => {
+    if (!checkRateLimit()) {
+      alert('Demo limit reached (5 uses per day). Please use your own OpenAI API key for unlimited access.');
+      return;
+    }
+    
+    setShowApiKeyDialog(false);
+    setIsProcessing(true);
+
+    try {
+      // Re-fetch the file from uploadedImage URL
+      const response = await fetch(uploadedImage);
+      const blob = await response.blob();
+      const file = new File([blob], 'diagram.png', { type: blob.type });
+      
+      const components = await extractComponentsWithAI(file, DEMO_API_KEY);
+      incrementUsage();
+      setDetectedComponents(components);
+      setShowPreview(true);
+    } catch (error) {
+      console.error('AI detection failed:', error);
+      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
+      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
+      setDetectedComponents(components);
+      setShowPreview(true);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const extractComponentsWithAI = async (file, apiKeyToUse) => {
+    const key = apiKeyToUse || localStorage.getItem('openai_api_key');
+    if (!key) {
       throw new Error('OpenAI API key not found');
     }
 
@@ -153,7 +220,7 @@ function DiagramImport({ onImport, onCancel }) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${key}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -516,7 +583,7 @@ Return ONLY the JSON, no other text.`
       {/* API Key Dialog */}
       {showApiKeyDialog && (
         <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: '500px' }}>
+          <div className="modal" style={{ maxWidth: '550px' }}>
             <div className="modal-header">
               <h2>
                 <i className="fas fa-robot" style={{ color: 'var(--accent)', marginRight: '0.5rem' }}></i>
@@ -546,13 +613,32 @@ Return ONLY the JSON, no other text.`
                 </ul>
               </div>
 
+              {/* Demo Key Option */}
+              <div style={{ 
+                padding: '1rem', 
+                background: 'var(--success-bg)', 
+                borderRadius: '0.5rem', 
+                marginBottom: '1rem',
+                border: '1px solid var(--success)'
+              }}>
+                <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--success)' }}>
+                  <i className="fas fa-gift"></i> Try Demo (Free)
+                </div>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
+                  Use our demo API key to try AI detection without signing up.
+                </p>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
+                  Remaining uses today: <span style={{ color: 'var(--success)' }}>{getRemainingUses()}/5</span>
+                </p>
+              </div>
+
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                OpenAI API Key (optional):
+                Your OpenAI API Key (optional):
               </label>
               <input
                 type="password"
                 className="input"
-                placeholder="sk-..."
+                placeholder="sk-... (for unlimited access)"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 style={{ marginBottom: '0.5rem' }}
@@ -562,23 +648,32 @@ Return ONLY the JSON, no other text.`
                 Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style={{ color: 'var(--accent)' }}>platform.openai.com</a>
               </p>
 
-              <div className="flex gap-2">
+              <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={handleUseDemoKey}
+                  disabled={getRemainingUses() === 0}
+                  style={{ flex: 1 }}
+                >
+                  <i className="fas fa-gift"></i> Try Demo
+                </button>
                 <button 
                   className="btn btn-primary" 
                   onClick={handleUseAI}
                   disabled={!apiKey}
                   style={{ flex: 1 }}
                 >
-                  <i className="fas fa-robot"></i> Use AI Detection
-                </button>
-                <button 
-                  className="btn btn-secondary" 
-                  onClick={handleUseStarterTemplate}
-                  style={{ flex: 1 }}
-                >
-                  <i className="fas fa-layer-group"></i> Use Starter Template
+                  <i className="fas fa-key"></i> Use My Key
                 </button>
               </div>
+              
+              <button 
+                className="btn btn-secondary" 
+                onClick={handleUseStarterTemplate}
+                style={{ width: '100%' }}
+              >
+                <i className="fas fa-layer-group"></i> Skip AI - Use Starter Template
+              </button>
             </div>
           </div>
         </div>
