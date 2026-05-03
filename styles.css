@@ -149,6 +149,16 @@ body {
   gap: 1rem;
 }
 
+.topbar-left > button:first-child {
+  display: none; /* Hide on desktop, mobile-menu-toggle will show on mobile */
+}
+
+@media (max-width: 768px) {
+  .topbar-left > button:first-child {
+    display: none !important; /* Use mobile-menu-toggle instead */
+  }
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
@@ -673,7 +683,7 @@ button {
   position: fixed;
   top: 1rem;
   left: 1rem;
-  z-index: 101;
+  z-index: 1000;
   background: var(--accent);
   color: white;
   border: none;
@@ -681,11 +691,31 @@ button {
   padding: 0.75rem;
   cursor: pointer;
   box-shadow: var(--shadow-md);
+  width: 44px;
+  height: 44px;
 }
 
 @media (max-width: 768px) {
   .mobile-menu-toggle {
     display: flex;
+
+.mobile-backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-backdrop {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+}
+
     align-items: center;
     justify-content: center;
   }
