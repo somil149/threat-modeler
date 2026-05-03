@@ -8,7 +8,6 @@ function ThreatIntelligence({ project }) {
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState('');
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [selectedSeverity, setSelectedSeverity] = React.useState('all');
 
   // Fetch CVEs based on project threats
   const fetchThreatIntel = async () => {
@@ -126,11 +125,17 @@ function ThreatIntelligence({ project }) {
             
             if (publishedDate < fiveYearsAgo) return;
             
+            const severity = metrics?.cvssData?.baseSeverity || 'MEDIUM';
+            const score = metrics?.cvssData?.baseScore || 5.0;
+            
+            // Only show CRITICAL and HIGH severity CVEs
+            if (severity !== 'CRITICAL' && severity !== 'HIGH') return;
+            
             results.push({
               id: cve.id,
               description: cve.descriptions?.[0]?.value || 'No description',
-              severity: metrics?.cvssData?.baseSeverity || 'MEDIUM',
-              score: metrics?.cvssData?.baseScore || 5.0,
+              severity: severity,
+              score: score,
               published: cve.published,
               publishedDate: publishedDate,
               keyword: keyword,
@@ -159,9 +164,9 @@ function ThreatIntelligence({ project }) {
   // Filter CVEs
   const filteredCVEs = cveData.filter(cve => {
     const matchesSearch = cve.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cve.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSeverity = selectedSeverity === 'all' || cve.severity === selectedSeverity;
-    return matchesSearch && matchesSeverity;
+                         cve.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         cve.matchedThreat.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesSearch;
   });
 
   // Get severity color
@@ -189,7 +194,7 @@ function ThreatIntelligence({ project }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-        <i className="fas fa-info-circle"></i> Fetches CVEs matching your project's identified threats (STRIDE categories)
+        <i className="fas fa-exclamation-triangle"></i> Showing only <strong>CRITICAL</strong> and <strong>HIGH</strong> severity CVEs matching your threats
       </p>
 
       {cveData.length > 0 && (
@@ -199,19 +204,8 @@ function ThreatIntelligence({ project }) {
             placeholder="Search CVEs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ flex: 1, marginRight: '0.5rem' }}
+            style={{ flex: 1 }}
           />
-          <select
-            value={selectedSeverity}
-            onChange={(e) => setSelectedSeverity(e.target.value)}
-            style={{ minWidth: '150px' }}
-          >
-            <option value="all">All Severities</option>
-            <option value="CRITICAL">Critical</option>
-            <option value="HIGH">High</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="LOW">Low</option>
-          </select>
         </div>
       )}
 
