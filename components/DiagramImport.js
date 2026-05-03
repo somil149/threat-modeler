@@ -9,11 +9,13 @@ function DiagramImport({ onImport, onCancel }) {
   const [detectedComponents, setDetectedComponents] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem('openai_api_key') || '');
+  const [apiKey, setApiKey] = useState(localStorage.getItem('openrouter_api_key') || '');
   const [useAI, setUseAI] = useState(false);
   
-  // Demo API key (obfuscated, but not truly secure - extractable from network)
-  const DEMO_API_KEY = atob('c2stcHJvai1MRnJsRmhkQ01NQkY5TkJSekhFY1Mtc1FPY21SRHlQTlljdXByM1QyMjFkTk1xb1Q0cVc3eFcxTlFfbXBOTWZsX0tuV0pXNGwwMFQzQmxia0ZKeE1uSFZNSWhvbGZoa3JCdlp6c05sdS13V25CeEZGODJENEpMTFkyYlhHQmNhTmpqVU9QT01IOWlwS21lTy1SQXFZSE5PdDktVUE=');
+  // Demo API key for OpenRouter (free models available)
+  const DEMO_API_KEY = 'OPENROUTER_KEY_HERE'; // Replace with your OpenRouter key
+  const API_ENDPOINT = 'https://openrouter.ai/api/v1/chat/completions';
+  const MODEL_NAME = 'google/gemini-flash-1.5'; // Free model
   
   const checkRateLimit = () => {
     const today = new Date().toDateString();
@@ -142,12 +144,12 @@ function DiagramImport({ onImport, onCancel }) {
 
   const handleUseAI = async () => {
     if (!apiKey) {
-      alert('Please enter your OpenAI API key');
+      alert('Please enter your OpenRouter API key');
       return;
     }
     
     // Save API key
-    localStorage.setItem('openai_api_key', apiKey);
+    localStorage.setItem('openrouter_api_key', apiKey);
     setShowApiKeyDialog(false);
     setIsProcessing(true);
 
@@ -202,9 +204,9 @@ function DiagramImport({ onImport, onCancel }) {
   };
 
   const extractComponentsWithAI = async (file, apiKeyToUse) => {
-    const key = apiKeyToUse || localStorage.getItem('openai_api_key');
+    const key = apiKeyToUse || localStorage.getItem('openrouter_api_key');
     if (!key) {
-      throw new Error('OpenAI API key not found');
+      throw new Error('OpenRouter API key not found');
     }
 
     // Convert image to base64
@@ -214,15 +216,17 @@ function DiagramImport({ onImport, onCancel }) {
       reader.readAsDataURL(file);
     });
 
-    // Call OpenAI Vision API
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Call OpenRouter API (supports free models like Gemini Flash)
+    const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${key}`
+        'Authorization': `Bearer ${key}`,
+        'HTTP-Referer': window.location.origin,
+        'X-Title': 'ThreatModeler'
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: MODEL_NAME,
         messages: [
           {
             role: 'user',
@@ -632,19 +636,19 @@ Return ONLY the JSON, no other text.`
               </div>
 
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                Your OpenAI API Key (optional):
+                Your OpenRouter API Key (optional):
               </label>
               <input
                 type="password"
                 className="input"
-                placeholder="sk-... (for unlimited access)"
+                placeholder="sk-or-... (for unlimited access)"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 style={{ marginBottom: '0.5rem' }}
               />
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
                 Your API key is stored locally and never sent to our servers. 
-                Get one at <a href="https://platform.openai.com/api-keys" target="_blank" style={{ color: 'var(--accent)' }}>platform.openai.com</a>
+                Get a free key at <a href="https://openrouter.ai/keys" target="_blank" style={{ color: 'var(--accent)' }}>openrouter.ai/keys</a> (supports free models)
               </p>
 
               <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
