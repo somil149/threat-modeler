@@ -13,7 +13,7 @@ const Storage = {
 
   // Get current user ID for data isolation
   getCurrentUserId() {
-    const user = FirebaseAuth?.getUser();
+    const user = (typeof FirebaseAuth !== 'undefined') ? FirebaseAuth.getUser() : null;
     return user ? user.id : null;
   },
 
@@ -21,7 +21,8 @@ const Storage = {
   getUserKey(baseKey) {
     const userId = this.getCurrentUserId();
     if (!userId) {
-      throw new Error('User not authenticated');
+      // Return a temporary key for unauthenticated state
+      return `${baseKey}_temp`;
     }
     return `${baseKey}_user_${userId}`;
   },

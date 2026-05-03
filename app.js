@@ -17,29 +17,43 @@ function App() {
 
   // Check authentication on mount
   useEffect(() => {
-    // Listen for auth state changes
-    const handleAuthChange = (event) => {
-      const user = event.detail;
-      setUser(user);
-      if (user) {
+    // Wait for FirebaseAuth to initialize
+    const checkAuth = () => {
+      if (typeof FirebaseAuth === 'undefined') {
+        setTimeout(checkAuth, 100);
+        return;
+      }
+
+      // Listen for auth state changes
+      const handleAuthChange = (event) => {
+        const user = event.detail;
+        setUser(user);
+        if (user) {
+          setShowLogin(false);
+        } else {
+          setShowLogin(true);
+        }
+      };
+
+      window.addEventListener('authStateChanged', handleAuthChange);
+
+      // Check existing auth
+      if (FirebaseAuth.isAuthenticated()) {
+        const existingUser = FirebaseAuth.getUser();
+        setUser(existingUser);
         setShowLogin(false);
       } else {
         setShowLogin(true);
       }
     };
 
-    window.addEventListener('authStateChanged', handleAuthChange);
+    checkAuth();
 
-    // Check existing auth
-    if (FirebaseAuth.isAuthenticated()) {
-      const existingUser = FirebaseAuth.getUser();
-      setUser(existingUser);
-      setShowLogin(false);
-    } else {
-      setShowLogin(true);
-    }
-
-    return () => window.removeEventListener('authStateChanged', handleAuthChange);
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('authStateChanged', () => {});
+      }
+    };
   }, []);
 
   // Apply theme
