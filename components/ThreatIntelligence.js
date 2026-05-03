@@ -6,18 +6,23 @@
 function ThreatIntelligence({ project }) {
   const [cveData, setCveData] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [progress, setProgress] = React.useState('');
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedSeverity, setSelectedSeverity] = React.useState('all');
 
   // Fetch CVEs based on project components
   const fetchThreatIntel = async () => {
     setLoading(true);
+    setProgress('Analyzing project components...');
     try {
       const keywords = extractKeywords(project);
+      setProgress(`Found ${keywords.length} keywords. Fetching CVEs...`);
       const cves = await fetchCVEsFromNVD(keywords);
       setCveData(cves);
+      setProgress('');
     } catch (error) {
       console.error('Failed to fetch threat intelligence:', error);
+      setProgress('Error fetching CVEs');
     }
     setLoading(false);
   };
@@ -27,34 +32,75 @@ function ThreatIntelligence({ project }) {
     const keywords = new Set();
     project.components.forEach(comp => {
       const type = comp.type.toLowerCase();
-      if (type.includes('api')) keywords.add('api');
-      if (type.includes('database') || type.includes('sql')) keywords.add('database');
-      if (type.includes('web')) keywords.add('web server');
-      if (type.includes('container') || type.includes('docker')) keywords.add('container');
-      if (type.includes('kubernetes')) keywords.add('kubernetes');
-      if (type.includes('lambda')) keywords.add('serverless');
-      if (type.includes('llm') || type.includes('ai')) keywords.add('artificial intelligence');
+      const name = comp.name.toLowerCase();
+      
+      // Infrastructure
+      if (type.includes('api') || name.includes('api')) keywords.add('api gateway');
+      if (type.includes('load balancer')) keywords.add('load balancer');
+      if (type.includes('firewall')) keywords.add('firewall');
+      if (type.includes('waf')) keywords.add('web application firewall');
+      
+      // Compute
+      if (type.includes('web') || name.includes('web')) keywords.add('web application');
+      if (type.includes('container') || type.includes('docker')) keywords.add('docker');
+      if (type.includes('kubernetes') || type.includes('k8s')) keywords.add('kubernetes');
+      if (type.includes('lambda') || type.includes('serverless')) keywords.add('serverless');
+      
+      // Data
+      if (type.includes('database') || type.includes('sql') || type.includes('mysql') || type.includes('postgres')) keywords.add('database');
+      if (type.includes('nosql') || type.includes('mongodb')) keywords.add('nosql');
+      if (type.includes('redis') || type.includes('cache')) keywords.add('redis');
+      if (type.includes('s3') || type.includes('storage')) keywords.add('cloud storage');
+      
+      // AI/ML
+      if (type.includes('llm') || type.includes('gpt') || name.includes('llm')) keywords.add('large language model');
+      if (type.includes('ai') || type.includes('ml')) keywords.add('machine learning');
+      
+      // Security
+      if (type.includes('auth') || type.includes('oauth')) keywords.add('authentication');
+      if (type.includes('identity')) keywords.add('identity management');
     });
+    
+    // Add general keywords if specific ones not found
+    if (keywords.size === 0) {
+      keywords.add('web application');
+      keywords.add('api');
+      keywords.add('cloud');
+    }
+    
     return Array.from(keywords);
   };
 
   // Fetch CVEs from NVD API
   const fetchCVEsFromNVD = async (keywords) => {
     const results = [];
+    const seenCVEs = new Set();
     
-    for (const keyword of keywords.slice(0, 3)) { // Limit to 3 keywords to avoid rate limiting
+    // Fetch up to 5 keywords with 20 results each
+    for (let i = 0; i < Math.min(keywords.length, 5); i++) {
+      const keyword = keywords[i];
+      setProgress(`Fetching CVEs for "${keyword}" (${i + 1}/${Math.min(keywords.length, 5)})...`);
+      
       try {
         const response = await fetch(
-          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=10`
+          `https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=${encodeURIComponent(keyword)}&resultsPerPage=20`
         );
         
-        if (!response.ok) continue;
+        if (!response.ok) {
+          console.warn(`NVD API error for "${keyword}": ${response.status}`);
+          continue;
+        }
         
         const data = await response.json();
         
         if (data.vulnerabilities) {
           data.vulnerabilities.forEach(vuln => {
             const cve = vuln.cve;
+            
+            // Skip duplicates
+            if (seenCVEs.has(cve.id)) return;
+            seenCVEs.add(cve.id);
+            
             const metrics = cve.metrics?.cvssMetricV31?.[0] || cve.metrics?.cvssMetricV2?.[0];
             
             results.push({
@@ -67,6 +113,12 @@ function ThreatIntelligence({ project }) {
             });
           });
         }
+        
+        // Add delay to avoid rate limiting (NVD allows 5 requests per 30 seconds without API key)
+        if (i < Math.min(keywords.length, 5) - 1) {
+          await new Promise(resolve => setTimeout(resolve, 6000));
+        }
+        
       } catch (error) {
         console.error(`Failed to fetch CVEs for ${keyword}:`, error);
       }
@@ -140,7 +192,10 @@ function ThreatIntelligence({ project }) {
       {loading && (
         <div className="empty-state">
           <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: 'var(--accent)', marginBottom: '1rem' }}></i>
-          <p>Fetching threat intelligence from NVD...</p>
+          <p>{progress || 'Fetching threat intelligence from NVD...'}</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
+            This may take 30-60 seconds due to API rate limits
+          </p>
         </div>
       )}
 
