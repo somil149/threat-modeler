@@ -8,7 +8,7 @@ function App() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [currentProject, setCurrentProject] = useState(null);
   const [theme, setTheme] = useState(Storage.getTheme());
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [versions, setVersions] = useState([]);
   const [showTutorial, setShowTutorial] = useState(false);
