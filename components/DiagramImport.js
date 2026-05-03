@@ -79,22 +79,39 @@ function DiagramImport({ onImport, onCancel }) {
   };
 
   const extractComponentsFromImage = async (imageUrl, fileType) => {
-    // Simple extraction: create a blank architecture for user to fill
+    // Simple extraction: create a comprehensive starter architecture
     // In a real implementation, this would use OCR and shape detection
     
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        // Create a simple grid of placeholder components
+        // Create a comprehensive starter template with common components
         const components = [
-          { id: 'comp_1', name: 'Component 1', type: 'process', trustBoundary: 'external', x: 100, y: 100 },
-          { id: 'comp_2', name: 'Component 2', type: 'process', trustBoundary: 'internal', x: 300, y: 100 },
-          { id: 'comp_3', name: 'Component 3', type: 'datastore', trustBoundary: 'internal', x: 200, y: 300 }
+          // External layer
+          { id: 'comp_1', name: 'User/Client', type: 'external-entity', trustBoundary: 'external', x: 100, y: 100 },
+          
+          // DMZ layer
+          { id: 'comp_2', name: 'API Gateway', type: 'process', trustBoundary: 'dmz', x: 300, y: 100 },
+          { id: 'comp_3', name: 'Load Balancer', type: 'process', trustBoundary: 'dmz', x: 500, y: 100 },
+          
+          // Application layer
+          { id: 'comp_4', name: 'Web Server', type: 'process', trustBoundary: 'internal', x: 200, y: 250 },
+          { id: 'comp_5', name: 'Application Server', type: 'process', trustBoundary: 'internal', x: 400, y: 250 },
+          { id: 'comp_6', name: 'Auth Service', type: 'process', trustBoundary: 'internal', x: 600, y: 250 },
+          
+          // Data layer
+          { id: 'comp_7', name: 'Database', type: 'datastore', trustBoundary: 'internal', x: 300, y: 400 },
+          { id: 'comp_8', name: 'Cache', type: 'datastore', trustBoundary: 'internal', x: 500, y: 400 }
         ];
         
         const flows = [
-          { id: 'flow_1', from: 'comp_1', to: 'comp_2', protocol: 'HTTPS', data: 'Data flow 1' },
-          { id: 'flow_2', from: 'comp_2', to: 'comp_3', protocol: 'SQL', data: 'Data flow 2' }
+          { id: 'flow_1', from: 'comp_1', to: 'comp_2', protocol: 'HTTPS', data: 'User requests' },
+          { id: 'flow_2', from: 'comp_2', to: 'comp_3', protocol: 'HTTP', data: 'Load balanced traffic' },
+          { id: 'flow_3', from: 'comp_3', to: 'comp_4', protocol: 'HTTP', data: 'Web requests' },
+          { id: 'flow_4', from: 'comp_4', to: 'comp_5', protocol: 'REST', data: 'API calls' },
+          { id: 'flow_5', from: 'comp_5', to: 'comp_6', protocol: 'REST', data: 'Auth requests' },
+          { id: 'flow_6', from: 'comp_5', to: 'comp_7', protocol: 'SQL', data: 'Database queries' },
+          { id: 'flow_7', from: 'comp_5', to: 'comp_8', protocol: 'Redis', data: 'Cache operations' }
         ];
         
         resolve({ components, flows });
@@ -270,18 +287,24 @@ function DiagramImport({ onImport, onCancel }) {
           {uploadedImage && (
             <div style={{ 
               padding: '1rem', 
-              background: 'var(--warning-bg)', 
+              background: 'var(--info-bg)', 
               borderRadius: '0.5rem', 
               marginBottom: '1rem',
-              border: '1px solid var(--warning)'
+              border: '1px solid var(--info)'
             }}>
-              <div style={{ fontSize: '0.875rem', color: 'var(--warning)', fontWeight: 600, marginBottom: '0.5rem' }}>
-                <i className="fas fa-info-circle"></i> Manual Detection
+              <div style={{ fontSize: '0.875rem', color: 'var(--info)', fontWeight: 600, marginBottom: '0.5rem' }}>
+                <i className="fas fa-lightbulb"></i> Starter Template Created
               </div>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Basic components have been created. After import, you can rename them, add more components, 
-                and adjust connections in the architecture canvas.
+                Created 8 starter components with common architecture patterns. After import:
               </p>
+              <ul style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem', marginBottom: 0, paddingLeft: '1.5rem' }}>
+                <li>Rename components to match your diagram</li>
+                <li>Add more components from the library</li>
+                <li>Adjust positions by dragging</li>
+                <li>Use Connect mode to add/modify flows</li>
+                <li>Use Delete mode to remove unwanted components</li>
+              </ul>
             </div>
           )}
 
