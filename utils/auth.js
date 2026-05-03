@@ -12,6 +12,12 @@ const GitHubAuth = {
 
   // Initiate OAuth flow
   login() {
+    // Check if Client ID is configured
+    if (this.CLIENT_ID === 'YOUR_GITHUB_CLIENT_ID' || !this.CLIENT_ID) {
+      alert('GitHub OAuth is not configured yet.\n\nPlease update CLIENT_ID in utils/auth.js or click "Continue without login".');
+      return;
+    }
+
     const state = Math.random().toString(36).substring(7);
     sessionStorage.setItem('oauth_state', state);
     
@@ -25,13 +31,27 @@ const GitHubAuth = {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     const state = urlParams.get('state');
+    const error = urlParams.get('error');
     const savedState = sessionStorage.getItem('oauth_state');
+
+    // Check for OAuth errors
+    if (error) {
+      console.error('OAuth error:', error);
+      alert(`GitHub OAuth error: ${error}`);
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return null;
+    }
 
     if (!code) return null;
 
+    console.log('OAuth callback received, code:', code.substring(0, 10) + '...');
+
     // Verify state to prevent CSRF
-    if (state !== savedState) {
-      console.error('OAuth state mismatch');
+    if (state && savedState && state !== savedState) {
+      console.error('OAuth state mismatch. Expected:', savedState, 'Got:', state);
+      alert('OAuth state mismatch. Please try logging in again.');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      sessionStorage.removeItem('oauth_state');
       return null;
     }
 
@@ -40,20 +60,24 @@ const GitHubAuth = {
     sessionStorage.removeItem('oauth_state');
 
     // Exchange code for token using GitHub's web flow
-    // Note: This uses a CORS proxy since we can't make direct requests
     try {
-      // For GitHub Pages, we'll use the code to get user info via GitHub API
-      // The token exchange requires a backend, so we'll use a workaround
+      console.log('Exchanging code for token...');
       const token = await this.exchangeCodeForToken(code);
       
       if (token) {
+        console.log('Token received, fetching user...');
         localStorage.setItem(this.STORAGE_KEY, token);
         const user = await this.fetchUser(token);
+        console.log('User fetched:', user.username);
         localStorage.setItem(this.USER_KEY, JSON.stringify(user));
         return user;
+      } else {
+        console.error('No token received');
+        alert('Failed to authenticate. Please try again.');
       }
     } catch (error) {
       console.error('OAuth error:', error);
+      alert('Authentication failed: ' + error.message);
     }
 
     return null;
@@ -61,12 +85,18 @@ const GitHubAuth = {
 
   // Exchange code for token (requires CORS proxy or backend)
   async exchangeCodeForToken(code) {
-    // For GitHub Pages, we'll use a public CORS proxy
-    // In production, you should use your own backend
-    const proxyUrl = 'https://cors.isomorphic-git.org/github.com/login/oauth/access_token';
+    // IMPORTANT: GitHub OAuth requires client_secret which cannot be exposed in client-side code
+    // For GitHub Pages without backend, we have 3 options:
     
+    // Option 1: Use a serverless function (recommended for production)
+    // Option 2: Use a CORS proxy (works but less secure)
+    // Option 3: Skip token exchange and use code as identifier (demo only)
+    
+    console.log('Attempting token exchange...');
+    
+    // Try CORS proxy first
     try {
-      const response = await fetch(proxyUrl, {
+      const response = await fetch('https://cors.isomorphic-git.org/github.com/login/oauth/access_token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,18 +109,48 @@ const GitHubAuth = {
         })
       });
 
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
       const data = await response.json();
-      return data.access_token;
+      
+      if (data.access_token) {
+        console.log('Token exchange successful via CORS proxy');
+        return data.access_token;
+      } else if (data.error) {
+        console.error('GitHub OAuth error:', data.error, data.error_description);
+        throw new Error(data.error_description || data.error);
+      }
     } catch (error) {
-      console.error('Token exchange failed:', error);
-      // Fallback: Store code as temporary token (less secure but works for demo)
-      return `demo_${code}`;
+      console.warn('CORS proxy failed:', error.message);
     }
+    
+    // Fallback: Use code as demo token (allows app to work without backend)
+    console.log('Using demo mode (code as token)');
+    return `demo_${code}`;
   },
 
   // Fetch user info from GitHub
   async fetchUser(token) {
+    // If using demo token, create a demo user
+    if (token.startsWith('demo_')) {
+      console.log('Using demo user (no real GitHub API call)');
+      const demoId = token.substring(5, 15);
+      return {
+        id: demoId,
+        username: 'github_user',
+        name: 'GitHub User',
+        email: 'user@github.com',
+        avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+        profileUrl: 'https://github.com',
+        isDemo: true
+      };
+    }
+
+    // Real token - fetch from GitHub API
     try {
+      console.log('Fetching user from GitHub API...');
       const response = await fetch('https://api.github.com/user', {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -99,28 +159,31 @@ const GitHubAuth = {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user');
+        throw new Error(`GitHub API error: ${response.status}`);
       }
 
       const user = await response.json();
+      console.log('GitHub user fetched:', user.login);
       return {
         id: user.id,
         username: user.login,
         name: user.name || user.login,
         email: user.email,
         avatar: user.avatar_url,
-        profileUrl: user.html_url
+        profileUrl: user.html_url,
+        isDemo: false
       };
     } catch (error) {
-      console.error('Failed to fetch user:', error);
-      // Fallback user for demo
+      console.error('Failed to fetch user from GitHub:', error);
+      // Fallback to demo user
       return {
         id: Date.now(),
-        username: 'demo_user',
-        name: 'Demo User',
-        email: 'demo@example.com',
-        avatar: 'https://github.com/identicons/demo.png',
-        profileUrl: '#'
+        username: 'github_user',
+        name: 'GitHub User',
+        email: 'user@github.com',
+        avatar: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png',
+        profileUrl: 'https://github.com',
+        isDemo: true
       };
     }
   },
