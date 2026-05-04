@@ -82,19 +82,6 @@ const FirebaseAuth = {
     return this.formatUser(result.user);
   },
 
-  async loginWithEmailPassword(email, password) {
-    const result = await this.auth.signInWithEmailAndPassword(email, password);
-    return this.formatUser(result.user);
-  },
-
-  async registerWithEmail(email, password, displayName) {
-    const result = await this.auth.createUserWithEmailAndPassword(email, password);
-    if (displayName) {
-      await result.user.updateProfile({ displayName });
-    }
-    return this.formatUser(result.user);
-  },
-
   getUser() {
     if (this.currentUser) return this.currentUser;
     const stored = localStorage.getItem('firebase_user');
