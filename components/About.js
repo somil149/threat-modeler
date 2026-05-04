@@ -183,15 +183,19 @@ function About() {
             onError={e => { e.target.style.display = 'none'; }}
           />
           <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>somil149</div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
-              Security-focused developer building open-source tools for the security community.
-              ThreatModeler was created to make professional threat modeling accessible to every developer — not just security specialists.
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.15rem' }}>Somil Goyal</div>
+            <div style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Senior Security Architect</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem', lineHeight: 1.6 }}>
+              Aiming to solve real-world security problems and scale without investing too much on paid security toolings — strategically. ThreatModeler was built to make professional threat modeling accessible to every developer and security team.
             </div>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <a href="mailto:goyal.somil2011@gmail.com"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.85rem' }}>
+                <i className="fas fa-envelope"></i> goyal.somil2011@gmail.com
+              </a>
               <a href="https://github.com/somil149/threat-modeler" target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
-                <i className="fab fa-github"></i> GitHub Repository
+                <i className="fab fa-github"></i> GitHub
               </a>
               <a href="https://somil149.github.io/threat-modeler/" target="_blank" rel="noopener noreferrer"
                 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
