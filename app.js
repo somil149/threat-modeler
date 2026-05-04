@@ -54,7 +54,7 @@ function App() {
         setUser(existingUser);
         setShowLogin(false);
       } else {
-        if (currentView !== 'about') setShowLogin(true);
+        // not authenticated - modal shown on demand via handleNavClick
       }
     };
 
@@ -105,6 +105,7 @@ function App() {
   };
 
   const handleProjectSelect = (project) => {
+    if (!user) { setShowLogin(true); return; }
     setCurrentProject(project);
     Storage.setCurrentProject(project.id);
     setCurrentView('architecture');
@@ -114,6 +115,10 @@ function App() {
   };
 
   const handleNavClick = (view) => {
+    if (view !== 'about' && !user) {
+      setShowLogin(true);
+      return;
+    }
     setCurrentView(view);
     // Close sidebar on mobile
     if (window.innerWidth <= 768) setSidebarOpen(false);
