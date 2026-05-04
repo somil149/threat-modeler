@@ -56,6 +56,43 @@ function About() {
         </div>
       </div>
 
+      {/* Built By */}
+      <div className="card" style={{ marginBottom: '1.5rem' }}>
+        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <i className="fas fa-user-circle" style={{ color: 'var(--success)' }}></i> Built By
+        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+          <img
+            src="https://github.com/somil149.png"
+            alt="somil149"
+            style={{ width: '72px', height: '72px', borderRadius: '50%', border: '3px solid var(--accent)' }}
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.15rem' }}>Somil Goyal</div>
+            <div style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Senior Security Architect</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem', lineHeight: 1.6 }}>
+              Aiming to solve real-world security problems and scale without investing too much on paid security toolings — strategically. ThreatModeler was built to make professional threat modeling accessible to every developer and security team.
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <a href="mailto:goyal.somil2011@gmail.com"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.85rem' }}>
+                <i className="fas fa-envelope"></i> goyal.somil2011@gmail.com
+              </a>
+              <a href="https://github.com/somil149/threat-modeler" target="_blank" rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
+                <i className="fab fa-github"></i> GitHub
+              </a>
+              <a href="https://somil149.github.io/threat-modeler/" target="_blank" rel="noopener noreferrer"
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
+                <i className="fas fa-external-link-alt"></i> Live Demo
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
       {/* Problem */}
       <div className="card" style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -167,42 +204,6 @@ function About() {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Built By */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <i className="fas fa-user-circle" style={{ color: 'var(--success)' }}></i> Built By
-        </h2>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
-          <img
-            src="https://github.com/somil149.png"
-            alt="somil149"
-            style={{ width: '72px', height: '72px', borderRadius: '50%', border: '3px solid var(--accent)' }}
-            onError={e => { e.target.style.display = 'none'; }}
-          />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.15rem' }}>Somil Goyal</div>
-            <div style={{ color: 'var(--accent)', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Senior Security Architect</div>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.75rem', lineHeight: 1.6 }}>
-              Aiming to solve real-world security problems and scale without investing too much on paid security toolings — strategically. ThreatModeler was built to make professional threat modeling accessible to every developer and security team.
-            </div>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
-              <a href="mailto:goyal.somil2011@gmail.com"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.85rem' }}>
-                <i className="fas fa-envelope"></i> goyal.somil2011@gmail.com
-              </a>
-              <a href="https://github.com/somil149/threat-modeler" target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
-                <i className="fab fa-github"></i> GitHub
-              </a>
-              <a href="https://somil149.github.io/threat-modeler/" target="_blank" rel="noopener noreferrer"
-                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>
-                <i className="fas fa-external-link-alt"></i> Live Demo
-              </a>
-            </div>
-          </div>
         </div>
       </div>
 
