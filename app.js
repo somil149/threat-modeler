@@ -341,6 +341,14 @@ function App() {
 
         <div className="sidebar-nav">
           <button
+            className={`nav-item ${currentView === 'about' ? 'active' : ''}`}
+            onClick={() => handleNavClick('about')}
+          >
+            <i className="fas fa-info-circle"></i>
+            <span>About</span>
+          </button>
+
+          <button
             className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`}
             onClick={() => handleNavClick('dashboard')}
           >
@@ -423,13 +431,6 @@ function App() {
               </button>
             </>
           )}
-          <button
-            className={`nav-item ${currentView === 'about' ? 'active' : ''}`}
-            onClick={() => handleNavClick('about')}
-          >
-            <i className="fas fa-info-circle"></i>
-            <span>About</span>
-          </button>
         </div>
       </div>
 
