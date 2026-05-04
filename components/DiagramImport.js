@@ -8,45 +8,6 @@ function DiagramImport({ onImport, onCancel }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectedComponents, setDetectedComponents] = useState([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState(localStorage.getItem('gemini_api_key') || '');
-  const [useAI, setUseAI] = useState(false);
-  
-  // Cloudflare Worker endpoint (bypasses CORS)
-  const WORKER_ENDPOINT = 'https://threat-modeler.goyal-somil2011.workers.dev';
-  
-  const checkRateLimit = () => {
-    const today = new Date().toDateString();
-    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
-    
-    if (usage.date !== today) {
-      // Reset daily limit
-      localStorage.setItem('demo_api_usage', JSON.stringify({ date: today, count: 0 }));
-      return true;
-    }
-    
-    if (usage.count >= 5) {
-      return false; // Limit: 5 uses per day
-    }
-    
-    return true;
-  };
-  
-  const incrementUsage = () => {
-    const today = new Date().toDateString();
-    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
-    localStorage.setItem('demo_api_usage', JSON.stringify({ 
-      date: today, 
-      count: (usage.count || 0) + 1 
-    }));
-  };
-  
-  const getRemainingUses = () => {
-    const today = new Date().toDateString();
-    const usage = JSON.parse(localStorage.getItem('demo_api_usage') || '{}');
-    if (usage.date !== today) return 5;
-    return Math.max(0, 5 - (usage.count || 0));
-  };
 
   const sampleDiagrams = [
     {
@@ -72,13 +33,9 @@ function DiagramImport({ onImport, onCancel }) {
   const handleSampleSelect = async (sample) => {
     setSelectedSample(sample);
     setIsProcessing(true);
-    
     try {
-      // Fetch the SVG content
       const response = await fetch(sample.path);
       const svgText = await response.text();
-      
-      // Parse SVG and extract components
       const components = parseSVGDiagram(svgText, sample.id);
       setDetectedComponents(components);
       setShowPreview(true);
@@ -101,354 +58,133 @@ function DiagramImport({ onImport, onCancel }) {
 
     const imageUrl = URL.createObjectURL(file);
     setUploadedImage(imageUrl);
-    
-    // Show AI detection dialog
-    setShowApiKeyDialog(true);
-  };
-
-  const handleUseDemoKey = async () => {
-    if (!checkRateLimit()) {
-      alert('Demo limit reached (5 uses per day). Please try again tomorrow or use the starter template.');
-      return;
-    }
-    
-    setShowApiKeyDialog(false);
     setIsProcessing(true);
 
     try {
-      // Re-fetch the file from uploadedImage URL
-      const response = await fetch(uploadedImage);
-      const blob = await response.blob();
-      const file = new File([blob], 'diagram.png', { type: blob.type });
-      
-      const components = await extractComponentsWithAI(file);
-      incrementUsage();
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } catch (error) {
-      console.error('AI detection failed:', error);
-      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
-      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleUseStarterTemplate = async () => {
-    setShowApiKeyDialog(false);
-    setIsProcessing(true);
-    try {
-      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
+      const components = await extractComponentsFromImage(imageUrl);
       setDetectedComponents(components);
       setShowPreview(true);
     } catch (error) {
       console.error('Error:', error);
-      alert('Failed to create template.');
+      alert('Failed to create starter template.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handleUseAI = async () => {
-    if (!apiKey) {
-      alert('Please enter your Google Gemini API key');
-      return;
-    }
-    
-    // Save API key
-    localStorage.setItem('gemini_api_key', apiKey);
-    setShowApiKeyDialog(false);
-    setIsProcessing(true);
-
-    try {
-      // Re-fetch the file from uploadedImage URL
-      const response = await fetch(uploadedImage);
-      const blob = await response.blob();
-      const file = new File([blob], 'diagram.png', { type: blob.type });
-      
-      const components = await extractComponentsWithAI(file, apiKey);
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } catch (error) {
-      console.error('AI detection failed:', error);
-      alert('AI detection failed: ' + error.message + '\n\nFalling back to starter template.');
-      const components = await extractComponentsFromImage(uploadedImage, 'image/png');
-      setDetectedComponents(components);
-      setShowPreview(true);
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const extractComponentsWithAI = async (file) => {
-    // Convert image to base64
-    const base64 = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(file);
-    });
-
-    const imageData = base64.split(',')[1]; // Remove data:image/png;base64, prefix
-
-    const question = `Analyze this architecture/data flow diagram and extract all components and data flows. 
-
-Return a JSON object with this exact structure:
-{
-  "components": [
-    {
-      "name": "Component Name",
-      "type": "process|datastore|external-entity",
-      "trustBoundary": "external|dmz|internal",
-      "description": "Brief description"
-    }
-  ],
-  "flows": [
-    {
-      "from": "Source Component Name",
-      "to": "Target Component Name", 
-      "protocol": "HTTPS|HTTP|SQL|REST|etc",
-      "data": "What data flows"
-    }
-  ]
-}
-
-Guidelines:
-- Identify ALL components (boxes, circles, cylinders, clouds, etc.)
-- Determine component type: "process" for services/apps, "datastore" for databases/storage, "external-entity" for users/external systems
-- Set trustBoundary: "external" for internet/users, "dmz" for load balancers/gateways, "internal" for backend services
-- Extract ALL arrows/connections as flows
-- Be thorough and accurate
-
-Return ONLY the JSON, no other text.`;
-
-    // Call Cloudflare Worker
-    console.log('Calling Cloudflare Worker:', WORKER_ENDPOINT);
-    
-    const response = await fetch(WORKER_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        image: imageData,
-        question: question
-      })
-    });
-
-    console.log('Response received:', response);
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('OpenRouter API Error:', error);
-      console.error('Response status:', response.status);
-      console.error('Response headers:', response.headers);
-      throw new Error(error.error?.message || JSON.stringify(error) || 'API request failed');
-    }
-
-    const data = await response.json();
-    console.log('Worker API Response:', data);
-    
-    // Handle different response formats
-    let content = '';
-    if (Array.isArray(data)) {
-      content = data[0]?.generated_text || data[0]?.text || JSON.stringify(data[0]);
-    } else if (data.generated_text) {
-      content = data.generated_text;
-    } else if (data.error) {
-      throw new Error(data.error);
-    } else {
-      content = JSON.stringify(data);
-    }
-    
-    console.log('Extracted content:', content);
-    
-    // Parse JSON from response - handle markdown code blocks
-    let jsonMatch = content.match(/```json\s*(\{[\s\S]*?\})\s*```/);
-    if (!jsonMatch) {
-      jsonMatch = content.match(/\{[\s\S]*\}/);
-    }
-    
-    if (!jsonMatch) {
-      console.error('No JSON found in response:', content);
-      throw new Error('AI did not return valid JSON. Using starter template instead.');
-    }
-    
-    const jsonStr = jsonMatch[1] || jsonMatch[0];
-    console.log('Extracted JSON:', jsonStr);
-    
-    const parsed = JSON.parse(jsonStr);
-    
-    // Convert to our format with IDs and positions
-    const components = parsed.components.map((comp, idx) => ({
-      id: `comp_${idx + 1}`,
-      name: comp.name,
-      type: comp.type || 'process',
-      trustBoundary: comp.trustBoundary || 'internal',
-      x: 100 + (idx % 4) * 200,
-      y: 100 + Math.floor(idx / 4) * 150
-    }));
-
-    const flows = parsed.flows.map((flow, idx) => {
-      const fromComp = components.find(c => c.name === flow.from);
-      const toComp = components.find(c => c.name === flow.to);
-      return {
-        id: `flow_${idx + 1}`,
-        from: fromComp?.id || components[0]?.id,
-        to: toComp?.id || components[1]?.id,
-        protocol: flow.protocol || 'HTTPS',
-        data: flow.data || 'Data flow'
-      };
-    });
-
-    return { components, flows };
-  };
-
-  const extractComponentsFromImage = async (imageUrl, fileType) => {
-    // Simple extraction: create a comprehensive starter architecture
-    // In a real implementation, this would use OCR and shape detection
-    
+  const extractComponentsFromImage = (imageUrl) => {
     return new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
-        // Create a comprehensive starter template with common components
         const components = [
-          // External layer
-          { id: 'comp_1', name: 'User/Client', type: 'external-entity', trustBoundary: 'external', x: 100, y: 100 },
-          
-          // DMZ layer
-          { id: 'comp_2', name: 'API Gateway', type: 'process', trustBoundary: 'dmz', x: 300, y: 100 },
-          { id: 'comp_3', name: 'Load Balancer', type: 'process', trustBoundary: 'dmz', x: 500, y: 100 },
-          
-          // Application layer
-          { id: 'comp_4', name: 'Web Server', type: 'process', trustBoundary: 'internal', x: 200, y: 250 },
-          { id: 'comp_5', name: 'Application Server', type: 'process', trustBoundary: 'internal', x: 400, y: 250 },
-          { id: 'comp_6', name: 'Auth Service', type: 'process', trustBoundary: 'internal', x: 600, y: 250 },
-          
-          // Data layer
-          { id: 'comp_7', name: 'Database', type: 'datastore', trustBoundary: 'internal', x: 300, y: 400 },
-          { id: 'comp_8', name: 'Cache', type: 'datastore', trustBoundary: 'internal', x: 500, y: 400 }
+          { id: 'comp_1', name: 'User/Client',          type: 'external-entity', trustBoundary: 'external',  x: 100, y: 100 },
+          { id: 'comp_2', name: 'API Gateway',          type: 'process',         trustBoundary: 'dmz',       x: 300, y: 100 },
+          { id: 'comp_3', name: 'Load Balancer',        type: 'process',         trustBoundary: 'dmz',       x: 500, y: 100 },
+          { id: 'comp_4', name: 'Web Server',           type: 'process',         trustBoundary: 'internal',  x: 200, y: 250 },
+          { id: 'comp_5', name: 'Application Server',   type: 'process',         trustBoundary: 'internal',  x: 400, y: 250 },
+          { id: 'comp_6', name: 'Auth Service',         type: 'process',         trustBoundary: 'internal',  x: 600, y: 250 },
+          { id: 'comp_7', name: 'Database',             type: 'datastore',       trustBoundary: 'internal',  x: 300, y: 400 },
+          { id: 'comp_8', name: 'Cache',                type: 'datastore',       trustBoundary: 'internal',  x: 500, y: 400 },
         ];
-        
         const flows = [
           { id: 'flow_1', from: 'comp_1', to: 'comp_2', protocol: 'HTTPS', data: 'User requests' },
-          { id: 'flow_2', from: 'comp_2', to: 'comp_3', protocol: 'HTTP', data: 'Load balanced traffic' },
-          { id: 'flow_3', from: 'comp_3', to: 'comp_4', protocol: 'HTTP', data: 'Web requests' },
-          { id: 'flow_4', from: 'comp_4', to: 'comp_5', protocol: 'REST', data: 'API calls' },
-          { id: 'flow_5', from: 'comp_5', to: 'comp_6', protocol: 'REST', data: 'Auth requests' },
-          { id: 'flow_6', from: 'comp_5', to: 'comp_7', protocol: 'SQL', data: 'Database queries' },
-          { id: 'flow_7', from: 'comp_5', to: 'comp_8', protocol: 'Redis', data: 'Cache operations' }
+          { id: 'flow_2', from: 'comp_2', to: 'comp_3', protocol: 'HTTP',  data: 'Load balanced traffic' },
+          { id: 'flow_3', from: 'comp_3', to: 'comp_4', protocol: 'HTTP',  data: 'Web requests' },
+          { id: 'flow_4', from: 'comp_4', to: 'comp_5', protocol: 'REST',  data: 'API calls' },
+          { id: 'flow_5', from: 'comp_5', to: 'comp_6', protocol: 'REST',  data: 'Auth requests' },
+          { id: 'flow_6', from: 'comp_5', to: 'comp_7', protocol: 'SQL',   data: 'Database queries' },
+          { id: 'flow_7', from: 'comp_5', to: 'comp_8', protocol: 'Redis', data: 'Cache operations' },
         ];
-        
         resolve({ components, flows });
       };
-      img.onerror = () => {
-        resolve({ components: [], flows: [] });
-      };
+      img.onerror = () => resolve({ components: [], flows: [] });
       img.src = imageUrl;
     });
   };
 
   const parseSVGDiagram = (svgText, diagramType) => {
-    // Parse SVG and extract text elements to identify components
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-    const textElements = svgDoc.querySelectorAll('text');
-    
     const components = [];
     const flows = [];
     let componentId = 1;
     let flowId = 1;
 
-    // Predefined mappings for sample diagrams
     const diagramMappings = {
       'web-app': {
         components: [
-          { name: 'User', type: 'external-entity', trustBoundary: 'external', x: 100, y: 150 },
-          { name: 'Load Balancer', type: 'process', trustBoundary: 'dmz', x: 250, y: 150 },
-          { name: 'Web Server', type: 'process', trustBoundary: 'internal', x: 400, y: 150 },
-          { name: 'API Server', type: 'process', trustBoundary: 'internal', x: 400, y: 300 },
-          { name: 'Database', type: 'datastore', trustBoundary: 'internal', x: 400, y: 450 },
-          { name: 'Redis Cache', type: 'datastore', trustBoundary: 'internal', x: 550, y: 300 }
+          { name: 'User',         type: 'external-entity', trustBoundary: 'external',  x: 100, y: 150 },
+          { name: 'Load Balancer',type: 'process',         trustBoundary: 'dmz',       x: 250, y: 150 },
+          { name: 'Web Server',   type: 'process',         trustBoundary: 'internal',  x: 400, y: 150 },
+          { name: 'API Server',   type: 'process',         trustBoundary: 'internal',  x: 400, y: 300 },
+          { name: 'Database',     type: 'datastore',       trustBoundary: 'internal',  x: 400, y: 450 },
+          { name: 'Redis Cache',  type: 'datastore',       trustBoundary: 'internal',  x: 550, y: 300 },
         ],
         flows: [
-          { from: 'User', to: 'Load Balancer', protocol: 'HTTPS', data: 'User requests' },
-          { from: 'Load Balancer', to: 'Web Server', protocol: 'HTTP', data: 'HTTP requests' },
-          { from: 'Web Server', to: 'API Server', protocol: 'REST', data: 'API calls' },
-          { from: 'API Server', to: 'Database', protocol: 'SQL', data: 'Database queries' },
-          { from: 'API Server', to: 'Redis Cache', protocol: 'Redis', data: 'Cache operations' }
+          { from: 'User',         to: 'Load Balancer', protocol: 'HTTPS',  data: 'User requests' },
+          { from: 'Load Balancer',to: 'Web Server',    protocol: 'HTTP',   data: 'HTTP requests' },
+          { from: 'Web Server',   to: 'API Server',    protocol: 'REST',   data: 'API calls' },
+          { from: 'API Server',   to: 'Database',      protocol: 'SQL',    data: 'Database queries' },
+          { from: 'API Server',   to: 'Redis Cache',   protocol: 'Redis',  data: 'Cache operations' },
         ]
       },
       'microservices': {
         components: [
-          { name: 'API Gateway', type: 'process', trustBoundary: 'dmz', x: 400, y: 100 },
-          { name: 'User Service', type: 'process', trustBoundary: 'internal', x: 150, y: 250 },
-          { name: 'Order Service', type: 'process', trustBoundary: 'internal', x: 300, y: 250 },
-          { name: 'Payment Service', type: 'process', trustBoundary: 'internal', x: 450, y: 250 },
-          { name: 'Notification Service', type: 'process', trustBoundary: 'internal', x: 600, y: 250 },
-          { name: 'User DB', type: 'datastore', trustBoundary: 'internal', x: 150, y: 400 },
-          { name: 'Order DB', type: 'datastore', trustBoundary: 'internal', x: 300, y: 400 },
-          { name: 'Payment DB', type: 'datastore', trustBoundary: 'internal', x: 450, y: 400 },
-          { name: 'Message Queue', type: 'datastore', trustBoundary: 'internal', x: 600, y: 400 }
+          { name: 'API Gateway',          type: 'process',   trustBoundary: 'dmz',      x: 400, y: 100 },
+          { name: 'User Service',         type: 'process',   trustBoundary: 'internal', x: 150, y: 250 },
+          { name: 'Order Service',        type: 'process',   trustBoundary: 'internal', x: 300, y: 250 },
+          { name: 'Payment Service',      type: 'process',   trustBoundary: 'internal', x: 450, y: 250 },
+          { name: 'Notification Service', type: 'process',   trustBoundary: 'internal', x: 600, y: 250 },
+          { name: 'User DB',              type: 'datastore', trustBoundary: 'internal', x: 150, y: 400 },
+          { name: 'Order DB',             type: 'datastore', trustBoundary: 'internal', x: 300, y: 400 },
+          { name: 'Payment DB',           type: 'datastore', trustBoundary: 'internal', x: 450, y: 400 },
+          { name: 'Message Queue',        type: 'datastore', trustBoundary: 'internal', x: 600, y: 400 },
         ],
         flows: [
-          { from: 'API Gateway', to: 'User Service', protocol: 'REST', data: 'User requests' },
-          { from: 'API Gateway', to: 'Order Service', protocol: 'REST', data: 'Order requests' },
-          { from: 'API Gateway', to: 'Payment Service', protocol: 'REST', data: 'Payment requests' },
-          { from: 'API Gateway', to: 'Notification Service', protocol: 'REST', data: 'Notification requests' },
-          { from: 'User Service', to: 'User DB', protocol: 'SQL', data: 'User data' },
-          { from: 'Order Service', to: 'Order DB', protocol: 'SQL', data: 'Order data' },
-          { from: 'Payment Service', to: 'Payment DB', protocol: 'NoSQL', data: 'Payment data' },
-          { from: 'Notification Service', to: 'Message Queue', protocol: 'AMQP', data: 'Messages' }
+          { from: 'API Gateway', to: 'User Service',         protocol: 'REST',  data: 'User requests' },
+          { from: 'API Gateway', to: 'Order Service',        protocol: 'REST',  data: 'Order requests' },
+          { from: 'API Gateway', to: 'Payment Service',      protocol: 'REST',  data: 'Payment requests' },
+          { from: 'API Gateway', to: 'Notification Service', protocol: 'REST',  data: 'Notification requests' },
+          { from: 'User Service',    to: 'User DB',       protocol: 'SQL',   data: 'User data' },
+          { from: 'Order Service',   to: 'Order DB',      protocol: 'SQL',   data: 'Order data' },
+          { from: 'Payment Service', to: 'Payment DB',    protocol: 'NoSQL', data: 'Payment data' },
+          { from: 'Notification Service', to: 'Message Queue', protocol: 'AMQP', data: 'Messages' },
         ]
       },
       'cloud-aws': {
         components: [
-          { name: 'Internet', type: 'external-entity', trustBoundary: 'external', x: 400, y: 100 },
-          { name: 'CloudFront CDN', type: 'process', trustBoundary: 'dmz', x: 400, y: 200 },
-          { name: 'Load Balancer', type: 'process', trustBoundary: 'dmz', x: 400, y: 300 },
-          { name: 'EC2 Instance 1', type: 'process', trustBoundary: 'internal', x: 200, y: 400 },
-          { name: 'EC2 Instance 2', type: 'process', trustBoundary: 'internal', x: 350, y: 400 },
-          { name: 'Lambda', type: 'process', trustBoundary: 'internal', x: 500, y: 400 },
-          { name: 'RDS', type: 'datastore', trustBoundary: 'internal', x: 200, y: 550 },
-          { name: 'S3 Bucket', type: 'datastore', trustBoundary: 'internal', x: 500, y: 550 },
-          { name: 'ElastiCache', type: 'datastore', trustBoundary: 'internal', x: 650, y: 400 }
+          { name: 'Internet',       type: 'external-entity', trustBoundary: 'external',  x: 400, y: 100 },
+          { name: 'CloudFront CDN', type: 'process',         trustBoundary: 'dmz',       x: 400, y: 200 },
+          { name: 'Load Balancer',  type: 'process',         trustBoundary: 'dmz',       x: 400, y: 300 },
+          { name: 'EC2 Instance 1', type: 'process',         trustBoundary: 'internal',  x: 200, y: 400 },
+          { name: 'EC2 Instance 2', type: 'process',         trustBoundary: 'internal',  x: 350, y: 400 },
+          { name: 'Lambda',         type: 'process',         trustBoundary: 'internal',  x: 500, y: 400 },
+          { name: 'RDS',            type: 'datastore',       trustBoundary: 'internal',  x: 200, y: 550 },
+          { name: 'S3 Bucket',      type: 'datastore',       trustBoundary: 'internal',  x: 500, y: 550 },
+          { name: 'ElastiCache',    type: 'datastore',       trustBoundary: 'internal',  x: 650, y: 400 },
         ],
         flows: [
-          { from: 'Internet', to: 'CloudFront CDN', protocol: 'HTTPS', data: 'User requests' },
-          { from: 'CloudFront CDN', to: 'Load Balancer', protocol: 'HTTPS', data: 'HTTP requests' },
-          { from: 'Load Balancer', to: 'EC2 Instance 1', protocol: 'HTTP', data: 'Web traffic' },
-          { from: 'Load Balancer', to: 'EC2 Instance 2', protocol: 'HTTP', data: 'Web traffic' },
-          { from: 'Load Balancer', to: 'Lambda', protocol: 'HTTP', data: 'API calls' },
-          { from: 'EC2 Instance 1', to: 'RDS', protocol: 'SQL', data: 'Database queries' },
-          { from: 'EC2 Instance 2', to: 'RDS', protocol: 'SQL', data: 'Database queries' },
-          { from: 'Lambda', to: 'S3 Bucket', protocol: 'S3 API', data: 'Object storage' },
-          { from: 'EC2 Instance 2', to: 'ElastiCache', protocol: 'Redis', data: 'Cache operations' }
+          { from: 'Internet',       to: 'CloudFront CDN',  protocol: 'HTTPS',  data: 'User requests' },
+          { from: 'CloudFront CDN', to: 'Load Balancer',   protocol: 'HTTPS',  data: 'HTTP requests' },
+          { from: 'Load Balancer',  to: 'EC2 Instance 1',  protocol: 'HTTP',   data: 'Web traffic' },
+          { from: 'Load Balancer',  to: 'EC2 Instance 2',  protocol: 'HTTP',   data: 'Web traffic' },
+          { from: 'Load Balancer',  to: 'Lambda',          protocol: 'HTTP',   data: 'API calls' },
+          { from: 'EC2 Instance 1', to: 'RDS',             protocol: 'SQL',    data: 'Database queries' },
+          { from: 'EC2 Instance 2', to: 'RDS',             protocol: 'SQL',    data: 'Database queries' },
+          { from: 'Lambda',         to: 'S3 Bucket',       protocol: 'S3 API', data: 'Object storage' },
+          { from: 'EC2 Instance 2', to: 'ElastiCache',     protocol: 'Redis',  data: 'Cache operations' },
         ]
       }
     };
 
     const mapping = diagramMappings[diagramType];
     if (mapping) {
-      mapping.components.forEach((comp, idx) => {
-        components.push({
-          id: `comp_${componentId++}`,
-          ...comp
-        });
+      mapping.components.forEach(comp => {
+        components.push({ id: `comp_${componentId++}`, ...comp });
       });
-
-      mapping.flows.forEach((flow, idx) => {
+      mapping.flows.forEach(flow => {
         const fromComp = components.find(c => c.name === flow.from);
-        const toComp = components.find(c => c.name === flow.to);
+        const toComp   = components.find(c => c.name === flow.to);
         if (fromComp && toComp) {
-          flows.push({
-            id: `flow_${flowId++}`,
-            from: fromComp.id,
-            to: toComp.id,
-            protocol: flow.protocol,
-            data: flow.data
-          });
+          flows.push({ id: `flow_${flowId++}`, from: fromComp.id, to: toComp.id, protocol: flow.protocol, data: flow.data });
         }
       });
     }
@@ -457,11 +193,7 @@ Return ONLY the JSON, no other text.`;
   };
 
   const handleConfirmImport = () => {
-    console.log('handleConfirmImport called');
-    console.log('detectedComponents:', detectedComponents);
-    
     if (detectedComponents.components && detectedComponents.components.length > 0) {
-      console.log('Calling onImport with data');
       onImport({
         components: detectedComponents.components,
         flows: detectedComponents.flows || [],
@@ -469,7 +201,6 @@ Return ONLY the JSON, no other text.`;
         description: selectedSample ? selectedSample.description : 'Imported from custom diagram'
       });
     } else {
-      console.error('No components detected!');
       alert('No components detected. Please try another diagram.');
     }
   };
@@ -489,7 +220,6 @@ Return ONLY the JSON, no other text.`;
             {selectedSample ? selectedSample.description : 'Uploaded custom architecture diagram'}
           </p>
 
-          {/* Show uploaded image if available */}
           {uploadedImage && (
             <div style={{ marginBottom: '1rem', maxHeight: '300px', overflow: 'auto', background: 'white', padding: '1rem', borderRadius: '0.5rem' }}>
               <img src={uploadedImage} alt="Uploaded diagram" style={{ maxWidth: '100%', height: 'auto' }} />
@@ -512,25 +242,18 @@ Return ONLY the JSON, no other text.`;
           </div>
 
           {uploadedImage && (
-            <div style={{ 
-              padding: '1rem', 
-              background: 'var(--info-bg)', 
-              borderRadius: '0.5rem', 
-              marginBottom: '1rem',
-              border: '1px solid var(--info)'
-            }}>
+            <div style={{ padding: '1rem', background: 'var(--info-bg)', borderRadius: '0.5rem', marginBottom: '1rem', border: '1px solid var(--info)' }}>
               <div style={{ fontSize: '0.875rem', color: 'var(--info)', fontWeight: 600, marginBottom: '0.5rem' }}>
                 <i className="fas fa-lightbulb"></i> Starter Template Created
               </div>
               <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Created 8 starter components with common architecture patterns. After import:
+                A starter template with common architecture patterns has been created. After import you can:
               </p>
               <ul style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginTop: '0.5rem', marginBottom: 0, paddingLeft: '1.5rem' }}>
                 <li>Rename components to match your diagram</li>
                 <li>Add more components from the library</li>
                 <li>Adjust positions by dragging</li>
                 <li>Use Connect mode to add/modify flows</li>
-                <li>Use Delete mode to remove unwanted components</li>
               </ul>
             </div>
           )}
@@ -570,104 +293,6 @@ Return ONLY the JSON, no other text.`;
         Import Architecture Diagram
       </h2>
 
-      {/* API Key Dialog */}
-      {showApiKeyDialog && (
-        <div className="modal-overlay">
-          <div className="modal" style={{ maxWidth: '550px' }}>
-            <div className="modal-header">
-              <h2>
-                <i className="fas fa-robot" style={{ color: 'var(--accent)', marginRight: '0.5rem' }}></i>
-                AI-Powered Detection
-              </h2>
-            </div>
-            <div className="modal-body">
-              <p style={{ marginBottom: '1rem', color: 'var(--text-secondary)' }}>
-                Use AI to automatically detect components and flows from your diagram, or use a starter template.
-              </p>
-
-              <div style={{ 
-                padding: '1rem', 
-                background: 'var(--info-bg)', 
-                borderRadius: '0.5rem', 
-                marginBottom: '1rem',
-                border: '1px solid var(--info)'
-              }}>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                  <i className="fas fa-magic"></i> AI Detection Benefits:
-                </div>
-                <ul style={{ fontSize: '0.875rem', margin: 0, paddingLeft: '1.5rem' }}>
-                  <li>Automatically identifies all components</li>
-                  <li>Detects data flows and connections</li>
-                  <li>Determines component types and trust boundaries</li>
-                  <li>Saves manual mapping time</li>
-                </ul>
-              </div>
-
-              <div style={{ 
-                padding: '1rem', 
-                background: 'var(--success-bg)', 
-                borderRadius: '0.5rem', 
-                marginBottom: '1rem',
-                border: '1px solid var(--success)'
-              }}>
-                <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--success)' }}>
-                  <i className="fas fa-gift"></i> Try AI Detection (Free)
-                </div>
-                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-                  Use our AI to automatically detect all components and flows from your diagram. Powered by Google Gemini.
-                </p>
-                <p style={{ fontSize: '0.875rem', fontWeight: 600, margin: 0 }}>
-                  Remaining uses today: <span style={{ color: 'var(--success)' }}>{getRemainingUses()}/5</span>
-                </p>
-              </div>
-
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
-                Your Google Gemini API Key (optional):
-              </label>
-              <input
-                type="password"
-                className="input"
-                placeholder="AIza... (for unlimited access)"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                style={{ marginBottom: '0.5rem' }}
-              />
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                Your API key is stored locally and never sent to our servers. 
-                Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style={{ color: 'var(--accent)' }}>aistudio.google.com</a> (free tier: 1500 requests/day)
-              </p>
-
-              <div className="flex gap-2" style={{ marginBottom: '0.75rem' }}>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleUseDemoKey}
-                  disabled={getRemainingUses() === 0}
-                  style={{ flex: 1 }}
-                >
-                  <i className="fas fa-gift"></i> Try Demo
-                </button>
-                <button 
-                  className="btn btn-primary" 
-                  onClick={handleUseAI}
-                  disabled={!apiKey}
-                  style={{ flex: 1 }}
-                >
-                  <i className="fas fa-key"></i> Use My Token
-                </button>
-              </div>
-              
-              <button 
-                className="btn btn-secondary" 
-                onClick={handleUseStarterTemplate}
-                style={{ width: '100%' }}
-              >
-                <i className="fas fa-layer-group"></i> Skip AI - Use Starter Template
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="card mb-2">
         <h3 className="card-title">
           <i className="fas fa-images"></i> Sample Diagrams
@@ -689,31 +314,14 @@ Return ONLY the JSON, no other text.`;
                 transition: 'all 0.2s',
                 background: selectedSample?.id === sample.id ? 'var(--accent-bg)' : 'var(--bg-secondary)'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
+              onMouseEnter={e => e.currentTarget.style.borderColor = 'var(--accent)'}
+              onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
             >
-              <div style={{ 
-                height: '150px', 
-                background: 'white', 
-                borderRadius: '0.375rem', 
-                marginBottom: '0.75rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden'
-              }}>
-                <img 
-                  src={sample.path} 
-                  alt={sample.name}
-                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                />
+              <div style={{ height: '150px', background: 'white', borderRadius: '0.375rem', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                <img src={sample.path} alt={sample.name} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
               </div>
-              <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-                {sample.name}
-              </h4>
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-                {sample.description}
-              </p>
+              <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.5rem' }}>{sample.name}</h4>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>{sample.description}</p>
             </div>
           ))}
         </div>
@@ -724,23 +332,8 @@ Return ONLY the JSON, no other text.`;
           <i className="fas fa-upload"></i> Upload Custom Diagram
         </h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-          Upload your own architecture diagram (PNG, JPG, or SVG)
+          Upload your own architecture diagram (PNG, JPG, or SVG). A starter template will be created automatically.
         </p>
-        <div style={{ 
-          padding: '1rem', 
-          background: 'var(--success-bg)', 
-          borderRadius: '0.5rem', 
-          marginBottom: '1rem',
-          border: '1px solid var(--success)'
-        }}>
-          <div style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--success)' }}>
-            <i className="fas fa-sparkles"></i> AI-Powered Detection Available!
-          </div>
-          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: 0 }}>
-            Upload your diagram and choose between AI-powered automatic detection (requires OpenAI API key) 
-            or use a comprehensive starter template to build from.
-          </p>
-        </div>
         <input
           type="file"
           accept="image/*,.svg"
@@ -751,26 +344,11 @@ Return ONLY the JSON, no other text.`;
       </div>
 
       {isProcessing && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.7)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999
-        }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div className="card" style={{ maxWidth: '400px', textAlign: 'center' }}>
             <i className="fas fa-spinner fa-spin" style={{ fontSize: '3rem', color: 'var(--accent)', marginBottom: '1rem' }}></i>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-              Processing Diagram...
-            </h3>
-            <p style={{ color: 'var(--text-secondary)' }}>
-              Detecting components and data flows
-            </p>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.5rem' }}>Processing Diagram...</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>Creating starter template</p>
           </div>
         </div>
       )}
