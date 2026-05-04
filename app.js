@@ -216,6 +216,8 @@ function App() {
         return <Architecture3D project={currentProject} />;
       case 'export':
         return <ExportPanel project={currentProject} />;
+      case 'about':
+        return <About />;
       default:
         return <Dashboard 
         onProjectSelect={handleProjectSelect} 
@@ -416,6 +418,13 @@ function App() {
               </button>
             </>
           )}
+          <button
+            className={`nav-item ${currentView === 'about' ? 'active' : ''}`}
+            onClick={() => handleNavClick('about')}
+          >
+            <i className="fas fa-info-circle"></i>
+            <span>About</span>
+          </button>
         </div>
       </div>
 
