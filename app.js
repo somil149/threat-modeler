@@ -14,6 +14,9 @@ function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [user, setUser] = useState(null);
   const [showLogin, setShowLogin] = useState(false);
+  const [loginMode, setLoginMode] = useState('social'); // 'social'|'login'|'register'
+  const [emailForm, setEmailForm] = useState({ name: '', email: '', password: '' });
+  const [authError, setAuthError] = useState('');
 
   // Debug: Log sidebar state changes
   useEffect(() => {
@@ -42,7 +45,7 @@ function App() {
         if (user) {
           setShowLogin(false);
         } else {
-          setShowLogin(true);
+          if (currentView !== 'about') setShowLogin(true);
         }
       };
 
@@ -115,6 +118,7 @@ function App() {
 
   const handleNavClick = (view) => {
     setCurrentView(view);
+    if (view !== 'about' && !user) setShowLogin(true);
     // Close sidebar on mobile
     if (window.innerWidth <= 768) setSidebarOpen(false);
   };
@@ -153,7 +157,7 @@ function App() {
 
   const renderView = () => {
     // Allow dashboard and diagramimport without a project
-    if (!currentProject && currentView !== 'dashboard' && currentView !== 'diagramimport') {
+    if (!currentProject && currentView !== 'dashboard' && currentView !== 'diagramimport' && currentView !== 'about') {
       return <Dashboard 
         onProjectSelect={handleProjectSelect} 
         onImportDiagram={() => setCurrentView('diagramimport')}
@@ -253,72 +257,111 @@ function App() {
               </h2>
             </div>
             <div className="modal-body" style={{ textAlign: 'center' }}>
-              <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
-                Sign in to access your threat models
-              </p>
-              
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await FirebaseAuth.loginWithGoogle();
-                  } catch (error) {
-                    alert('Google login failed: ' + error.message);
-                  }
-                }}
-                style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#4285f4' }}
-              >
-                <i className="fab fa-google" style={{ marginRight: '0.5rem' }}></i>
-                Continue with Google
-              </button>
+              {loginMode === 'social' && (
+                <>
+                  <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
+                    Sign in to access your threat models
+                  </p>
 
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await FirebaseAuth.loginWithGitHub();
-                  } catch (error) {
-                    alert('GitHub login failed: ' + error.message);
-                  }
-                }}
-                style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#24292e' }}
-              >
-                <i className="fab fa-github" style={{ marginRight: '0.5rem' }}></i>
-                Continue with GitHub
-              </button>
+                  <button className="btn btn-primary" onClick={async () => { try { await FirebaseAuth.loginWithGoogle(); } catch(e) { alert('Google login failed: ' + e.message); } }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#4285f4' }}>
+                    <i className="fab fa-google" style={{ marginRight: '0.5rem' }}></i>Continue with Google
+                  </button>
 
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await FirebaseAuth.loginWithMicrosoft();
-                  } catch (error) {
-                    alert('Microsoft login failed: ' + error.message);
-                  }
-                }}
-                style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#00a4ef' }}
-              >
-                <i className="fab fa-microsoft" style={{ marginRight: '0.5rem' }}></i>
-                Continue with Microsoft
-              </button>
+                  <button className="btn btn-primary" onClick={async () => { try { await FirebaseAuth.loginWithGitHub(); } catch(e) { alert('GitHub login failed: ' + e.message); } }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#24292e' }}>
+                    <i className="fab fa-github" style={{ marginRight: '0.5rem' }}></i>Continue with GitHub
+                  </button>
 
-              <button
-                className="btn btn-primary"
-                onClick={async () => {
-                  try {
-                    await FirebaseAuth.loginWithTwitter();
-                  } catch (error) {
-                    alert('Twitter login failed: ' + error.message);
-                  }
-                }}
-                style={{ width: '100%', padding: '1rem', fontSize: '1rem', background: '#1da1f2' }}
-              >
-                <i className="fab fa-twitter" style={{ marginRight: '0.5rem' }}></i>
-                Continue with Twitter
-              </button>
+                  <button className="btn btn-primary" onClick={async () => { try { await FirebaseAuth.loginWithMicrosoft(); } catch(e) { alert('Microsoft login failed: ' + e.message); } }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#00a4ef' }}>
+                    <i className="fab fa-microsoft" style={{ marginRight: '0.5rem' }}></i>Continue with Microsoft
+                  </button>
+
+                  <button className="btn btn-primary" onClick={async () => { try { await FirebaseAuth.loginWithTwitter(); } catch(e) { alert('Twitter login failed: ' + e.message); } }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem', background: '#1da1f2' }}>
+                    <i className="fab fa-twitter" style={{ marginRight: '0.5rem' }}></i>Continue with Twitter
+                  </button>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1rem 0' }}>
+                    <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border)' }} />
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>or</span>
+                    <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border)' }} />
+                  </div>
+
+                  <button onClick={() => { setLoginMode('login'); setAuthError(''); }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer', marginBottom: '0.5rem' }}>
+                    <i className="fas fa-envelope" style={{ marginRight: '0.5rem' }}></i>Sign in with Email
+                  </button>
+                  <button onClick={() => { setLoginMode('register'); setAuthError(''); }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', background: 'var(--bg-tertiary)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer' }}>
+                    <i className="fas fa-user-plus" style={{ marginRight: '0.5rem' }}></i>Create Account
+                  </button>
+                </>
+              )}
+
+              {(loginMode === 'login' || loginMode === 'register') && (
+                <>
+                  <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
+                    {loginMode === 'register' ? 'Create a new account' : 'Sign in with your email'}
+                  </p>
+
+                  {authError && (
+                    <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)', borderRadius: '8px', padding: '0.75rem', marginBottom: '1rem', color: 'var(--danger)', fontSize: '0.85rem' }}>
+                      {authError}
+                    </div>
+                  )}
+
+                  {loginMode === 'register' && (
+                    <input type="text" placeholder="Display Name" value={emailForm.name}
+                      onChange={e => setEmailForm({...emailForm, name: e.target.value})}
+                      style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '1rem' }} />
+                  )}
+
+                  <input type="email" placeholder="Email address" value={emailForm.email}
+                    onChange={e => setEmailForm({...emailForm, email: e.target.value})}
+                    style={{ width: '100%', padding: '0.75rem', marginBottom: '0.75rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '1rem' }} />
+
+                  <input type="password" placeholder="Password" value={emailForm.password}
+                    onChange={e => setEmailForm({...emailForm, password: e.target.value})}
+                    onKeyDown={async e => {
+                      if (e.key === 'Enter') {
+                        try {
+                          setAuthError('');
+                          if (loginMode === 'register') {
+                            await FirebaseAuth.registerWithEmail(emailForm.email, emailForm.password, emailForm.name);
+                          } else {
+                            await FirebaseAuth.loginWithEmailPassword(emailForm.email, emailForm.password);
+                          }
+                        } catch(err) { setAuthError(err.message); }
+                      }
+                    }}
+                    style={{ width: '100%', padding: '0.75rem', marginBottom: '1rem', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '1rem' }} />
+
+                  <button className="btn btn-primary"
+                    onClick={async () => {
+                      try {
+                        setAuthError('');
+                        if (loginMode === 'register') {
+                          await FirebaseAuth.registerWithEmail(emailForm.email, emailForm.password, emailForm.name);
+                        } else {
+                          await FirebaseAuth.loginWithEmailPassword(emailForm.email, emailForm.password);
+                        }
+                      } catch(err) { setAuthError(err.message); }
+                    }}
+                    style={{ width: '100%', padding: '1rem', fontSize: '1rem', marginBottom: '0.75rem' }}>
+                    {loginMode === 'register' ? 'Create Account' : 'Sign In'}
+                  </button>
+
+                  <button onClick={() => { setLoginMode('social'); setAuthError(''); setEmailForm({ name: '', email: '', password: '' }); }}
+                    style={{ background: 'none', border: 'none', color: 'var(--accent)', cursor: 'pointer', fontSize: '0.9rem' }}>
+                    ← Back to all sign-in options
+                  </button>
+                </>
+              )}
 
               <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Your data is stored locally and encrypted. Login is required to access the app.
+                Your data is stored locally. <a href="#" onClick={e => { e.preventDefault(); setShowLogin(false); setCurrentView('about'); }} style={{ color: 'var(--accent)' }}>Learn more</a>
               </p>
             </div>
           </div>
