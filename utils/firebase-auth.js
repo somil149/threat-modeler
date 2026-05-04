@@ -48,13 +48,17 @@ const FirebaseAuth = {
   },
 
   formatUser(firebaseUser) {
+    const isGuest = firebaseUser.isAnonymous;
     return {
       id: firebaseUser.uid,
-      username: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'user',
-      name: firebaseUser.displayName || 'User',
+      username: isGuest ? 'guest' : (firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'user'),
+      name: isGuest ? 'Guest User' : (firebaseUser.displayName || 'User'),
       email: firebaseUser.email,
-      avatar: firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(firebaseUser.displayName || 'User')}&background=6366f1&color=fff`,
-      provider: firebaseUser.providerData[0]?.providerId || 'unknown'
+      avatar: isGuest
+        ? 'https://ui-avatars.com/api/?name=Guest&background=6b7280&color=fff'
+        : (firebaseUser.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(firebaseUser.displayName || 'User')}&background=6366f1&color=fff`),
+      provider: isGuest ? 'anonymous' : (firebaseUser.providerData[0]?.providerId || 'unknown'),
+      isGuest
     };
   },
 
@@ -79,6 +83,11 @@ const FirebaseAuth = {
   async loginWithTwitter() {
     const provider = new firebase.auth.TwitterAuthProvider();
     const result = await this.auth.signInWithPopup(provider);
+    return this.formatUser(result.user);
+  },
+
+  async loginAsGuest() {
+    const result = await this.auth.signInAnonymously();
     return this.formatUser(result.user);
   },
 

@@ -322,8 +322,25 @@ function App() {
                 Continue with Twitter
               </button>
 
-              <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Your data is stored locally and encrypted. Login is required to access the app.
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0 0.75rem' }}>
+                <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border)' }} />
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>or</span>
+                <hr style={{ flex: 1, border: 'none', borderTop: '1px solid var(--border)' }} />
+              </div>
+
+              <button
+                onClick={async () => {
+                  try { await FirebaseAuth.loginAsGuest(); }
+                  catch (error) { alert('Guest login failed: ' + error.message); }
+                }}
+                style={{ width: '100%', padding: '0.9rem', fontSize: '1rem', background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border)', borderRadius: '8px', cursor: 'pointer' }}
+              >
+                <i className="fas fa-user-secret" style={{ marginRight: '0.5rem' }}></i>
+                Continue as Guest
+              </button>
+
+              <p style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                Guest data is temporary and tied to this browser session.
               </p>
             </div>
           </div>
