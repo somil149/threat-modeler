@@ -54,7 +54,7 @@ function App() {
         setUser(existingUser);
         setShowLogin(false);
       } else {
-        setShowLogin(true);
+        if (currentView !== 'about') setShowLogin(true);
       }
     };
 
@@ -153,7 +153,7 @@ function App() {
 
   const renderView = () => {
     // Allow dashboard and diagramimport without a project
-    if (!currentProject && currentView !== 'dashboard' && currentView !== 'diagramimport') {
+    if (!currentProject && currentView !== 'dashboard' && currentView !== 'diagramimport' && currentView !== 'about') {
       return <Dashboard 
         onProjectSelect={handleProjectSelect} 
         onImportDiagram={() => setCurrentView('diagramimport')}
